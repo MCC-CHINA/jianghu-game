@@ -34,6 +34,9 @@ body{background:#141009;color:#e8dcc0;font-family:"Songti SC","STSong","SimSun",
 .rtx.rt3 .crown{filter:hue-rotate(-22deg) saturate(1.1)}
 .rtx.rt-moon b{background:linear-gradient(180deg,#8e2a5e 0%,#6e1c48 55%,#4e102f 100%);border-top-color:#ffc9e2;border-bottom-color:#a84a7e;color:#ffd6e8;text-shadow:1px 0 0 #3d0a24,-1px 0 0 #3d0a24,0 1px 0 #3d0a24,0 -1px 0 #3d0a24,1px 1px 0 #3d0a24,-1px -1px 0 #3d0a24,1px -1px 0 #3d0a24,-1px 1px 0 #3d0a24,0 0 10px rgba(255,160,205,.85)}
 .rtx.rt-moon .wing{filter:hue-rotate(295deg) saturate(1.35)}
+.rtx.rt0 b{background:linear-gradient(180deg,#2a2a33 0%,#141419 55%,#08080b 100%);border-top-color:#ffe9a8;border-bottom-color:#8a6d1f;color:#ffe9a8;text-shadow:1px 0 0 #000,-1px 0 0 #000,0 1px 0 #000,0 -1px 0 #000,1px 1px 0 #000,-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,0 0 14px rgba(255,215,100,1)}
+.rtx.rt0{filter:drop-shadow(0 0 8px rgba(255,215,100,.55))}
+.rtx.rt0 .wing{filter:saturate(1.7) brightness(1.2)}
 .rtx.rt-moon .crown{filter:hue-rotate(295deg) saturate(1.35)}
 #topbar .pname .title{color:#ffe9a8;font-size:13px;margin-right:4px;text-shadow:0 0 6px rgba(245,214,123,.6)}
 .bars{margin-top:6px;display:flex;flex-direction:column;gap:4px}
@@ -193,7 +196,9 @@ const TIERS=[
  {money:6,gold:60,bonus:""},
  {money:30,gold:330,bonus:"多送10%"},
  {money:98,gold:1080,bonus:"多送15%"},
- {money:198,gold:2280,bonus:"多送20%"}
+ {money:198,gold:2280,bonus:"多送20%"},
+ {money:648,gold:7800,bonus:"多送30%"},
+ {money:1980,gold:24800,bonus:"多送40%"}
 ];
 const RANKS=[{name:"武林神话·叶孤鸿",zl:99999},{name:"剑圣·西门飘雪",zl:52000},{name:"魔教教主·任逍遥",zl:38000},{name:"丐帮帮主·洪七",zl:26000},{name:"武当掌门·张真人",zl:18000},{name:"峨眉掌门·灭绝师太",zl:12000},{name:"少林方丈·玄慈",zl:9000},{name:"黑风寨主·黑风虎",zl:5000},{name:"采花大盗·田伯光",zl:2800},{name:"江南大侠·江别鹤",zl:1500}];
 const RANK_PAY=[{name:"神豪·王多鱼",pay:99999},{name:"江南首富·沈万三",pay:52000},{name:"西域土豪·金轮法王",pay:26000},{name:"盐帮帮主·方中信",pay:12000},{name:"总镖头·铁中堂",pay:6000},{name:"富商·陶朱公",pay:2600},{name:"钱庄掌柜·金算盘",pay:1200},{name:"小地主·黄世仁",pay:500},{name:"暴发户·苟富贵",pay:150}];
@@ -295,13 +300,15 @@ function startWBattle(){
 }
 const GFNAME={atk:"攻击",def:"防御",hp:"气血",mp:"内力",spd:"速度",luck:"幸运"};
 /* ============ VIP系统 ============ */
-const VIP_NEED=[0,6,30,98,198,498,998]; // 索引即VIP等级：升到该级所需累计充值
+const VIP_NEED=[0,6,30,98,198,498,998,1998,2998,4998,7998,12998,19998]; // 索引即VIP等级：升到该级所需累计充值
 function vipTotal(){return S.orders.reduce((a,o)=>a+o.money,0);}
 function vipLevel(){const t=vipTotal();let v=0;for(let i=1;i<VIP_NEED.length;i++)if(t>=VIP_NEED[i])v=i;return v;}
 function vipGift(){const v=vipLevel();return{coins:v*300,stam:10+v*5,gold:v*8};}
 const VIP_TITLES=[null, // 索引=VIP等级：称号名+属性+爆率
  {name:"初露锋芒",atk:8,hp:80,drop:5},{name:"江湖新秀",atk:16,hp:160,drop:8},{name:"一方豪杰",atk:28,hp:280,drop:12},
- {name:"武林名宿",atk:45,hp:450,drop:16},{name:"绝世高手",atk:70,hp:700,drop:20},{name:"武林神话",atk:110,hp:1100,drop:30}];
+ {name:"武林名宿",atk:45,hp:450,drop:16},{name:"绝世高手",atk:70,hp:700,drop:20},{name:"武林神话",atk:110,hp:1100,drop:30},
+ {name:"独步天下",atk:160,hp:1600,drop:35},{name:"盖世无双",atk:230,hp:2300,drop:40},{name:"君临天下",atk:320,hp:3200,drop:45},
+ {name:"天人合一",atk:450,hp:4500,drop:50},{name:"破碎虚空",atk:620,hp:6200,drop:60},{name:"武道至尊",atk:850,hp:8500,drop:70}];
 function vipDrop(){const t=VIP_TITLES[S.title||0];return t?(t.drop||0):0;} // 当前佩戴VIP称号的爆率加成%
 </script>
 <script>
@@ -789,7 +796,7 @@ function rPay(){
  const v=vipLevel(),total=vipTotal(),next=v<VIP_NEED.length-1?VIP_NEED[v+1]:null;
  const today=nowStr().slice(0,10),claimed=S.vipClaim===today,g=vipGift();
  const T=VIP_TITLES[S.title||0];
- const vtCls=(S.title||0)>=5?"rt1":((S.title||0)>=3?"rt2":"rt3");
+ const vtCls=(S.title||0)>=9?"rt0":((S.title||0)>=5?"rt1":((S.title||0)>=3?"rt2":"rt3"));
  let titleBtns="";
  for(let i=1;i<=v;i++){const tt=VIP_TITLES[i];titleBtns+=`<button class="btn small${(S.title||0)===i?" primary":""}" style="flex:1;margin:2px;white-space:nowrap" data-title="${i}">「${tt.name}」</button>`;}
  if(!titleBtns)titleBtns=`<span class="dim">充值到 VIP1 解锁称号</span>`;
@@ -963,7 +970,7 @@ function rMore(){
  · 去「江湖」挑战敌人，升级变强<br>· 怪物掉装备，去「背包」穿戴、铁匠铺强化<br>
  · 野怪打到30%血可捕捉为宠物，宠物会帮你打架<br>
  · 🥋技能全是斗破斗技：八极崩、焰分噬浪尺、佛怒火莲、三千雷动、帝印诀等，去「门派」学习<br>
- · 🔥异火极难掉落：世界BOSS有极低概率掉落异火；佩戴👑VIP称号提升稀有爆率（VIP6+30%），野外装备掉率也受加成<br>
+ · 🔥异火极难掉落：世界BOSS有极低概率掉落异火；佩戴👑VIP称号提升稀有爆率（VIP12+70%），野外装备掉率也受加成<br>
  · 体力不够就打坐，或去商城买体力丹<br>
  · 「充值」是模拟的，不花真钱，随便点！首充自动赠小红剑（限时3天），另有🎁首充礼包可领（288元宝+2万铜币+体力+4阶灵兽蛋）；累计充值提升VIP等级，加攻击气血、每日领礼包<br>
  · 宠物可捕捉斗罗魂兽：柔骨兔·小舞、蓝银皇·阿银、鬼虎、人面魔蛛、泰坦巨猿·二明、暗魔邪神虎、天青牛蟒·大明、冰碧帝皇蝎<br>
