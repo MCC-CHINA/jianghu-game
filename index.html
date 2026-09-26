@@ -461,14 +461,14 @@ function renderTop(){
  </div>
  <div class="wallet"><span>🪙铜币 <b>${p.coins}</b></span><span>💰元宝 <b>${p.gold}</b></span><span>⚡体力 <b>${p.stamina}/${p.maxStamina}</b></span><span>🍀幸运 <b>${p.luck||0}</b></span><span>⚔️战力 <b>${zhanli()}</b></span></div>`;
 }
-const TABS=[["home","🏠<br>江湖"],["bag","🎒<br>背包"],["pet","🦊<br>宠物"],["sect","🥋<br>门派"],["gongfa","📖<br>功法"],["shop","🏪<br>商店"],["gold","💎<br>商城"],["pay","💰<br>充值"],["rank","🏆<br>排行"],["arena","⚔️<br>竞技"],["event","🎉<br>活动"],["more","⚙️<br>更多"]];
+const TABS=[["home","🏠<br>江湖"],["bag","🎒<br>背包"],["pet","🦊<br>宠物"],["wing","🪽<br>翅膀"],["partner","🤝<br>伙伴"],["sect","🥋<br>门派"],["gongfa","📖<br>功法"],["shop","🏪<br>商店"],["gold","💎<br>商城"],["pay","💰<br>充值"],["rank","🏆<br>排行"],["arena","⚔️<br>竞技"],["event","🎉<br>活动"],["more","⚙️<br>更多"]];
 function renderTabs(){
  const t=$("tabbar");t.style.display="flex";
  t.innerHTML=TABS.map(([k,n])=>`<button class="${TAB===k?'on':''}" data-t="${k}">${n}</button>`).join("");
  t.querySelectorAll("button").forEach(b=>b.onclick=()=>{TAB=b.dataset.t;B=null;render();});
 }
 function render(){if(S&&S.player&&sweepExpired())setTimeout(()=>toast("⏳ 小红剑已到期，已自动卸下"),50);renderTop();renderTabs();
- ({home:rHome,bag:rBag,pet:rPet,sect:rSect,gongfa:rGongfa,shop:rShop,gold:rGold,pay:rPay,rank:rRank,arena:rArena,event:rEvent,more:rMore}[TAB])();}
+ ({home:rHome,bag:rBag,pet:rPet,sect:rSect,gongfa:rGongfa,shop:rShop,gold:rGold,pay:rPay,rank:rRank,arena:rArena,wing:rWing,partner:rPartner,event:rEvent,more:rMore}[TAB])();}
 /* ============ 创建角色 ============ */
 let selSect="shaolin";
 function rCreate(){
@@ -595,7 +595,7 @@ if(B.wb){ // 世界BOSS：掉落功法（神级以下）
  }
  // 世界BOSS掉落灵羽（翅膀升阶材料）
  const fn=2+Math.floor(Math.random()*4);p.feather=(p.feather||0)+fn;
- log(`<span class="sys">🪶 世界BOSS掉落灵羽×${fn}！可在「宠物」页升级翅膀</span>`);
+ log(`<span class="sys">🪶 世界BOSS掉落灵羽×${fn}！可在「翅膀」页升级翅膀</span>`);
 }else if(B.arena){ // 竞技场：获胜提升排名
  const R=B.oppRank,A=S.arena;
  if(R<A.rank){
@@ -734,43 +734,16 @@ S.player.coins-=cost;it.enh++;calcStats();save();closeModal();render();toast("�
 };
 }
 /* ============ 宠物 ============ */
-function rPet(){
+function rWing(){
 const m=$("main"),p=S.player;
-// ---- 翅膀 ----
 const wt=(S.wing&&S.wing.tier)||0,wc=wingCost(wt);
 const canUp=wt<WING_MAX&&(p.feather||0)>=wc.feather&&p.coins>=wc.coins;
-let wh=`<div class="card"><h3>🪽 我的翅膀</h3>`;
-if(!wt)wh+=`<p class="dim">尚未激活翅膀。集齐 <b class="gold">🪶灵羽×${wc.feather}</b> + 铜币${wc.coins} 即可激活「${WING_NAMES[1]}」！<br>灵羽来源：🌍世界BOSS掉落、💎商城购买、👑每日VIP礼包。</p>`;
-else wh+=`<p>当前：<b class="gold">🪽${WING_NAMES[wt]}（${wt}阶）</b> <span class="dim">攻击+${12*wt} 气血+${120*wt} 速度+${3*wt}</span></p>`;
-if(wt<WING_MAX)wh+=`<div class="tier"><div><div class="gold">${wt?"升至"+(wt+1)+"阶·"+WING_NAMES[wt+1]:"激活翅膀"}</div><div class="m">消耗 🪶灵羽×${wc.feather}（拥有${p.feather||0}）· 铜币${wc.coins}（拥有${p.coins}）</div></div>
+let h=`<div class="card"><h3>🪽 我的翅膀</h3>`;
+if(!wt)h+=`<p class="dim">尚未激活翅膀。集齐 <b class="gold">🪶灵羽×${wc.feather}</b> + 铜币${wc.coins} 即可激活「${WING_NAMES[1]}」！<br>灵羽来源：🌍世界BOSS掉落、💎商城购买、👑每日VIP礼包。</p>`;
+else h+=`<p>当前：<b class="gold">🪽${WING_NAMES[wt]}（${wt}阶）</b> <span class="dim">攻击+${12*wt} 气血+${120*wt} 速度+${3*wt}</span></p>`;
+if(wt<WING_MAX)h+=`<div class="tier"><div><div class="gold">${wt?"升至"+(wt+1)+"阶·"+WING_NAMES[wt+1]:"激活翅膀"}</div><div class="m">消耗 🪶灵羽×${wc.feather}（拥有${p.feather||0}）· 铜币${wc.coins}（拥有${p.coins}）</div></div>
 <button class="btn small primary" style="width:auto;margin:0" id="wingUp"${canUp?"":" disabled"}>${wt?"升阶":"激活"}</button></div>`;
-else wh+=`<p class="dim">已达最高 ${WING_MAX} 阶「${WING_NAMES[WING_MAX]}」，翱翔九天！</p>`;
-wh+=`</div>`;
-// ---- 伙伴 ----
-let ph=`<div class="card"><h3>🤝 我的伙伴</h3><p class="dim">伙伴可穿戴武器/护甲/靴子/饰品。出战伙伴将其30%属性加给你，战斗胜利出战伙伴获得修为升级。</p>
-<div class="rowbtns"><button class="btn small" id="recC">📜 广发英雄帖<br><span class="dim">5000铜币</span></button><button class="btn small" id="recG">💰 千金募名将<br><span class="dim">88元宝</span></button></div>`;
-if(!(S.partners||[]).length)ph+=`<p class="dim">还没有伙伴，去招募一位与你并肩闯荡吧！</p>`;
-(S.partners||[]).forEach((pt,i)=>{
- const st=partnerStats(pt);
- ph+=`<div class="tier"><div><div class="mn">${pt.name} <span style="color:${PARTNER_QC[pt.quality]}">${PARTNER_Q[pt.quality]}</span> <span class="dim">Lv.${pt.level}</span>${i===S.activePartner?' <span class="gold">出战中</span>':""}</div>
- <div class="md">攻击${st.atk} 防御${st.def} 气血${st.hp} 速度${st.spd}${st.luck?` 幸运${st.luck}`:""} · 经验${pt.exp||0}/${40*pt.level}</div>
- <div class="md">`;
- for(const slot of["weapon","armor","boots","charm"]){
-  const it=pt.equip[slot];
-  ph+=`${SLOTNAME[slot]}:${it?ITEMS[it.iid].name+(it.enh?`+${it.enh}`:""):"空"}${it?`<button class="btn small" style="padding:2px 6px;font-size:11px;margin:2px" data-pun="${i}_${slot}">卸下</button>`:`<button class="btn small" style="padding:2px 6px;font-size:11px;margin:2px" data-peq="${i}_${slot}">穿戴</button>`} `;
- }
- ph+=`</div></div>${i===S.activePartner?"":`<button class="btn small" style="width:auto;margin:0" data-pfight="${i}">出战</button>`}</div>`;
-});
-ph+=`</div>`;
-let h=wh+ph+`<div class="card"><h3>🦊 我的宠物</h3><p class="dim">宠物分黄/玄/地/天/神五级，品级越高助战越强。野外把怪物打到30%血以下可捕捉；神级宠物只能通过充值豪礼或限时活动获得。</p>`;
-if(!S.pets.length)h+=`<p class="dim">还没有宠物，去青竹林捕捉小灵猴吧！</p>`;
-S.pets.forEach((pet,i)=>{
-const b=PETS[pet.pid];
-const atk=Math.floor(b.atk*(1+0.15*(pet.level-1))),hp=Math.floor(b.hp*(1+0.15*(pet.level-1)));
-h+=`<div class="mob"><div><div class="mn">${pet.name} <span class="ptier ${PTN[b.tier]}">${PTN[b.tier]}级</span> <span class="dim">Lv.${pet.level}</span> ${i===S.activePet?'<span class="gold">出战中</span>':""}</div>
-<div class="md">${b.desc}</div><div class="md">气血${hp} 攻击${atk} · 经验${pet.exp}/${petExpNeed(pet.level)}</div></div>
-${i===S.activePet?"":`<button class="btn" data-pet="${i}">出战</button>`}</div>`;
-});
+else h+=`<p class="dim">已达最高 ${WING_MAX} 阶「${WING_NAMES[WING_MAX]}」，翱翔九天！</p>`;
 h+=`</div>`;m.innerHTML=h;
 const wu=$("wingUp");
 if(wu)wu.onclick=()=>{
@@ -779,8 +752,24 @@ if(wu)wu.onclick=()=>{
  p.feather-=c.feather;p.coins-=c.coins;S.wing={tier:t+1};
  calcStats();save();render();toast(`🪽 翅膀${t?"升至":"激活"}「${WING_NAMES[t+1]}」！`);
 };
-m.querySelectorAll("[data-pet]").forEach(b=>b.onclick=()=>{S.activePet=+b.dataset.pet;save();render();toast("宠物出战！");});
-// ---- 伙伴：招募/出战/穿戴 ----
+}
+function rPartner(){
+const m=$("main"),p=S.player;
+let h=`<div class="card"><h3>🤝 我的伙伴</h3><p class="dim">伙伴可穿戴武器/护甲/靴子/饰品。出战伙伴将其30%属性加给你，战斗胜利出战伙伴获得修为升级。</p>
+<div class="rowbtns"><button class="btn small" id="recC">📜 广发英雄帖<br><span class="dim">5000铜币</span></button><button class="btn small" id="recG">💰 千金募名将<br><span class="dim">88元宝</span></button></div>`;
+if(!(S.partners||[]).length)h+=`<p class="dim">还没有伙伴，去招募一位与你并肩闯荡吧！</p>`;
+(S.partners||[]).forEach((pt,i)=>{
+ const st=partnerStats(pt);
+ h+=`<div class="tier"><div><div class="mn">${pt.name} <span style="color:${PARTNER_QC[pt.quality]}">${PARTNER_Q[pt.quality]}</span> <span class="dim">Lv.${pt.level}</span>${i===S.activePartner?' <span class="gold">出战中</span>':""}</div>
+ <div class="md">攻击${st.atk} 防御${st.def} 气血${st.hp} 速度${st.spd}${st.luck?` 幸运${st.luck}`:""} · 经验${pt.exp||0}/${40*pt.level}</div>
+ <div class="md">`;
+ for(const slot of["weapon","armor","boots","charm"]){
+  const it=pt.equip[slot];
+  h+=`${SLOTNAME[slot]}:${it?ITEMS[it.iid].name+(it.enh?`+${it.enh}`:""):"空"}${it?`<button class="btn small" style="padding:2px 6px;font-size:11px;margin:2px" data-pun="${i}_${slot}">卸下</button>`:`<button class="btn small" style="padding:2px 6px;font-size:11px;margin:2px" data-peq="${i}_${slot}">穿戴</button>`} `;
+ }
+ h+=`</div></div>${i===S.activePartner?"":`<button class="btn small" style="width:auto;margin:0" data-pfight="${i}">出战</button>`}</div>`;
+});
+h+=`</div>`;m.innerHTML=h;
 const rc=$("recC");
 if(rc)rc.onclick=()=>{if(p.coins<5000){toast("铜币不足（需5000）");return;}p.coins-=5000;
  const r=Math.random();recruitPartner(r<0.5?0:(r<0.8?1:2));};
@@ -804,6 +793,20 @@ m.querySelectorAll("[data-peq]").forEach(b=>b.onclick=()=>{
   closeModal();calcStats();save();render();toast(`🤝 ${pt.name}装备了${ITEMS[it.iid].name}`);
  });
 });
+}
+function rPet(){
+const m=$("main"),p=S.player;
+let h=`<div class="card"><h3>🦊 我的宠物</h3><p class="dim">宠物分黄/玄/地/天/神五级，品级越高助战越强。野外把怪物打到30%血以下可捕捉；神级宠物只能通过充值豪礼或限时活动获得。</p>`;
+if(!S.pets.length)h+=`<p class="dim">还没有宠物，去青竹林捕捉小灵猴吧！</p>`;
+S.pets.forEach((pet,i)=>{
+const b=PETS[pet.pid];
+const atk=Math.floor(b.atk*(1+0.15*(pet.level-1))),hp=Math.floor(b.hp*(1+0.15*(pet.level-1)));
+h+=`<div class="mob"><div><div class="mn">${pet.name} <span class="ptier ${PTN[b.tier]}">${PTN[b.tier]}级</span> <span class="dim">Lv.${pet.level}</span> ${i===S.activePet?'<span class="gold">出战中</span>':""}</div>
+<div class="md">${b.desc}</div><div class="md">气血${hp} 攻击${atk} · 经验${pet.exp}/${petExpNeed(pet.level)}</div></div>
+${i===S.activePet?"":`<button class="btn" data-pet="${i}">出战</button>`}</div>`;
+});
+h+=`</div>`;m.innerHTML=h;
+m.querySelectorAll("[data-pet]").forEach(b=>b.onclick=()=>{S.activePet=+b.dataset.pet;save();render();toast("宠物出战！");});
 }
 /* ============ 门派 ============ */
 function rSect(){
