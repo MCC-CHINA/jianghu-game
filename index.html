@@ -16,6 +16,11 @@ body{background:#141009;color:#e8dcc0;font-family:"Songti SC","STSong","SimSun",
 #topbar .pname .vip{background:linear-gradient(180deg,#f5d67b,#c8903c);color:#3a2a08;font-size:12px;font-weight:bold;padding:1px 8px;border-radius:10px;margin-left:6px;vertical-align:2px}
 #topVip{cursor:pointer;background:rgba(20,12,4,.55);color:#f5d67b;border:1px solid #c8903c;text-shadow:0 0 8px rgba(245,214,123,.7);box-shadow:0 0 8px rgba(200,144,60,.35)}
 /* VIP6+名字变色，VIP12彩虹流动 */
+.vipn1{color:#a8a8a8;font-weight:bold}
+.vipn2{color:#7bed9f;font-weight:bold}
+.vipn3{color:#70a1ff;font-weight:bold}
+.vipn4{color:#eccc68;font-weight:bold}
+.vipn5{color:#ff7f50;font-weight:bold}
 .vipn6{color:#ffd700;font-weight:bold;text-shadow:0 0 8px rgba(255,215,0,.7)}
 .vipn7{color:#ff9f43;font-weight:bold;text-shadow:0 0 8px rgba(255,159,67,.7)}
 .vipn8{color:#ff5b5b;font-weight:bold;text-shadow:0 0 8px rgba(255,91,91,.7)}
@@ -111,6 +116,10 @@ input[type=text]{width:100%;background:#0d0a06;border:1px solid #8a6d2f;color:#f
 .center{text-align:center}
 .gold{color:#f5d67b}
 .dim{color:#b09a5e;font-size:13px}
+.chatbox{max-height:320px;overflow-y:auto;background:rgba(0,0,0,.25);border:1px solid #3a2c1c;border-radius:8px;padding:8px;margin:8px 0}
+.chatline{margin:4px 0;font-size:14px;line-height:1.5;word-break:break-all}
+.chatinput{display:flex;gap:8px;margin-top:8px}
+.chatinput input{flex:1;background:#1a1410;border:1px solid #3a2c1c;color:#e8dcc0;border-radius:8px;padding:8px;font-size:14px}
 </style>
 </head>
 <body>
@@ -273,11 +282,11 @@ const TIERS=[
  {money:648,gold:7800,bonus:"多送30%"},
  {money:1980,gold:24800,bonus:"多送40%"}
 ];
-const RANKS=[{name:"武林神话·叶孤鸿",zl:99999},{name:"剑圣·西门飘雪",zl:52000},{name:"魔教教主·任逍遥",zl:38000},{name:"丐帮帮主·洪七",zl:26000},{name:"武当掌门·张真人",zl:18000},{name:"峨眉掌门·灭绝师太",zl:12000},{name:"少林方丈·玄慈",zl:9000},{name:"黑风寨主·黑风虎",zl:5000},{name:"采花大盗·田伯光",zl:2800},{name:"江南大侠·江别鹤",zl:1500}];
-const RANK_PAY=[{name:"神豪·王多鱼",pay:99999},{name:"江南首富·沈万三",pay:52000},{name:"西域土豪·金轮法王",pay:26000},{name:"盐帮帮主·方中信",pay:12000},{name:"总镖头·铁中堂",pay:6000},{name:"富商·陶朱公",pay:2600},{name:"钱庄掌柜·金算盘",pay:1200},{name:"小地主·黄世仁",pay:500},{name:"暴发户·苟富贵",pay:150}];
-const RANK_PET=[{name:"兽王·蛮吉",pet:"啸天虎",score:8800},{name:"毒仙·何仙姑",pet:"碧鳞蛇",score:7200},{name:"驭兽斋主·公孙瓒",pet:"金翅雕",score:6100},{name:"南疆蛊女·蓝凤凰",pet:"金蚕蛊",score:4800},{name:"猎户·石大壮",pet:"苍原狼",score:3500},{name:"药农·老蔫",pet:"月影兔",score:2200},{name:"顽童·小豆子",pet:"灵羽鸡",score:1200}];
-const RANK_WING=[{name:"翼皇·陆九天",wing:"九天神翼",tier:12},{name:"风神·聂风行",wing:"混沌天翼",tier:10},{name:"火凤传人·祝融焱",wing:"天罡神翼",tier:9},{name:"夜枭·影无痕",wing:"暗影之翼",tier:7},{name:"云游僧·慧远",wing:"圣光之翼",tier:6},{name:"苗疆翼女·阿幼",wing:"烈焰之翼",tier:3},{name:"送信小厮·阿毛",wing:"翠羽之翼",tier:1}];
-const RANK_LV=[{name:"武林神话·叶孤鸿",lv:99},{name:"剑圣·西门飘雪",lv:88},{name:"魔教教主·任逍遥",lv:80},{name:"丐帮帮主·洪七",lv:72},{name:"武当掌门·张真人",lv:65},{name:"峨眉掌门·灭绝师太",lv:58},{name:"少林方丈·玄慈",lv:52},{name:"黑风寨主·黑风虎",lv:40},{name:"采花大盗·田伯光",lv:30},{name:"江南大侠·江别鹤",lv:20}];
+const RANKS=[{name:"武林神话·叶孤鸿",zl:99999,vip:12},{name:"剑圣·西门飘雪",zl:52000,vip:10},{name:"魔教教主·任逍遥",zl:38000,vip:9},{name:"丐帮帮主·洪七",zl:26000,vip:8},{name:"武当掌门·张真人",zl:18000,vip:7},{name:"峨眉掌门·灭绝师太",zl:12000,vip:6},{name:"少林方丈·玄慈",zl:9000,vip:5},{name:"黑风寨主·黑风虎",zl:5000,vip:3},{name:"采花大盗·田伯光",zl:2800,vip:2},{name:"江南大侠·江别鹤",zl:1500,vip:1}];
+const RANK_PAY=[{name:"神豪·王多鱼",pay:99999,vip:12},{name:"江南首富·沈万三",pay:52000,vip:11},{name:"西域土豪·金轮法王",pay:26000,vip:10},{name:"盐帮帮主·方中信",pay:12000,vip:8},{name:"总镖头·铁中堂",pay:6000,vip:7},{name:"富商·陶朱公",pay:2600,vip:5},{name:"钱庄掌柜·金算盘",pay:1200,vip:4},{name:"小地主·黄世仁",pay:500,vip:2},{name:"暴发户·苟富贵",pay:150,vip:1}];
+const RANK_PET=[{name:"兽王·蛮吉",pet:"啸天虎",score:8800,vip:8},{name:"毒仙·何仙姑",pet:"碧鳞蛇",score:7200,vip:6},{name:"驭兽斋主·公孙瓒",pet:"金翅雕",score:6100,vip:5},{name:"南疆蛊女·蓝凤凰",pet:"金蚕蛊",score:4800,vip:4},{name:"猎户·石大壮",pet:"苍原狼",score:3500,vip:2},{name:"药农·老蔫",pet:"月影兔",score:2200,vip:1},{name:"顽童·小豆子",pet:"灵羽鸡",score:1200,vip:0}];
+const RANK_WING=[{name:"翼皇·陆九天",wing:"九天神翼",tier:12,vip:12},{name:"风神·聂风行",wing:"混沌天翼",tier:10,vip:9},{name:"火凤传人·祝融焱",wing:"天罡神翼",tier:9,vip:8},{name:"夜枭·影无痕",wing:"暗影之翼",tier:7,vip:6},{name:"云游僧·慧远",wing:"圣光之翼",tier:6,vip:5},{name:"苗疆翼女·阿幼",wing:"烈焰之翼",tier:3,vip:2},{name:"送信小厮·阿毛",wing:"翠羽之翼",tier:1,vip:0}];
+const RANK_LV=[{name:"武林神话·叶孤鸿",lv:99,vip:12},{name:"剑圣·西门飘雪",lv:88,vip:10},{name:"魔教教主·任逍遥",lv:80,vip:9},{name:"丐帮帮主·洪七",lv:72,vip:8},{name:"武当掌门·张真人",lv:65,vip:7},{name:"峨眉掌门·灭绝师太",lv:58,vip:6},{name:"少林方丈·玄慈",lv:52,vip:5},{name:"黑风寨主·黑风虎",lv:40,vip:3},{name:"采花大盗·田伯光",lv:30,vip:2},{name:"江南大侠·江别鹤",lv:20,vip:1}];
 /* 排行榜称号：前三名自动获得，属性可叠加 */
 const RANK_TITLES={
  zl:[{name:"战力之巅",cls:"rt1",bonus:{atk:30,hp:300}},{name:"武林传奇",cls:"rt2",bonus:{atk:20,hp:200}},{name:"江湖豪杰",cls:"rt3",bonus:{atk:10,hp:100}}],
@@ -686,10 +695,12 @@ function newGame(name,sectKey){
  base:{maxhp:sc.hp,maxmp:sc.mp,atk:sc.atk,def:sc.def,spd:sc.spd}},
  equip:{weapon:null,armor:null,boots:null,charm:null},bag:[],pets:[],activePet:-1,wing:{tier:0},
  partners:[],activePartner:-1,arena:{rank:1000,date:"",left:5,reward:"",top:ARENA_TOP.map((n,i)=>({name:n,rank:i+1}))},
- orders:[],zone:0,created:nowStr(),wornTitle:null,gongfa:{},gongfaLearned:{},claimedGifts:{},douqi:0,yihuo:[],fenjue:{lv:0},eventTitles:[]};
+ orders:[],zone:0,created:nowStr(),wornTitle:null,gongfa:{},gongfaLearned:{},claimedGifts:{},douqi:0,yihuo:[],fenjue:{lv:0},eventTitles:[],chat:{world:[{sys:1,txt:"欢迎来到江湖世界，谨言慎行，行侠仗义！",t:Date.now()}],sect:[],ch:"world",cd:0}};
  calcStats();S.player.hp=S.player.maxhp;S.player.mp=S.player.maxmp;save();
 }
 /* ============ 顶栏/导航 ============ */
+function escHtml(s){return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function vipName(n,v){v=Math.min(v||0,12);if(v<1)return escHtml(n);return `<span class="vipn${v}">${escHtml(n)}</span>`;}
 function renderTop(){
  const p=S.player,t=$("topbar");t.style.display="block";
  const v=vipLevel();
@@ -705,14 +716,14 @@ function renderTop(){
  $("topPay").onclick=()=>{TAB="pay";B=null;render();window.scrollTo(0,0);};
  const tv=$("topVip");if(tv)tv.onclick=()=>{TAB="vipinfo";B=null;render();window.scrollTo(0,0);};
 }
-const TABS=[["home","江湖"],["bag","背包"],["pet","宠物"],["wing","翅膀"],["partner","伙伴"],["sect","门派"],["gongfa","功法"],["skill","技能"],["shop","商店"],["rank","排行"],["title","称号"],["arena","竞技"],["event","活动"],["more","更多"]];
+const TABS=[["home","江湖"],["bag","背包"],["pet","宠物"],["wing","翅膀"],["partner","伙伴"],["sect","门派"],["gongfa","功法"],["skill","技能"],["shop","商店"],["rank","排行"],["title","称号"],["arena","竞技"],["chat","聊天"],["event","活动"],["more","更多"]];
 function renderTabs(){
  const t=$("tabbar");t.style.display="flex";
  t.innerHTML=TABS.map(([k,n])=>`<button class="${TAB===k?'on':''}" data-t="${k}">${n}</button>`).join("");
  t.querySelectorAll("button").forEach(b=>b.onclick=()=>{TAB=b.dataset.t;B=null;render();});
 }
 function render(){if(S&&S.player&&sweepExpired())setTimeout(()=>toast(" 小红剑已到期，已自动卸下"),50);renderTop();renderTabs();
- ({home:rHome,bag:rBag,pet:rPet,sect:rSect,gongfa:rGongfa,skill:rSkill,shop:rShop,pay:rPay,rank:rRank,title:rTitle,arena:rArena,wing:rWing,partner:rPartner,event:rEvent,more:rMore,vipinfo:rVip}[TAB])();}
+ ({home:rHome,bag:rBag,pet:rPet,sect:rSect,gongfa:rGongfa,skill:rSkill,shop:rShop,pay:rPay,rank:rRank,title:rTitle,arena:rArena,chat:rChat,wing:rWing,partner:rPartner,event:rEvent,more:rMore,vipinfo:rVip}[TAB])();}
 /* ============ 创建角色 ============ */
 let selSect="shaolin";
 function rCreate(){
@@ -820,6 +831,7 @@ function endBattle(win){
 B.over=true;const p=S.player,f=B.foe;
 if(win){
 log(`<span class="sys">战胜了！获得修为 ${f.exp}、铜币 ${f.coins}</span>`);
+if(f.boss)pushChat("world",{sys:1,txt:`恭喜「${p.name}」击败了${f.name}，威震江湖！`,t:Date.now()});
 gainExp(f.exp);p.coins+=f.coins;gainPetExp(Math.floor(f.exp/2));gainPartnerExp(Math.floor(f.exp/2));
 if(B.wb){ // 世界BOSS：掉落功法（神级以下）
  const cand=Object.keys(GONGFA).filter(g=>!["神","圣"].includes(GONGFA[g].tier)&&!gfLearned(g));
@@ -1457,25 +1469,72 @@ function rRank(){
  const zlist=[...RANKS.map(r=>({...r})),{name:p.name+"（我）",zl,me:true}].sort((a,b)=>b.zl-a.zl);
  const plist=[...RANK_PAY.map(r=>({...r})),{name:p.name+"（我）",pay,me:true}].sort((a,b)=>b.pay-a.pay);
  let h=`<div class="card"><h3>武林战力榜</h3><p class="dim">我的战力：<b class="gold">${zl}</b>· 第 ${zlist.findIndex(r=>r.me)+1} 名</p>`;
- h+=zlist.map((r,i)=>`<div class="rankrow${r.me?" me":""}"><span>${i+1}. ${r.name}${i<3?` ${titleBadge(RANK_TITLES.zl[i].name,RANK_TITLES.zl[i].cls)}`:""}</span><span>${r.zl}</span></div>`).join("")+`</div>`;
+ h+=zlist.map((r,i)=>`<div class="rankrow${r.me?" me":""}"><span>${i+1}. ${vipName(r.name,r.me?vipLevel():(r.vip||0))}${i<3?` ${titleBadge(RANK_TITLES.zl[i].name,RANK_TITLES.zl[i].cls)}`:""}</span><span>${r.zl}</span></div>`).join("")+`</div>`;
  h+=`<div class="card"><h3>充值风云榜</h3><p class="dim">我的累计充值：<b class="gold">￥${pay}</b>· 第 ${plist.findIndex(r=>r.me)+1} 名</p>`;
- h+=plist.map((r,i)=>`<div class="rankrow${r.me?" me":""}"><span>${i+1}. ${r.name}${i<3?` ${titleBadge(RANK_TITLES.pay[i].name,RANK_TITLES.pay[i].cls)}`:""}</span><span>￥${r.pay}</span></div>`).join("")+`</div>`;
+ h+=plist.map((r,i)=>`<div class="rankrow${r.me?" me":""}"><span>${i+1}. ${vipName(r.name,r.me?vipLevel():(r.vip||0))}${i<3?` ${titleBadge(RANK_TITLES.pay[i].name,RANK_TITLES.pay[i].cls)}`:""}</span><span>￥${r.pay}</span></div>`).join("")+`</div>`;
  // 宠物榜
  let myPetScore=0,myPetName="暂无宠物";
  for(const pet of(S.pets||[])){const sc=petScore(pet);if(sc>myPetScore){myPetScore=sc;myPetName=pet.name;}}
  const petlist=[...RANK_PET.map(r=>({...r})),{name:p.name+"（我）",pet:myPetName,score:myPetScore,me:true}].sort((a,b)=>b.score-a.score);
  h+=`<div class="card"><h3>宠物排行榜</h3><p class="dim">我的最强宠物：<b class="gold">${myPetName}</b>（评分${myPetScore}）· 第 ${petlist.findIndex(r=>r.me)+1} 名</p>`;
- h+=petlist.map((r,i)=>`<div class="rankrow${r.me?" me":""}"><span>${i+1}. ${r.name} <span class="dim">${r.pet}</span>${i<3?` ${titleBadge(RANK_TITLES.pet[i].name,RANK_TITLES.pet[i].cls)}`:""}</span><span>${r.score}</span></div>`).join("")+`</div>`;
+ h+=petlist.map((r,i)=>`<div class="rankrow${r.me?" me":""}"><span>${i+1}. ${vipName(r.name,r.me?vipLevel():(r.vip||0))} <span class="dim">${r.pet}</span>${i<3?` ${titleBadge(RANK_TITLES.pet[i].name,RANK_TITLES.pet[i].cls)}`:""}</span><span>${r.score}</span></div>`).join("")+`</div>`;
  // 翅膀榜
  const myWing=(S.wing&&S.wing.tier)||0;
  const winglist=[...RANK_WING.map(r=>({...r})),{name:p.name+"（我）",wing:myWing?WING_NAMES[myWing]:"未激活",tier:myWing,me:true}].sort((a,b)=>b.tier-a.tier);
  h+=`<div class="card"><h3>翅膀排行榜</h3><p class="dim">我的翅膀：<b class="gold">${myWing?WING_NAMES[myWing]+`（${myWing}阶）`:"未激活"}</b>· 第 ${winglist.findIndex(r=>r.me)+1} 名</p>`;
- h+=winglist.map((r,i)=>`<div class="rankrow${r.me?" me":""}"><span>${i+1}. ${r.name} <span class="dim">${r.wing}${r.tier?`·${r.tier}阶`:""}</span>${i<3?` ${titleBadge(RANK_TITLES.wing[i].name,RANK_TITLES.wing[i].cls)}`:""}</span><span>${r.tier}阶</span></div>`).join("")+`</div>`;
+ h+=winglist.map((r,i)=>`<div class="rankrow${r.me?" me":""}"><span>${i+1}. ${vipName(r.name,r.me?vipLevel():(r.vip||0))} <span class="dim">${r.wing}${r.tier?`·${r.tier}阶`:""}</span>${i<3?` ${titleBadge(RANK_TITLES.wing[i].name,RANK_TITLES.wing[i].cls)}`:""}</span><span>${r.tier}阶</span></div>`).join("")+`</div>`;
  // 等级榜
  const lvlist=[...RANK_LV.map(r=>({...r})),{name:p.name+"（我）",lv:p.level,me:true}].sort((a,b)=>b.lv-a.lv);
  h+=`<div class="card"><h3>等级排行榜</h3><p class="dim">我的等级：<b class="gold">Lv.${p.level}</b>· 第 ${lvlist.findIndex(r=>r.me)+1} 名</p>`;
- h+=lvlist.map((r,i)=>`<div class="rankrow${r.me?" me":""}"><span>${i+1}. ${r.name}${i<3?` ${titleBadge(RANK_TITLES.lv[i].name,RANK_TITLES.lv[i].cls)}`:""}</span><span>Lv.${r.lv}</span></div>`).join("")+`</div>`;
+ h+=lvlist.map((r,i)=>`<div class="rankrow${r.me?" me":""}"><span>${i+1}. ${vipName(r.name,r.me?vipLevel():(r.vip||0))}${i<3?` ${titleBadge(RANK_TITLES.lv[i].name,RANK_TITLES.lv[i].cls)}`:""}</span><span>Lv.${r.lv}</span></div>`).join("")+`</div>`;
  m.innerHTML=h;
+}
+/* ============ 聊天系统 ============ */
+const CHAT_NPCS=[{n:"剑圣·西门飘雪",vip:10},{n:"总镖头·铁中堂",vip:7},{n:"云游僧·慧远",vip:5},{n:"猎户·石大壮",vip:2},{n:"苗疆翼女·阿幼",vip:2},{n:"采花大盗·田伯光",vip:2},{n:"江南大侠·江别鹤",vip:1},{n:"药农·老蔫",vip:1},{n:"顽童·小豆子",vip:0},{n:"送信小厮·阿毛",vip:0}];
+const CHAT_WORLD=["今日华山之巅又有人比剑，听说打得天昏地暗","求组队刷幽冥谷，来个高战力的","刚开出洗炼石，有人要收吗","萌新求问，峨眉派厉害吗","世界BOSS快刷新了，蹲一波","轩辕神剑太难合了，四把神兵遥遥无期","出售金疮药大还丹，价格公道","有没有丐帮的兄弟，交流下打狗棒法心得","昨晚竞技场被一个高VIP大佬虐了","宠物榜第一的啸天虎真威风","刚升20级，终于能学地阶技能了","少林防御是真的硬，站着让你打","武当内力多，技能随便放","凌晨在线的都是夜猫子吧","求个大佬带刷黑风寨","刚合出轩辕战甲，防御直接起飞","有人知道圣级宠物怎么得吗","每日礼包别忘了领","十二个装备栏终于凑齐了","红包掉率还行，今天掉了三个"];
+const CHAT_SECT={
+ shaolin:["阿弥陀佛，今日早课可曾修炼","罗汉拳练到第几重了","师兄弟们，组队去青竹林刷怪","方丈说心静自然强","防御就是硬道理"],
+ wudang:["太极绵劲，以柔克刚","今日论道，谁来切磋","内力又涨了，技能随便甩","张真人讲道，受益匪浅","绵掌看似柔，实则刚"],
+ emei:["姐妹们，峨眉刺练起来","速度即是正义","今日采药，顺便练级","灭绝师太巡查，都认真点","身法灵动，来无影去无踪"],
+ gaibang:["兄弟们，喝酒去啊","打狗棒法专打恶人","降龙之力，一掌定乾坤","今日化缘收获不错","丐帮弟子，遍布天下"]};
+function pushChat(ch,msg){
+ const c=S.chat||(S.chat={world:[],sect:[],ch:"world",cd:0});
+ (c[ch]=c[ch]||[]).push(msg);
+ if(c[ch].length>60)c[ch]=c[ch].slice(-60);
+ save();
+}
+function npcChat(ch){
+ const pool=ch==="sect"?(CHAT_SECT[S.player.sect]||CHAT_WORLD):CHAT_WORLD;
+ const npc=pick(CHAT_NPCS);
+ pushChat(ch,{n:npc.n,vip:npc.vip,t:Date.now(),txt:pick(pool)});
+}
+function chatLine(m){
+ const t=new Date(m.t||Date.now());
+ const ts=String(t.getHours()).padStart(2,"0")+":"+String(t.getMinutes()).padStart(2,"0");
+ if(m.sys)return `<p class="chatline"><span class="sys">[系统 ${ts}] ${escHtml(m.txt)}</span></p>`;
+ return `<p class="chatline"><span class="dim">[${ts}]</span> ${vipName(m.n,m.vip)}${m.me?' <span class="dim">(我)</span>':""}：${escHtml(m.txt)}</p>`;
+}
+function sendChat(){
+ const p=S.player,c=S.chat,inp=$("chatIn"),txt=(inp.value||"").trim();
+ if(!txt){toast("先写点什么吧");return;}
+ const now=Date.now();
+ if(c.cd&&now-c.cd<5000){toast("发言太快，"+Math.ceil((5000-(now-c.cd))/1000)+"秒后再试");return;}
+ c.cd=now;
+ pushChat(c.ch||"world",{n:p.name,vip:vipLevel(),t:now,txt:txt.slice(0,60),me:1});
+ if(Math.random()<0.65)setTimeout(()=>{try{npcChat(c.ch||"world");if(TAB==="chat")render();}catch(e){}},1200);
+ render();
+}
+function rChat(){
+ const m=$("main"),p=S.player,c=S.chat;
+ if(Math.random()<0.45)npcChat(c.ch||"world");
+ const ch=c.ch||"world",msgs=c[ch]||[];
+ let h=`<div class="card"><h3>江湖聊天</h3><div class="rowbtns"><button class="btn small ${ch==="world"?"primary":""}" id="chW">世界</button><button class="btn small ${ch==="sect"?"primary":""}" id="chS">门派·${SECTS[p.sect].name}</button></div><div class="chatbox" id="chatbox">${msgs.map(chatLine).join("")||'<p class="dim">暂无消息，来说第一句吧</p>'}</div><div class="chatinput"><input id="chatIn" maxlength="60" placeholder="说点什么…（5秒一条）"><button class="btn primary" id="chatSend" style="width:auto">发送</button></div><p class="dim">世界频道畅所欲言，门派频道只和同门交流。VIP名字会显示专属颜色。</p></div>`;
+ m.innerHTML=h;
+ const box=$("chatbox");box.scrollTop=box.scrollHeight;
+ $("chW").onclick=()=>{c.ch="world";save();render();};
+ $("chS").onclick=()=>{c.ch="sect";save();render();};
+ $("chatSend").onclick=sendChat;
+ $("chatIn").onkeydown=e=>{if(e.key==="Enter")sendChat();};
 }
 /* ============ 更多：GM后台/帮助/存档 ============ */
 function rEvent(){
@@ -1552,7 +1611,7 @@ function rMore(){
  <div>建号时间<b style="font-size:11px">${S.created}</b></div></div>
  <p class="dim" style="margin-top:8px">正式版这里会显示所有玩家的订单，并支持订单查询、补发、封号等管理功能。</p></div>
  <div class="card"><h3>玩法说明</h3><p class="dim">
- · 去「江湖」挑战敌人，升级变强<br>· 四门派属性/特性/技能各不相同（少林防御、武当内力、峨眉速度暴击、丐帮攻击），「技能」页可学习本门专属技能；12个装备栏位：武器/帽子/护甲/裤子/护腕×2/戒指×2/项链/勋章/鞋子/饰品；BOSS概率掉落本关最高级武器和防具（概率受爆率加成），集齐BOSS装备可在背包「神兵合成」打造轩辕系列终极装备；武器带随机属性，洗炼石可重置（爆率加成提升概率），集齐四把BOSS神兵+300万铜币可在背包「神兵合成」打造终极武器轩辕神剑<br>
+ · 去「江湖」挑战敌人，升级变强<br>· 四门派属性/特性/技能各不相同（少林防御、武当内力、峨眉速度暴击、丐帮攻击），「技能」页可学习本门专属技能；「聊天」可世界/门派频道发言，NPC会互动，VIP名字彩色显示；12个装备栏位：武器/帽子/护甲/裤子/护腕×2/戒指×2/项链/勋章/鞋子/饰品；BOSS概率掉落本关最高级武器和防具（概率受爆率加成），集齐BOSS装备可在背包「神兵合成」打造轩辕系列终极装备；武器带随机属性，洗炼石可重置（爆率加成提升概率），集齐四把BOSS神兵+300万铜币可在背包「神兵合成」打造终极武器轩辕神剑<br>
  · 野怪打到30%血可捕捉为宠物，宠物会帮你打架<br>
  · 技能全是斗破斗技：八极崩、焰分噬浪尺、佛怒火莲、三千雷动、帝印诀等，去「门派」学习<br>
  · 竞技场：底部「竞技」页，每日5次挑战排名更高的对手，获胜排名上升；前三名每日可领元宝/铜币/灵羽<br>
@@ -1580,7 +1639,7 @@ function rMore(){
   S.player.skills=S.player.skills.filter(s=>s!=="bajibeng"&&s!=="shihuyin");
   const st=SECT_STARTER[S.player.sect];if(st&&!S.player.skills.includes(st))S.player.skills.push(st);
  }
- if(!Array.isArray(S.partners))S.partners=[];if(S.activePartner===undefined)S.activePartner=-1;if(!Array.isArray(S.pets))S.pets=[];if(!Array.isArray(S.eventTitles))S.eventTitles=[];migrateTitle();calcStats();TAB="home";render();}
+ if(!Array.isArray(S.partners))S.partners=[];if(S.activePartner===undefined)S.activePartner=-1;if(!Array.isArray(S.pets))S.pets=[];if(!Array.isArray(S.eventTitles))S.eventTitles=[];if(!S.chat)S.chat={world:[{sys:1,txt:"欢迎来到江湖世界，谨言慎行，行侠仗义！",t:Date.now()}],sect:[],ch:"world",cd:0};migrateTitle();calcStats();TAB="home";render();}
  else{rCreate();}
  setInterval(()=>{ // 每60秒回1点体力
  if(S&&S.player&&S.player.stamina<S.player.maxStamina){S.player.stamina++;save();if(TAB==="home"&&!B)renderTop();}
