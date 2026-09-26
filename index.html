@@ -24,6 +24,11 @@ body{background:#141009;color:#e8dcc0;font-family:"Songti SC","STSong","SimSun",
 /* 神级物品：七彩流光 */
 .godflow{font-weight:bold;background:linear-gradient(90deg,#ff2d2d,#ff7f00,#ffe600,#2dff2d,#00e5ff,#2d7fff,#a52dff,#ffd700,#ff2d2d);background-size:300% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:rainbow 3s linear infinite}
 .ptier.神{background:linear-gradient(90deg,#ff2d2d,#ff7f00,#ffe600,#2dff2d,#00e5ff,#a52dff,#ffd700);background-size:300% auto;animation:rainbow 3s linear infinite;color:#fff;font-weight:bold;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+/* 称号页：只显示称号牌；未获得灰色未点亮 */
+.tgrid{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:4px 0}
+.tt{display:inline-block;cursor:default}
+.tt.locked .rtx{filter:grayscale(1) brightness(.55);opacity:.65}
+.tt.worn{outline:2px solid #f5d67b;border-radius:10px;box-shadow:0 0 10px rgba(245,214,123,.6)}
 .ptier{font-size:11px;padding:1px 6px;border-radius:8px;margin-left:4px;white-space:nowrap}
 .ptier.黄{background:#5a4a1a;color:#f5d67b}
 .ptier.玄{background:#3a3a6a;color:#b8b0f0}
@@ -1108,23 +1113,21 @@ function rArena(){
 }
 /* ============ 称号 ============ */
 function rTitle(){
- const m=$("main"),p=S.player;
- const v=vipLevel(),T=VIP_TITLES[S.title||0];
- let h=`<div class="card"><h3>🏅 我的称号</h3><p class="dim">称号带来强力属性加成：VIP称号佩戴生效，排行榜与限定称号自动生效、多个可叠加。</p></div>`;
- let titleBtns="";
- for(let i=1;i<=v;i++){const tt=VIP_TITLES[i];titleBtns+=`<button class="btn small${(S.title||0)===i?" primary":""}" style="flex:1;margin:2px;white-space:nowrap" data-title="${i}">${titleBadge(tt.name,vipTitleCls(i))}</button>`;}
- if(!titleBtns)titleBtns=`<span class="dim">充值到 VIP1 解锁称号</span>`;
- h+=`<div class="card"><h3>👑 VIP称号</h3><p>当前佩戴：${T?titleBadge(T.name,vipTitleCls(S.title||0)):"暂无"}${T?`<span class="dim"> 攻击+${T.atk} 气血+${T.hp} 爆率+${T.drop}%</span>`:""}</p><div class="rowbtns" style="flex-wrap:wrap">${titleBtns}</div></div>`;
- const myT=myRankTitles();
- h+=`<div class="card"><h3>🎖️ 排行榜荣誉称号</h3><p class="dim">任一榜单前三名自动获得称号，多个称号属性可叠加。</p>`;
- h+=myT.length?myT.map(t=>`<div class="tier"><div>${titleBadge(t.name,t.cls)}<span class="dim"> ${t.board}第${t.rank}名</span><div class="m">${bonusStr(t.bonus)}</div></div></div>`).join(""):`<p class="dim">暂未上榜，继续努力！</p>`;
- h+=`</div>`;
- const evts=(S.eventTitles||[]).map(eid=>EVENT_TITLES[eid]).filter(Boolean);
- h+=`<div class="card"><h3>🎉 限定称号</h3><p class="dim">通过节日活动与特殊机缘获得，自动生效、可叠加。</p>`;
- h+=evts.length?evts.map(e=>`<div class="tier"><div>${titleBadge(e.name,e.cls)}<span class="dim"> ${e.desc}</span><div class="m">${bonusStr(e.bonus)}</div></div></div>`).join(""):`<p class="dim">暂无限 定称号，去活动中心看看吧！</p>`;
- h+=`</div>`;
- m.innerHTML=h;
- m.querySelectorAll("[data-title]").forEach(b=>b.onclick=()=>{S.title=+b.dataset.title;calcStats();save();render();toast(`已佩戴称号「${VIP_TITLES[S.title].name}」！`);});
+ const m=$("main"),v=vipLevel(),worn=S.title||0;
+ const myT=myRankTitles().map(t=>t.name),evGot=S.eventTitles||[];
+ let vipHtml="";
+ for(let i=1;i<=12;i++){const tt=VIP_TITLES[i],got=i<=v;
+  vipHtml+=`<span class="tt${got?"":" locked"}${worn===i?" worn":""}"${got?` data-title="${i}"`:""}>${titleBadge(tt.name,vipTitleCls(i))}</span>`;}
+ let rkHtml="";
+ for(const bk of Object.keys(RANK_TITLES))for(let i=0;i<3;i++){const t=RANK_TITLES[bk][i],got=myT.includes(t.name);
+  rkHtml+=`<span class="tt${got?"":" locked"}">${titleBadge(t.name,t.cls)}</span>`;}
+ let evHtml="";
+ for(const eid of Object.keys(EVENT_TITLES)){const e=EVENT_TITLES[eid],got=evGot.includes(eid);
+  evHtml+=`<span class="tt${got?"":" locked"}">${titleBadge(e.name,e.cls)}</span>`;}
+ m.innerHTML=`<div class="card"><h3>👑 VIP称号</h3><div class="tgrid">${vipHtml}</div></div>`
+  +`<div class="card"><h3>🎖️ 排行榜荣誉称号</h3><div class="tgrid">${rkHtml}</div></div>`
+  +`<div class="card"><h3>🎉 限定称号</h3><div class="tgrid">${evHtml}</div></div>`;
+ m.querySelectorAll("[data-title]").forEach(s=>s.onclick=()=>{S.title=+s.dataset.title;calcStats();save();render();toast(`已佩戴称号「${VIP_TITLES[S.title].name}」！`);});
 }
 function rRank(){
  const m=$("main"),zl=zhanli(),p=S.player;
