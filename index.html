@@ -352,6 +352,13 @@ const RECHARGE_REWARDS=[
  {need:9999,desc:"元宝×100000 · 神话伙伴×2 · 限定称号「名扬四海」· 铜币×1000万",give:[["gold",100000],["partner",4],["partner",4],["title","mingyang"],["coins",10000000]]}
 ];
 function rechargeProgress(){return vipTotal()+(S.rechargeBonus||0);} // 累计充值奖励进度：真实充值+红包
+function rpList(){ // 充值红包数组（兼容老存档的数字）
+ if(!Array.isArray(S.redpackets)){
+  const n=(typeof S.redpackets==="number")?S.redpackets:0;
+  S.redpackets=[];for(let i=0;i<n;i++)S.redpackets.push(1);
+ }
+ return S.redpackets;
+}
 function grantReward(g){
  const p=S.player,k=g[0],v=g[1];
  if(k==="gold")p.gold+=v;
@@ -760,9 +767,15 @@ S.bag.push({iid,enh:0});
 log(`<span class="sys">获得了！</span>`);
 }
 }
-// 充值红包掉落：散人打怪也能攒累计充值奖励进度
+// 充值红包掉落：散人打怪也能攒累计充值奖励进度，每日最多100个
+const rpToday=nowStr().slice(0,10);
+if(S.rpDay!==rpToday){S.rpDay=rpToday;S.rpDayCount=0;}
 const rpRate=B.wb?0.5:(B.arena?0.2:0.06);
-if(Math.random()<rpRate){S.redpackets=(S.redpackets||0)+1;log(`<span class="sys">获得充值红包×1！去充值页开启，可计入累计充值奖励</span>`);}
+if((S.rpDayCount||0)<100&&Math.random()<rpRate){
+ const rr=Math.random(),amt=rr<0.02?10:(rr<0.08?5:(rr<0.20?3:(rr<0.50?1:0.5)));
+ rpList().push(amt);S.rpDayCount=(S.rpDayCount||0)+1;
+ log(`<span class="sys">获得${amt}元充值红包×1！去充值页开启，可计入累计充值奖励</span>`);
+}
 if(p.task&&!p.taskDone){p.task.done++;if(p.task.done>=p.task.need){p.taskDone=true;log(`<span class="sys">师门任务完成，可回门派领奖！</span>`);}}
 }else{
 log(`<span class="sys">你败下阵来，被好心人救回，气血恢复…</span>`);
@@ -1125,6 +1138,7 @@ function rPay(){
  const m=$("main"),p=S.player;
  const v=vipLevel(),total=vipTotal(),next=v<VIP_NEED.length-1?VIP_NEED[v+1]:null;
  const bonus=S.rechargeBonus||0,prog=total+bonus;
+ const rpN=rpList().length,rpDayN=(S.rpDay===nowStr().slice(0,10))?(S.rpDayCount||0):0;
  const today=nowStr().slice(0,10),claimed=S.vipClaim===today,g=vipGift();
  const wtPay=wornTitleInfo();
  let h=`<div class="card"><h3>VIP特权</h3>
@@ -1153,8 +1167,8 @@ function rPay(){
  h+=`</div><div class="card"><h3>累计充值奖励</h3>
  <p class="dim">真实充值与红包共同累积进度，10档壕礼拉开差距！散人打怪掉落充值红包，开启后计入下方奖励进度（不计入VIP等级）。</p>
  <p>奖励进度：<b class="gold">￥${prog}</b> <span class="dim">（真实充值￥${total} + 红包￥${bonus}）</span></p>
- <div class="tier"><div><div class="gold">充值红包×${S.redpackets||0}</div><div class="m">开启随机获得1~3元奖励进度</div></div>
- <button class="btn small primary" style="width:auto;margin:0" id="openrp"${(S.redpackets||0)?"":" disabled"}>${(S.redpackets||0)?"开启红包":"暂无红包"}</button></div>`;
+ <div class="tier"><div><div class="gold">充值红包×${rpN}</div><div class="m">金额0.5/1/3/5/10元，越大越稀有 · 今日已掉落 ${rpDayN}/100</div></div>
+ <button class="btn small primary" style="width:auto;margin:0" id="openrp"${rpN?"":" disabled"}>${rpN?"开启红包":"暂无红包"}</button></div>`;
  RECHARGE_REWARDS.forEach((rw,i)=>{
  const ok=prog>=rw.need,got=(S.claimedRecharge||[]).includes(rw.need);
  h+=`<div class="tier"><div><div class="gold">累计满￥${rw.need}</div><div class="m">${rw.desc}</div><div class="m dim">进度 ${Math.min(prog,rw.need)}/${rw.need}</div></div>
@@ -1207,10 +1221,11 @@ function rPay(){
  });
  const orp=$("openrp");
  if(orp)orp.onclick=()=>{
- const n=S.redpackets||0;if(!n)return;
- let add=0;for(let i=0;i<n;i++)add+=1+Math.floor(Math.random()*3);
- S.redpackets=0;S.rechargeBonus=(S.rechargeBonus||0)+add;
- save();render();toast(`开启${n}个红包，累计充值奖励进度+￥${add}！`);
+ const arr=rpList();if(!arr.length)return;
+ let add=0;for(const a of arr)add+=a;add=Math.round(add*10)/10;
+ S.redpackets=[];
+ S.rechargeBonus=Math.round(((S.rechargeBonus||0)+add)*10)/10;
+ save();render();toast(`开启${arr.length}个红包，累计充值奖励进度+￥${add}！`);
  };
 }
 function payModal(i){
@@ -1421,7 +1436,7 @@ function rMore(){
  · 「充值」是模拟的，不花真钱，随便点！首充自动赠小红剑（限时3天），另有首充礼包可领（288元宝+2万铜币+体力+4阶灵兽蛋）；累计充值提升VIP等级，加攻击气血、每日领礼包<br>
  · 宠物可捕捉斗罗魂兽：柔骨兔·小舞、蓝银皇·阿银、鬼虎、人面魔蛛、泰坦巨猿·二明、暗魔邪神虎、天青牛蟒·大明、冰碧帝皇蝎<br>
  · 「排行」有战力榜和充值榜，前三名自动获得炫酷称号（属性可叠加）：战力之巅/武林传奇/江湖豪杰，神豪无双/富甲天下/一掷千金<br>
- · 宠物分黄/玄/地/天/神五级，品级越高助战越强；新增累计充值奖励（10档，神级宠物/功法/神话伙伴等壕礼）；打怪掉落充值红包，散人也能攒进度领奖励（红包不计VIP等级）<br>
+ · 宠物分黄/玄/地/天/神五级，品级越高助战越强；新增累计充值奖励（10档，神级宠物/功法/神话伙伴等壕礼）；打怪掉落充值红包（0.5/1/3/5/10元，越大越稀有，每日最多100个），散人也能攒进度领奖励（红包不计VIP等级）<br>
  · 活动中心：限时活动（中秋称号、神功现世）、每日活动（世界BOSS、师门任务）、福利领取（VIP礼包/首充礼包/充值豪礼）都在这里<br>· 神话伙伴：VIP8免费领 / 限时活动「神将降临」（累计充值￥1288）/ 千金募名将低概率出<br></p></div>
  <div class="card"><h3>存档</h3>
  <button class="btn small" id="resave">手动保存</button>
