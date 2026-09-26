@@ -371,14 +371,14 @@ function renderTop(){
  </div>
  <div class="wallet"><span>🪙铜币 <b>${p.coins}</b></span><span>💰元宝 <b>${p.gold}</b></span><span>⚡体力 <b>${p.stamina}/${p.maxStamina}</b></span><span>🍀幸运 <b>${p.luck||0}</b></span><span>⚔️战力 <b>${zhanli()}</b></span></div>`;
 }
-const TABS=[["home","🏠<br>江湖"],["bag","🎒<br>背包"],["pet","🦊<br>宠物"],["sect","🥋<br>门派"],["gongfa","📖<br>功法"],["shop","🏪<br>商店"],["gold","💎<br>商城"],["pay","💰<br>充值"],["rank","🏆<br>排行"],["more","⚙️<br>更多"]];
+const TABS=[["home","🏠<br>江湖"],["bag","🎒<br>背包"],["pet","🦊<br>宠物"],["sect","🥋<br>门派"],["gongfa","📖<br>功法"],["shop","🏪<br>商店"],["gold","💎<br>商城"],["pay","💰<br>充值"],["rank","🏆<br>排行"],["event","🎉<br>活动"],["more","⚙️<br>更多"]];
 function renderTabs(){
  const t=$("tabbar");t.style.display="flex";
  t.innerHTML=TABS.map(([k,n])=>`<button class="${TAB===k?'on':''}" data-t="${k}">${n}</button>`).join("");
  t.querySelectorAll("button").forEach(b=>b.onclick=()=>{TAB=b.dataset.t;B=null;render();});
 }
 function render(){if(S&&S.player&&sweepExpired())setTimeout(()=>toast("⏳ 小红剑已到期，已自动卸下"),50);renderTop();renderTabs();
- ({home:rHome,bag:rBag,pet:rPet,sect:rSect,gongfa:rGongfa,shop:rShop,gold:rGold,pay:rPay,rank:rRank,more:rMore}[TAB])();}
+ ({home:rHome,bag:rBag,pet:rPet,sect:rSect,gongfa:rGongfa,shop:rShop,gold:rGold,pay:rPay,rank:rRank,event:rEvent,more:rMore}[TAB])();}
 /* ============ 创建角色 ============ */
 let selSect="shaolin";
 function rCreate(){
@@ -906,6 +906,51 @@ function rRank(){
  h+=`</div>`;m.innerHTML=h;
 }
 /* ============ 更多：GM后台/帮助/存档 ============ */
+function rEvent(){
+ const m=$("main"),p=S.player;
+ const total=vipTotal(),today=nowStr().slice(0,10);
+ let h=`<div class="card"><h3>🎉 活动中心</h3><p class="dim">所有活动都在这里，一目了然。</p></div>`;
+ // ---- 限时活动 ----
+ const midGot=(S.eventTitles||[]).includes("midautumn");
+ const darinGot=gfLearned("darin"),canDarin=total>=498&&!darinGot;
+ h+=`<div class="card"><h3>⏳ 限时活动</h3>
+ <div class="tier"><div><div class="gold">🎑 中秋赏月</div><div class="m">限定称号 ${titleBadge("🐰中秋快乐","rt-moon")}<br>攻击+15 气血+150，可叠加</div></div>
+ <button class="btn small primary" style="width:auto;margin:0" id="evtMid"${midGot?" disabled":""}>${midGot?"已领取":"领取"}</button></div>
+ <div class="tier"><div><div class="gold">⚡ 神功现世</div><div class="m">累计充值满￥498 领取神级《大日焚天诀》（${total}/498）<br><span class="dim">原需👑VIP6，限时直得</span></div></div>
+ <button class="btn small primary" style="width:auto;margin:0" id="evtDarin"${canDarin?"":" disabled"}>${darinGot?"已领取":(total>=498?"领取":`差￥${498-total}`)}</button></div></div>`;
+ // ---- 每日活动 ----
+ const wbl=wbLeft();
+ const taskSt=!p.task?"未接取":(p.taskDone?"可领奖":`进行中 ${p.task.done}/${p.task.need}`);
+ h+=`<div class="card"><h3>📅 每日活动</h3>
+ <div class="tier"><div><div class="gold">🌍 世界BOSS</div><div class="m">远古魔龙·帝天，掉落功法秘籍/异火 · 今日剩余 <b class="gold">${wbl}</b> 次</div></div>
+ <button class="btn small" style="width:auto;margin:0" data-go="home">前往</button></div>
+ <div class="tier"><div><div class="gold">📜 师门任务</div><div class="m">击败10个敌人，奖300铜币+200修为 · ${taskSt}</div></div>
+ <button class="btn small" style="width:auto;margin:0" data-go="sect">前往</button></div></div>`;
+ // ---- 福利领取 ----
+ const v=vipLevel(),vclaimed=S.vipClaim===today;
+ const vSt=!v?"VIP1开启":(vclaimed?"今日已领取":"可领取");
+ const fgSt=S.firstGift?"已领取":(S.orders.length?"可领取":"首充后可领");
+ const giftN=GIFTS.filter(gf=>total>=gf.need&&!(S.claimedGifts||{})[gf.id]).length;
+ const giftSt=giftN?`${giftN}个可领取`:"暂无可领";
+ h+=`<div class="card"><h3>🎁 福利领取</h3>
+ <div class="tier"><div><div class="gold">👑 每日VIP礼包</div><div class="m">${vSt}</div></div>
+ <button class="btn small" style="width:auto;margin:0" data-go="pay">前往领取</button></div>
+ <div class="tier"><div><div class="gold">🎁 首充礼包</div><div class="m">${fgSt} · 288元宝+2万铜币+体力+灵兽蛋</div></div>
+ <button class="btn small" style="width:auto;margin:0" data-go="pay">前往领取</button></div>
+ <div class="tier"><div><div class="gold">💎 充值豪礼</div><div class="m">${giftSt} · 神级宠物/稀有称号</div></div>
+ <button class="btn small" style="width:auto;margin:0" data-go="pay">前往领取</button></div></div>`;
+ m.innerHTML=h;
+ const em=$("evtMid");
+ if(em)em.onclick=()=>{S.eventTitles=S.eventTitles||[];
+  if(S.eventTitles.includes("midautumn"))return;
+  S.eventTitles.push("midautumn");calcStats();save();render();toast("🎑 获得限定称号「🐰中秋快乐」！");};
+ const ed=$("evtDarin");
+ if(ed)ed.onclick=()=>{
+  if(vipTotal()<498||gfLearned("darin"))return;
+  S.gongfaLearned=S.gongfaLearned||{};S.gongfaLearned.darin=1;
+  calcStats();save();render();toast("⚡ 限时活动：获得神级功法《大日焚天诀》！");};
+ m.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{TAB=b.dataset.go;B=null;render();window.scrollTo(0,0);});
+}
 function rMore(){
  const m=$("main"),p=S.player;
  const total=S.orders.reduce((a,o)=>a+o.money,0);
@@ -924,31 +969,11 @@ function rMore(){
  · 宠物可捕捉斗罗魂兽：柔骨兔·小舞、蓝银皇·阿银、鬼虎、人面魔蛛、泰坦巨猿·二明、暗魔邪神虎、天青牛蟒·大明、冰碧帝皇蝎<br>
  · 「排行」有战力榜和充值榜，前三名自动获得炫酷称号（属性可叠加）：👑战力之巅/⚔️武林传奇/🛡️江湖豪杰，💎神豪无双/💰富甲天下/🪙一掷千金<br>
  · 🦊宠物分黄/玄/地/天/神五级，品级越高助战越强；神级宠物、神级功法、稀有称号只能通过💎充值豪礼或⚡限时活动获得<br>
- · 📖神级以下功法：元宝购买或打🌍世界BOSS掉落；「更多」→「节日活动」有中秋称号和神功现世限时活动</p></div>
- <div class="card"><h3>🎑 节日活动</h3>
- <div class="tier"><div><div class="gold">中秋赏月 · 限时</div><div class="m">领取限定称号 ${titleBadge("🐰中秋快乐","rt-moon")}<br>攻击+15 气血+150，与其他称号叠加</div></div>
- <button class="btn small primary" style="width:auto;margin:0" id="evtMid"${(S.eventTitles||[]).includes("midautumn")?" disabled":""}>${(S.eventTitles||[]).includes("midautumn")?"已领取":"领取"}</button></div>
- <div class="tier"><div><div class="gold">⚡神功现世 · 限时</div><div class="m">活动期间累计充值满￥498，领取神级《大日焚天诀》<br><span class="dim">（原需👑VIP6，限时直得）</span></div></div>
- <button class="btn small primary" style="width:auto;margin:0" id="evtDarin">领取</button></div></div>
+ · 🎉活动中心：⏳限时活动（中秋称号、神功现世）、📅每日活动（世界BOSS、师门任务）、🎁福利领取（VIP礼包/首充礼包/充值豪礼）都在这里<br></p></div>
  <div class="card"><h3>💾 存档</h3>
  <button class="btn small" id="resave">手动保存</button>
  <button class="btn small danger" id="reset">删号重来（清空存档）</button></div>`;
  $("resave").onclick=()=>{save();toast("已保存");};
- const em=$("evtMid");
- if(em)em.onclick=()=>{S.eventTitles=S.eventTitles||[];
-  if(S.eventTitles.includes("midautumn"))return;
-  S.eventTitles.push("midautumn");calcStats();save();render();toast("🎑 获得限定称号「🐰中秋快乐」！");};
- const ed=$("evtDarin");
- if(ed){
-  const total=S.orders.reduce((a,o)=>a+o.money,0),hasD=gfLearned("darin");
-  ed.disabled=hasD||total<498;ed.textContent=hasD?"已获得":(total>=498?"领取":`还差￥${498-total}`);
-  ed.onclick=()=>{
-   const t2=S.orders.reduce((a,o)=>a+o.money,0);
-   if(t2<498||gfLearned("darin"))return;
-   S.gongfaLearned=S.gongfaLearned||{};S.gongfaLearned.darin=1;
-   calcStats();save();render();toast("⚡ 限时活动：获得神级功法《大日焚天诀》！");
-  };
- }
  $("reset").onclick=()=>{
   if(confirm("确定删除存档、重新开始吗？")){localStorage.removeItem(SAVE_KEY);location.reload();}
  };
