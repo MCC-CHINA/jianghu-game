@@ -142,19 +142,23 @@ const ITEMS={ // iid: {name,slot,atk,def,hp,spd,luck,tier}
  c3:{name:"灵珠",slot:"charm",atk:7,def:4,hp:80,tier:3},c4:{name:"龙纹佩",slot:"charm",atk:12,def:7,hp:140,tier:4}
 };
 const SLOTNAME={weapon:"武器",armor:"护甲",boots:"鞋子",charm:"饰品"};
-const PETS={ // pid: {name,hp,atk,def,spd,desc,tier}
+const PTN=["","黄","玄","地","天","神"]; // 宠物品级名
+const PET_TMULT=[0,1,1.15,1.3,1.6,2]; // 品级助战倍率
+const PETS={ // pid: {name,hp,atk,def,spd,desc,tier:1黄 2玄 3地 4天 5神}
  linghou:{name:"小灵猴",hp:60,atk:10,def:5,spd:12,desc:"青竹林的机灵小猴，动作敏捷",tier:1},
- rougutu:{name:"柔骨兔·小舞",hp:70,atk:12,def:6,spd:14,desc:"十万年柔骨兔化形，腿法惊人",tier:1},
- lanyinhuang:{name:"蓝银皇·阿银",hp:90,atk:8,def:12,spd:6,desc:"蓝银皇血脉，生命力磅礴",tier:1},
- tiedog:{name:"铁背犬",hp:110,atk:16,def:10,spd:8,desc:"黑风寨驯养的獒犬，忠心护主",tier:2},
+ tiedog:{name:"铁背犬",hp:110,atk:16,def:10,spd:8,desc:"黑风寨驯养的獒犬，忠心护主",tier:1},
+ youmingzhu:{name:"幽冥蛛",hp:150,atk:24,def:14,spd:10,desc:"幽冥谷的毒蛛，獠牙淬毒",tier:1},
+ xuediao:{name:"雪雕",hp:200,atk:34,def:18,spd:16,desc:"华山之巅的雪雕，翱翔九天",tier:1},
+ rougutu:{name:"柔骨兔·小舞",hp:70,atk:12,def:6,spd:14,desc:"十万年柔骨兔化形，腿法惊人",tier:2},
+ lanyinhuang:{name:"蓝银皇·阿银",hp:90,atk:8,def:12,spd:6,desc:"蓝银皇血脉，生命力磅礴",tier:2},
  guihu:{name:"鬼虎",hp:130,atk:20,def:12,spd:10,desc:"影虎一族，神出鬼没",tier:2},
- renmianzhu:{name:"人面魔蛛",hp:140,atk:22,def:10,spd:12,desc:"人面蛛身，剧毒无比",tier:2},
- youmingzhu:{name:"幽冥蛛",hp:150,atk:24,def:14,spd:10,desc:"幽冥谷的毒蛛，獠牙淬毒",tier:3},
+ renmianzhu:{name:"人面魔蛛",hp:140,atk:22,def:10,spd:12,desc:"人面蛛身，剧毒无比",tier:3},
  taitan:{name:"泰坦巨猿·二明",hp:220,atk:40,def:24,spd:8,desc:"森林之王，力大无穷",tier:3},
  xiemohu:{name:"暗魔邪神虎",hp:200,atk:44,def:18,spd:14,desc:"邪神血脉，风雷双翼",tier:3},
- xuediao:{name:"雪雕",hp:200,atk:34,def:18,spd:16,desc:"华山之巅的雪雕，翱翔九天",tier:4},
  tianqing:{name:"天青牛蟒·大明",hp:300,atk:52,def:30,spd:12,desc:"十万年天青牛蟒，君临星斗",tier:4},
- bingdi:{name:"冰碧帝皇蝎",hp:280,atk:58,def:24,spd:18,desc:"极北冰帝，极致之冰",tier:4}
+ bingdi:{name:"冰碧帝皇蝎",hp:280,atk:58,def:24,spd:18,desc:"极北冰帝，极致之冰",tier:4},
+ sanyan:{name:"三眼金猊·王秋儿",hp:400,atk:70,def:35,spd:20,desc:"帝皇瑞兽，执掌命运之力",tier:5},
+ xuenv:{name:"冰天雪女",hp:380,atk:75,def:30,spd:22,desc:"极北三大天王之首，冰雪之灵",tier:5}
 };
 function mkMonster(name,lv,catchPet,boss){return{name,lv,catchPet:catchPet||null,boss:!!boss,
  hp:Math.floor(45+lv*24),atk:Math.floor(8+lv*2.3),def:Math.floor(4+lv*1.3),spd:Math.floor(5+lv*0.9),
@@ -189,8 +193,15 @@ const RANK_TITLES={
 };
 /* 节日限定称号 */
 const EVENT_TITLES={
- midautumn:{name:"🐰中秋快乐",cls:"rt-moon",bonus:{atk:15,hp:150},desc:"2026中秋限定"}
+ midautumn:{name:"🐰中秋快乐",cls:"rt-moon",bonus:{atk:15,hp:150},desc:"2026中秋限定"},
+ shenzhi:{name:"🌟神之眷顾",cls:"rt1",bonus:{atk:50,hp:500,luck:3},desc:"充值豪礼·稀有称号"}
 };
+/* 充值豪礼：累计充值领取神级宠物/稀有称号 */
+const GIFTS=[
+ {id:"pet_sanyan",need:198,kind:"pet",pid:"sanyan",name:"神级宠物「三眼金猊·王秋儿」",desc:"神级魂兽，帝皇瑞兽"},
+ {id:"pet_xuenv",need:498,kind:"pet",pid:"xuenv",name:"神级宠物「冰天雪女」",desc:"神级魂兽，极北天王"},
+ {id:"title_shenzhi",need:998,kind:"title",eid:"shenzhi",name:"稀有称号「🌟神之眷顾」",desc:"攻击+50 气血+500 幸运+3，可叠加"}
+];
 function myRankTitles(){
  const t=[],zl=zhanli();
  const zr=[...RANKS.map(r=>({...r})),{zl,me:true}].sort((a,b)=>b.zl-a.zl).findIndex(r=>r.me);
@@ -251,7 +262,7 @@ function bonusStr(b){return Object.entries(b||{}).map(([k,v])=>`${GFNAME[k]||k}+
 function gfLv(gid){return (S.gongfa&&S.gongfa[gid])||0;}
 function gfCost(lv){return 300*Math.pow(2,lv);}
 function gfLearned(gid){ // 是否已习得
- if(gid==="darin")return vipLevel()>=6;
+ if(gid==="darin")return vipLevel()>=6||!!(S.gongfaLearned&&S.gongfaLearned.darin);
  return !!((S.gongfaLearned&&S.gongfaLearned[gid])||gfLv(gid)>0);
 }
 /* 世界BOSS */
@@ -321,7 +332,7 @@ function calcStats(){
 }
 function zhanli(){
  const p=S.player;let z=p.atk*3+p.def*2+p.maxhp*0.5+p.spd*2;
- const pet=S.pets[S.activePet]; if(pet){const b=PETS[pet.pid];z+=(b.atk*(1+0.15*(pet.level-1)))*2;}
+ const pet=S.pets[S.activePet]; if(pet){const b=PETS[pet.pid];z+=(b.atk*(1+0.15*(pet.level-1)))*2*(PET_TMULT[b.tier]||1);}
  return Math.floor(z);
 }
 function newGame(name,sectKey){
@@ -330,7 +341,7 @@ function newGame(name,sectKey){
    stamina:50,maxStamina:50,skills:[sc.skill],task:null,taskDone:false,
    base:{maxhp:sc.hp,maxmp:sc.mp,atk:sc.atk,def:sc.def,spd:sc.spd}},
   equip:{weapon:null,armor:null,boots:null,charm:null},bag:[],pets:[],activePet:-1,
-  orders:[],zone:0,created:nowStr(),gongfa:{},gongfaLearned:{},douqi:0,yihuo:[],fenjue:{lv:0},eventTitles:[]};
+  orders:[],zone:0,created:nowStr(),gongfa:{},gongfaLearned:{},claimedGifts:{},douqi:0,yihuo:[],fenjue:{lv:0},eventTitles:[]};
  calcStats();S.player.hp=S.player.maxhp;S.player.mp=S.player.maxmp;save();
 }
 /* ============ 顶栏/导航 ============ */
@@ -440,7 +451,7 @@ function petTurn(){
 const pet=S.pets[S.activePet];
 if(!pet||B.over)return;
 const b=PETS[pet.pid],f=B.foe;
-const pa=Math.floor(b.atk*(1+0.15*(pet.level-1)));
+const pa=Math.floor(b.atk*(1+0.15*(pet.level-1))*(PET_TMULT[b.tier]||1));
 const d=Math.max(1,Math.floor(pa*1.2-f.def*0.5));
 f.hp=Math.max(0,f.hp-d);
 log(`<span class="pet">协助攻击，造成 ${d} 点伤害</span>`);
@@ -602,12 +613,12 @@ S.player.coins-=cost;it.enh++;calcStats();save();closeModal();render();toast("�
 /* ============ 宠物 ============ */
 function rPet(){
 const m=$("main");
-let h=`<div class="card"><h3>🦊 我的宠物</h3><p class="dim">野外把怪物打到30%血以下可捕捉。出战宠物会在战斗中协助攻击。</p>`;
+let h=`<div class="card"><h3>🦊 我的宠物</h3><p class="dim">宠物分黄/玄/地/天/神五级，品级越高助战越强。野外把怪物打到30%血以下可捕捉；神级宠物只能通过充值豪礼或限时活动获得。</p>`;
 if(!S.pets.length)h+=`<p class="dim">还没有宠物，去青竹林捕捉小灵猴吧！</p>`;
 S.pets.forEach((pet,i)=>{
 const b=PETS[pet.pid];
 const atk=Math.floor(b.atk*(1+0.15*(pet.level-1))),hp=Math.floor(b.hp*(1+0.15*(pet.level-1)));
-h+=`<div class="mob"><div><div class="mn">${pet.name} <span class="dim">Lv.${pet.level}</span> ${i===S.activePet?'<span class="gold"></span>':""}</div>
+h+=`<div class="mob"><div><div class="mn">${pet.name} <span class="ptier ${PTN[b.tier]}">${PTN[b.tier]}级</span> <span class="dim">Lv.${pet.level}</span> ${i===S.activePet?'<span class="gold">出战中</span>':""}</div>
 <div class="md">${b.desc}</div><div class="md">气血${hp} 攻击${atk} · 经验${pet.exp}/${petExpNeed(pet.level)}</div></div>
 ${i===S.activePet?"":`<button class="btn" data-pet="${i}">出战</button>`}</div>`;
 });
@@ -656,7 +667,7 @@ for(const[gid,g]of Object.entries(GONGFA)){
    btn=`<button class="btn small primary" style="width:auto;margin:0" data-gf="${gid}"${maxed?" disabled":""}>${maxed?"已满重":`修炼·${gfCost(lv)}铜币`}</button>`;
   }else{
    btn=`<button class="btn small" style="width:auto;margin:0" disabled>👑VIP6专属</button>`;
-   sub=`<div class="m" style="color:#e08a8a">累计充值至VIP6即可获得</div>`;
+   sub=`<div class="m" style="color:#e08a8a">👑VIP6 或 ⚡限时活动「神功现世」可获得</div>`;
   }
  }else if(!learned){
   btn=`<button class="btn small primary" style="width:auto;margin:0" data-buygf="${gid}">购买·${g.price}元宝</button>`;
@@ -734,7 +745,7 @@ const m=$("main"),p=S.player;
 const tier=Math.min(5,Math.floor(p.level/6)+1);
 let h=`<div class="card"><h3>💎 元宝商城</h3><p class="dim">你有元宝 <b class="gold">${p.gold}</b> · 没元宝？去充值！</p>
 <div class="tier"><div><div class="gold">体力丹</div><div class="m">+30体力 · 10元宝</div></div><button class="btn small" style="width:auto;margin:0" data-g="tili">购买</button></div>
-<div class="tier"><div><div class="gold">灵兽蛋</div><div class="m">随机开出当前区域宠物 · 88元宝</div></div><button class="btn small" style="width:auto;margin:0" data-g="egg">购买</button></div>
+<div class="tier"><div><div class="gold">灵兽蛋</div><div class="m">随机开出黄~天级宠物 · 88元宝</div></div><button class="btn small" style="width:auto;margin:0" data-g="egg">购买</button></div>
 <div class="tier"><div><div class="gold">神兵宝箱</div><div class="m">随机开出${tier}阶武器 · 68元宝</div></div><button class="btn small" style="width:auto;margin:0" data-g="box">购买</button></div>
 </div>`;m.innerHTML=h;
 m.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>{
@@ -775,6 +786,12 @@ function rPay(){
   h+=`<div class="tier"><div><div class="gold">${t.gold} 元宝 ${t.bonus?`<span class="dim">${t.bonus}</span>`:""}${i===0&&!S.orders.length?` <span class="dim">🎁首充赠小红剑（限时3天）</span>`:""}</div><div class="m">￥${t.money}</div></div>
   <button class="btn small primary" style="width:auto;margin:0" data-tier="${i}">充值</button></div>`;
  });
+ h+=`</div><div class="card"><h3>💎 充值豪礼</h3><p class="dim">神级宠物与稀有称号只能通过充值豪礼或限时活动获得。</p>`;
+ GIFTS.forEach(gf=>{
+  const ok=total>=gf.need,got=(S.claimedGifts||{})[gf.id];
+  h+=`<div class="tier"><div><div class="gold">${gf.name}</div><div class="m">${gf.desc} · 累计充值满￥${gf.need}（${total}/${gf.need}）</div></div>
+  <button class="btn small primary" style="width:auto;margin:0" data-gift="${gf.id}"${(ok&&!got)?"":" disabled"}>${got?"已领取":(ok?"领取":"未达成")}</button></div>`;
+ });
  h+=`</div><div class="card"><h3>🧾 我的充值记录</h3>`;
  if(!S.orders.length)h+=`<p class="dim">暂无充值记录</p>`;
  [...S.orders].reverse().forEach(o=>{
@@ -792,6 +809,15 @@ function rPay(){
  };
  m.querySelectorAll("[data-title]").forEach(b=>b.onclick=()=>{S.title=+b.dataset.title;calcStats();save();render();toast(`已佩戴称号「${VIP_TITLES[S.title].name}」！`);});
  m.querySelectorAll("[data-tier]").forEach(b=>b.onclick=()=>payModal(+b.dataset.tier));
+ m.querySelectorAll("[data-gift]").forEach(b=>b.onclick=()=>{
+  const gf=GIFTS.find(x=>x.id===b.dataset.gift);
+  const total=S.orders.reduce((a,o)=>a+o.money,0);
+  if(!gf||total<gf.need||(S.claimedGifts||{})[gf.id])return;
+  S.claimedGifts=S.claimedGifts||{};S.claimedGifts[gf.id]=1;
+  if(gf.kind==="pet"){const pb=PETS[gf.pid];S.pets.push({pid:gf.pid,name:pb.name,level:S.player.level,exp:0});if(S.activePet===-1)S.activePet=0;}
+  else{S.eventTitles=S.eventTitles||[];if(!S.eventTitles.includes(gf.eid))S.eventTitles.push(gf.eid);}
+  calcStats();save();render();toast(`🎁获得${gf.name}！`);
+ });
 }
 function payModal(i){
  const t=TIERS[i],oid="T"+Date.now().toString().slice(-8);
@@ -857,11 +883,13 @@ function rMore(){
  · 「充值」是模拟的，不花真钱，随便点！累计充值提升VIP等级，加攻击气血、每日领礼包<br>
  · 宠物可捕捉斗罗魂兽：柔骨兔·小舞、蓝银皇·阿银、鬼虎、人面魔蛛、泰坦巨猿·二明、暗魔邪神虎、天青牛蟒·大明、冰碧帝皇蝎<br>
  · 「排行」有战力榜和充值榜，前三名自动获得炫酷称号（属性可叠加）：👑战力之巅/⚔️武林传奇/🛡️江湖豪杰，💎神豪无双/💰富甲天下/🪙一掷千金<br>
- · 「更多」→「节日活动」可领中秋限定称号「🐰中秋快乐」（攻击+15 气血+150，可叠加）<br>
- · 📖功法：神级以下先元宝购买（或打🌍世界BOSS掉落）再修炼，神级《大日焚天诀》唯👑VIP6可得；《焚诀》炼化异火可进化</p></div>
+ · 🦊宠物分黄/玄/地/天/神五级，品级越高助战越强；神级宠物、神级功法、稀有称号只能通过💎充值豪礼或⚡限时活动获得<br>
+ · 📖神级以下功法：元宝购买或打🌍世界BOSS掉落；「更多」→「节日活动」有中秋称号和神功现世限时活动</p></div>
  <div class="card"><h3>🎑 节日活动</h3>
  <div class="tier"><div><div class="gold">中秋赏月 · 限时</div><div class="m">领取限定称号 <span class="rt rt-moon">🐰中秋快乐</span><br>攻击+15 气血+150，与其他称号叠加</div></div>
- <button class="btn small primary" style="width:auto;margin:0" id="evtMid"${(S.eventTitles||[]).includes("midautumn")?" disabled":""}>${(S.eventTitles||[]).includes("midautumn")?"已领取":"领取"}</button></div></div>
+ <button class="btn small primary" style="width:auto;margin:0" id="evtMid"${(S.eventTitles||[]).includes("midautumn")?" disabled":""}>${(S.eventTitles||[]).includes("midautumn")?"已领取":"领取"}</button></div>
+ <div class="tier"><div><div class="gold">⚡神功现世 · 限时</div><div class="m">活动期间累计充值满￥498，领取神级《大日焚天诀》<br><span class="dim">（原需👑VIP6，限时直得）</span></div></div>
+ <button class="btn small primary" style="width:auto;margin:0" id="evtDarin">领取</button></div></div>
  <div class="card"><h3>💾 存档</h3>
  <button class="btn small" id="resave">手动保存</button>
  <button class="btn small danger" id="reset">删号重来（清空存档）</button></div>`;
@@ -870,6 +898,17 @@ function rMore(){
  if(em)em.onclick=()=>{S.eventTitles=S.eventTitles||[];
   if(S.eventTitles.includes("midautumn"))return;
   S.eventTitles.push("midautumn");calcStats();save();render();toast("🎑 获得限定称号「🐰中秋快乐」！");};
+ const ed=$("evtDarin");
+ if(ed){
+  const total=S.orders.reduce((a,o)=>a+o.money,0),hasD=gfLearned("darin");
+  ed.disabled=hasD||total<498;ed.textContent=hasD?"已获得":(total>=498?"领取":`还差￥${498-total}`);
+  ed.onclick=()=>{
+   const t2=S.orders.reduce((a,o)=>a+o.money,0);
+   if(t2<498||gfLearned("darin"))return;
+   S.gongfaLearned=S.gongfaLearned||{};S.gongfaLearned.darin=1;
+   calcStats();save();render();toast("⚡ 限时活动：获得神级功法《大日焚天诀》！");
+  };
+ }
  $("reset").onclick=()=>{
   if(confirm("确定删除存档、重新开始吗？")){localStorage.removeItem(SAVE_KEY);location.reload();}
  };
