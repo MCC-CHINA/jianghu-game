@@ -216,22 +216,22 @@ const RANK_WING=[{name:"翼皇·陆九天",wing:"九天神翼",tier:12},{name:"�
 const RANK_LV=[{name:"武林神话·叶孤鸿",lv:99},{name:"剑圣·西门飘雪",lv:88},{name:"魔教教主·任逍遥",lv:80},{name:"丐帮帮主·洪七",lv:72},{name:"武当掌门·张真人",lv:65},{name:"峨眉掌门·灭绝师太",lv:58},{name:"少林方丈·玄慈",lv:52},{name:"黑风寨主·黑风虎",lv:40},{name:"采花大盗·田伯光",lv:30},{name:"江南大侠·江别鹤",lv:20}];
 /* 排行榜称号：前三名自动获得，属性可叠加 */
 const RANK_TITLES={
- zl:[{name:"👑战力之巅",cls:"rt1",bonus:{atk:30,hp:300}},{name:"⚔️武林传奇",cls:"rt2",bonus:{atk:20,hp:200}},{name:"🛡️江湖豪杰",cls:"rt3",bonus:{atk:10,hp:100}}],
- pay:[{name:"💎神豪无双",cls:"rt1",bonus:{atk:25,hp:250,luck:2}},{name:"💰富甲天下",cls:"rt2",bonus:{atk:15,hp:150,luck:1}},{name:"🪙一掷千金",cls:"rt3",bonus:{atk:8,hp:80}}],
- pet:[{name:"🦊灵兽之主",cls:"rt1",bonus:{atk:20,hp:200}},{name:"🐾兽语者",cls:"rt2",bonus:{atk:12,hp:120}},{name:"🐣驯兽师",cls:"rt3",bonus:{atk:6,hp:60}}],
- wing:[{name:"🪽九天神皇",cls:"rt0",bonus:{atk:25,hp:250,spd:3}},{name:"🕊️凌云之志",cls:"rt2",bonus:{atk:15,hp:150,spd:2}},{name:"🪶风行者",cls:"rt3",bonus:{atk:8,hp:80,spd:1}}],
- lv:[{name:"⬆️登峰造极",cls:"rt1",bonus:{atk:20,hp:200}},{name:"📈后来居上",cls:"rt2",bonus:{atk:12,hp:120}},{name:"🌱初露头角",cls:"rt3",bonus:{atk:6,hp:60}}]
+ zl:[{name:"战力之巅",cls:"rt1",bonus:{atk:30,hp:300}},{name:"武林传奇",cls:"rt2",bonus:{atk:20,hp:200}},{name:"江湖豪杰",cls:"rt3",bonus:{atk:10,hp:100}}],
+ pay:[{name:"神豪无双",cls:"rt1",bonus:{atk:25,hp:250,luck:2}},{name:"富甲天下",cls:"rt2",bonus:{atk:15,hp:150,luck:1}},{name:"一掷千金",cls:"rt3",bonus:{atk:8,hp:80}}],
+ pet:[{name:"灵兽之主",cls:"rt1",bonus:{atk:20,hp:200}},{name:"兽语者",cls:"rt2",bonus:{atk:12,hp:120}},{name:"驯兽师",cls:"rt3",bonus:{atk:6,hp:60}}],
+ wing:[{name:"九天神皇",cls:"rt0",bonus:{atk:25,hp:250,spd:3}},{name:"凌云之志",cls:"rt2",bonus:{atk:15,hp:150,spd:2}},{name:"风行者",cls:"rt3",bonus:{atk:8,hp:80,spd:1}}],
+ lv:[{name:"登峰造极",cls:"rt1",bonus:{atk:20,hp:200}},{name:"后来居上",cls:"rt2",bonus:{atk:12,hp:120}},{name:"初露头角",cls:"rt3",bonus:{atk:6,hp:60}}]
 };
 /* 节日限定称号 */
 const EVENT_TITLES={
- midautumn:{name:"🐰中秋快乐",cls:"rt-moon",bonus:{atk:15,hp:150},desc:"2026中秋限定"},
- shenzhi:{name:"🌟神之眷顾",cls:"rt1",bonus:{atk:50,hp:500,luck:3},desc:"充值豪礼·稀有称号"}
+ midautumn:{name:"中秋快乐",cls:"rt-moon",bonus:{atk:15,hp:150},desc:"2026中秋限定"},
+ shenzhi:{name:"神之眷顾",cls:"rt1",bonus:{atk:50,hp:500,luck:3},desc:"充值豪礼·稀有称号"}
 };
 /* 充值豪礼：累计充值领取神级宠物/稀有称号 */
 const GIFTS=[
  {id:"pet_sanyan",need:198,kind:"pet",pid:"sanyan",name:"神级宠物「三眼金猊·王秋儿」",desc:"神级魂兽，帝皇瑞兽"},
  {id:"pet_xuenv",need:498,kind:"pet",pid:"xuenv",name:"神级宠物「冰天雪女」",desc:"神级魂兽，极北天王"},
- {id:"title_shenzhi",need:998,kind:"title",eid:"shenzhi",name:"稀有称号「🌟神之眷顾」",desc:"攻击+50 气血+500 幸运+3，可叠加"}
+ {id:"title_shenzhi",need:998,kind:"title",eid:"shenzhi",name:"稀有称号「神之眷顾」",desc:"攻击+50 气血+500 幸运+3，可叠加"}
 ];
 /* 称号牌渲染：皇冠+翼饰+缎带 */
 function titleBadge(name,cls){return `<span class="rtx ${cls}"><b>${name}</b></span>`;}
@@ -1153,7 +1153,7 @@ function rEvent(){
  const darinGot=gfLearned("darin"),canDarin=total>=498&&!darinGot;
  const mythicGot=!!S.claimedMythicEvent,canMythic=total>=1288&&!mythicGot;
  h+=`<div class="card"><h3>⏳ 限时活动</h3>
- <div class="tier"><div><div class="gold">🎑 中秋赏月</div><div class="m">限定称号 ${titleBadge("🐰中秋快乐","rt-moon")}<br>攻击+15 气血+150，可叠加</div></div>
+ <div class="tier"><div><div class="gold">🎑 中秋赏月</div><div class="m">限定称号 ${titleBadge(EVENT_TITLES.midautumn.name,"rt-moon")}<br>攻击+15 气血+150，可叠加</div></div>
  <button class="btn small primary" style="width:auto;margin:0" id="evtMid"${midGot?" disabled":""}>${midGot?"已领取":"领取"}</button></div>
  <div class="tier"><div><div class="gold">⚡ 神功现世</div><div class="m">累计充值满￥498 领取神级《<span class="godflow">大日焚天诀</span>》（${total}/498）<br><span class="dim">原需👑VIP6，限时直得</span></div></div>
  <button class="btn small primary" style="width:auto;margin:0" id="evtDarin"${canDarin?"":" disabled"}>${darinGot?"已领取":(total>=498?"领取":`差￥${498-total}`)}</button></div>
@@ -1187,7 +1187,7 @@ function rEvent(){
  const em=$("evtMid");
  if(em)em.onclick=()=>{S.eventTitles=S.eventTitles||[];
   if(S.eventTitles.includes("midautumn"))return;
-  S.eventTitles.push("midautumn");calcStats();save();render();toast("🎑 获得限定称号「🐰中秋快乐」！");};
+  S.eventTitles.push("midautumn");calcStats();save();render();toast("🎑 获得限定称号「中秋快乐」！");};
  const ed=$("evtDarin");
  if(ed)ed.onclick=()=>{
   if(vipTotal()<498||gfLearned("darin"))return;
@@ -1218,7 +1218,7 @@ function rMore(){
  · 体力不够就打坐，或去商城买体力丹<br>
  · 「充值」是模拟的，不花真钱，随便点！首充自动赠小红剑（限时3天），另有🎁首充礼包可领（288元宝+2万铜币+体力+4阶灵兽蛋）；累计充值提升VIP等级，加攻击气血、每日领礼包<br>
  · 宠物可捕捉斗罗魂兽：柔骨兔·小舞、蓝银皇·阿银、鬼虎、人面魔蛛、泰坦巨猿·二明、暗魔邪神虎、天青牛蟒·大明、冰碧帝皇蝎<br>
- · 「排行」有战力榜和充值榜，前三名自动获得炫酷称号（属性可叠加）：👑战力之巅/⚔️武林传奇/🛡️江湖豪杰，💎神豪无双/💰富甲天下/🪙一掷千金<br>
+ · 「排行」有战力榜和充值榜，前三名自动获得炫酷称号（属性可叠加）：战力之巅/武林传奇/江湖豪杰，神豪无双/富甲天下/一掷千金<br>
  · 🦊宠物分黄/玄/地/天/神五级，品级越高助战越强；神级宠物、神级功法、稀有称号只能通过💎充值豪礼或⚡限时活动获得<br>
  · 🎉活动中心：⏳限时活动（中秋称号、神功现世）、📅每日活动（世界BOSS、师门任务）、🎁福利领取（VIP礼包/首充礼包/充值豪礼）都在这里<br>· 🤝神话伙伴：👑VIP8免费领 / ⏳限时活动「神将降临」（累计充值￥1288）/ 💰千金募名将低概率出<br></p></div>
  <div class="card"><h3>💾 存档</h3>
