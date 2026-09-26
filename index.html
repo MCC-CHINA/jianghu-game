@@ -235,6 +235,7 @@ const GIFTS=[
 ];
 /* 称号牌渲染：皇冠+翼饰+缎带 */
 function titleBadge(name,cls){return `<span class="rtx ${cls}"><i class="crown"></i><i class="wing"></i><b>${name}</b><i class="wing r"></i></span>`;}
+function vipTitleCls(t){return t>=9?"rt0":(t>=5?"rt1":(t>=3?"rt2":"rt3"));} // VIP称号传奇风样式
 function myRankTitles(){
  const t=[],zl=zhanli();
  const zr=[...RANKS.map(r=>({...r})),{zl,me:true}].sort((a,b)=>b.zl-a.zl).findIndex(r=>r.me);
@@ -452,7 +453,7 @@ function renderTop(){
  const p=S.player,t=$("topbar");t.style.display="block";
  const v=vipLevel();
  const T=VIP_TITLES[S.title||0];
- t.innerHTML=`<div class="pname">${T?`<span class="title">「${T.name}」</span>`:""}<span class="${v>=6?"vipn"+Math.min(v,12):""}">${p.name}</span><span class="lv">Lv.${p.level} ${SECTS[p.sect].name}</span>${v?`<span class="vip">👑VIP${v}</span>`:""}</div>
+ t.innerHTML=`<div class="pname">${T?titleBadge(T.name,vipTitleCls(S.title||0)):""}<span class="${v>=6?"vipn"+Math.min(v,12):""}">${p.name}</span><span class="lv">Lv.${p.level} ${SECTS[p.sect].name}</span>${v?`<span class="vip">👑VIP${v}</span>`:""}</div>
  <div class="bars">
   <div class="bar hp"><i style="width:${p.hp/p.maxhp*100}%"></i><span>气血 ${p.hp}/${p.maxhp}</span></div>
   <div class="bar mp"><i style="width:${p.mp/p.maxmp*100}%"></i><span>内力 ${p.mp}/${p.maxmp}</span></div>
@@ -950,9 +951,9 @@ function rPay(){
  const v=vipLevel(),total=vipTotal(),next=v<VIP_NEED.length-1?VIP_NEED[v+1]:null;
  const today=nowStr().slice(0,10),claimed=S.vipClaim===today,g=vipGift();
  const T=VIP_TITLES[S.title||0];
- const vtCls=(S.title||0)>=9?"rt0":((S.title||0)>=5?"rt1":((S.title||0)>=3?"rt2":"rt3"));
+ const vtCls=vipTitleCls(S.title||0);
  let titleBtns="";
- for(let i=1;i<=v;i++){const tt=VIP_TITLES[i];titleBtns+=`<button class="btn small${(S.title||0)===i?" primary":""}" style="flex:1;margin:2px;white-space:nowrap" data-title="${i}">「${tt.name}」</button>`;}
+ for(let i=1;i<=v;i++){const tt=VIP_TITLES[i];titleBtns+=`<button class="btn small${(S.title||0)===i?" primary":""}" style="flex:1;margin:2px;white-space:nowrap" data-title="${i}">${titleBadge(tt.name,vipTitleCls(i))}</button>`;}
  if(!titleBtns)titleBtns=`<span class="dim">充值到 VIP1 解锁称号</span>`;
  let h=`<div class="card"><h3>👑 VIP特权</h3>
  <p>当前等级：<b class="gold">VIP${v}</b> · 累计充值 <b class="gold">￥${total}</b></p>
