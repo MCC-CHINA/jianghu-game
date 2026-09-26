@@ -18,19 +18,23 @@ body{background:#141009;color:#e8dcc0;font-family:"Songti SC","STSong","SimSun",
 .ptier.地{background:#2a4a2a;color:#9ae09a}
 .ptier.天{background:#5a2a2a;color:#f0a8a8}
 .ptier.神{background:#6a4a00;color:#ffe97b;font-weight:bold}
-/* 称号牌：中间金属牌匾 + 两侧对称翼饰 */
-.rtx{display:inline-flex;align-items:center;vertical-align:middle;margin:2px 1px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.45))}
-.rtx .wing{flex:none;width:42px;height:30px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 36'%3E%3Cdefs%3E%3ClinearGradient id='m' x1='0' y1='0' x2='1' y2='0'%3E%3Cstop offset='0' stop-color='%23fff3b0'/%3E%3Cstop offset='.55' stop-color='%23ffdf6b'/%3E%3Cstop offset='1' stop-color='%23c8862a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M58 18 C44 8 26 6 6 12 C20 13 26 15 28 18 C26 21 20 23 6 24 C26 30 44 28 58 18 Z' fill='url(%23m)'/%3E%3Cpath d='M58 18 C48 12 36 10 24 13 C34 14 40 16 42 18 C40 20 34 22 24 23 C36 26 48 24 58 18 Z' fill='%23fffbe8' opacity='.45'/%3E%3Ccircle cx='7' cy='18' r='2.6' fill='%23fff3b0'/%3E%3Ccircle cx='7' cy='18' r='1.2' fill='%23a86a1a'/%3E%3C/svg%3E") no-repeat center/contain}
+/* 称号牌：传奇式 皇冠+火焰翼饰+缎带+描边金字 */
+.rtx{position:relative;display:inline-flex;align-items:center;vertical-align:middle;margin:2px 1px;padding-top:9px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.5))}
+.rtx .crown{position:absolute;top:0;left:50%;transform:translateX(-50%);width:34px;height:20px;z-index:2;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 24'%3E%3Cdefs%3E%3ClinearGradient id='c' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23fff3b0'/%3E%3Cstop offset='1' stop-color='%23c8862a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M3 21 L5 7 L12 13 L20 3 L28 13 L35 7 L37 21 Z' fill='url(%23c)' stroke='%237a4a00' stroke-width='1'/%3E%3Crect x='3' y='19' width='34' height='4' rx='2' fill='%23c8862a' stroke='%237a4a00'/%3E%3Ccircle cx='20' cy='14' r='2.6' fill='%23e03030' stroke='%237a1010' stroke-width='.8'/%3E%3Ccircle cx='5' cy='7' r='1.6' fill='%23fff3b0'/%3E%3Ccircle cx='35' cy='7' r='1.6' fill='%23fff3b0'/%3E%3Ccircle cx='20' cy='3' r='1.6' fill='%23fff3b0'/%3E%3C/svg%3E") no-repeat center/contain}
+.rtx .wing{flex:none;width:46px;height:32px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 70 36'%3E%3Cdefs%3E%3ClinearGradient id='w' x1='1' y1='0' x2='0' y2='0'%3E%3Cstop offset='0' stop-color='%23fff3b0'/%3E%3Cstop offset='.5' stop-color='%23ffdf6b'/%3E%3Cstop offset='1' stop-color='%23c8862a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M68 18 C54 6 34 4 12 10 C26 11 34 14 36 18 C34 22 26 25 12 26 C34 32 54 30 68 18 Z' fill='url(%23w)'/%3E%3Cpath d='M68 18 C60 10 50 8 40 10 C48 12 54 14 58 18 Z' fill='%23fff8d0' opacity='.5'/%3E%3Cpath d='M68 18 C60 26 50 28 40 26 C48 24 54 22 58 18 Z' fill='%23fff8d0' opacity='.35'/%3E%3Ccircle cx='22' cy='12' r='1.5' fill='%23ffdf6b' opacity='.85'/%3E%3Ccircle cx='22' cy='24' r='1.5' fill='%23ffdf6b' opacity='.85'/%3E%3Ccircle cx='10' cy='18' r='2.6' fill='%23fff3b0' stroke='%23c8862a'/%3E%3C/svg%3E") no-repeat center/contain}
 .rtx .wing.r{transform:scaleX(-1)}
-.rtx b{position:relative;overflow:hidden;flex:none;font-size:13px;font-weight:bold;white-space:nowrap;padding:5px 14px;margin:0 -8px;border-radius:7px;background:linear-gradient(180deg,#fff6c0 0%,#ffdf6b 45%,#e09a3a 100%);border:1px solid #fff8d0;outline:1px solid #a86a1a;outline-offset:-4px;color:#4a2a00;text-shadow:0 1px 0 rgba(255,255,255,.65),0 0 6px rgba(255,210,90,.6)}
-.rtx b::after{content:"";position:absolute;top:0;left:-70%;width:45%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.65),transparent);transform:skewX(-20deg);animation:sweep 2.8s ease-in-out infinite}
+.rtx b{position:relative;overflow:hidden;flex:none;font-size:13px;font-weight:bold;white-space:nowrap;padding:4px 14px 5px;margin:0 -10px;border-radius:4px;background:linear-gradient(180deg,#93321c 0%,#6e1f10 55%,#4e130a 100%);border-top:2px solid #ffdf6b;border-bottom:2px solid #c8862a;color:#ffdf6b;text-shadow:1px 0 0 #3d0e00,-1px 0 0 #3d0e00,0 1px 0 #3d0e00,0 -1px 0 #3d0e00,1px 1px 0 #3d0e00,-1px -1px 0 #3d0e00,1px -1px 0 #3d0e00,-1px 1px 0 #3d0e00,0 0 10px rgba(255,190,70,.85)}
+.rtx b::after{content:"";position:absolute;top:0;left:-70%;width:45%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.5),transparent);transform:skewX(-20deg);animation:sweep 2.8s ease-in-out infinite}
 @keyframes sweep{to{left:140%}}
-.rtx.rt2 b{background:linear-gradient(180deg,#f2f2ff 0%,#b9b9f0 45%,#7676b8 100%);border-color:#f6f6ff;outline-color:#43437e;color:#1b1b4d;text-shadow:0 1px 0 rgba(255,255,255,.7),0 0 6px rgba(150,150,255,.6)}
+.rtx.rt2 b{background:linear-gradient(180deg,#4a2a8a 0%,#33206e 55%,#221447 100%);border-top-color:#c9c9ff;border-bottom-color:#7a7ac0;color:#e8e8ff;text-shadow:1px 0 0 #14143a,-1px 0 0 #14143a,0 1px 0 #14143a,0 -1px 0 #14143a,1px 1px 0 #14143a,-1px -1px 0 #14143a,1px -1px 0 #14143a,-1px 1px 0 #14143a,0 0 10px rgba(170,170,255,.85)}
 .rtx.rt2 .wing{filter:hue-rotate(205deg) saturate(.55)}
-.rtx.rt3 b{background:linear-gradient(180deg,#ffe6c8 0%,#f0a870 45%,#a8642f 100%);border-color:#ffedda;outline-color:#6f3f1c;color:#3a1e00;text-shadow:0 1px 0 rgba(255,255,255,.6),0 0 6px rgba(240,170,110,.6)}
+.rtx.rt2 .crown{filter:hue-rotate(205deg) saturate(.6)}
+.rtx.rt3 b{background:linear-gradient(180deg,#8a5a2a 0%,#6e421c 55%,#4e2c10 100%);border-top-color:#ffd9a0;border-bottom-color:#a86a2a;color:#ffd9a0;text-shadow:1px 0 0 #2e1a00,-1px 0 0 #2e1a00,0 1px 0 #2e1a00,0 -1px 0 #2e1a00,1px 1px 0 #2e1a00,-1px -1px 0 #2e1a00,1px -1px 0 #2e1a00,-1px 1px 0 #2e1a00,0 0 10px rgba(255,200,120,.85)}
 .rtx.rt3 .wing{filter:hue-rotate(-22deg) saturate(1.1)}
-.rtx.rt-moon b{background:linear-gradient(180deg,#ffe4f1 0%,#ff9ec7 45%,#c65a92 100%);border-color:#ffecf6;outline-color:#7e2454;color:#560f34;text-shadow:0 1px 0 rgba(255,255,255,.7),0 0 8px rgba(255,150,200,.7)}
+.rtx.rt3 .crown{filter:hue-rotate(-22deg) saturate(1.1)}
+.rtx.rt-moon b{background:linear-gradient(180deg,#8e2a5e 0%,#6e1c48 55%,#4e102f 100%);border-top-color:#ffc9e2;border-bottom-color:#a84a7e;color:#ffd6e8;text-shadow:1px 0 0 #3d0a24,-1px 0 0 #3d0a24,0 1px 0 #3d0a24,0 -1px 0 #3d0a24,1px 1px 0 #3d0a24,-1px -1px 0 #3d0a24,1px -1px 0 #3d0a24,-1px 1px 0 #3d0a24,0 0 10px rgba(255,160,205,.85)}
 .rtx.rt-moon .wing{filter:hue-rotate(295deg) saturate(1.35)}
+.rtx.rt-moon .crown{filter:hue-rotate(295deg) saturate(1.35)}
 #topbar .pname .title{color:#ffe9a8;font-size:13px;margin-right:4px;text-shadow:0 0 6px rgba(245,214,123,.6)}
 .bars{margin-top:6px;display:flex;flex-direction:column;gap:4px}
 .bar{height:14px;background:#0d0a06;border:1px solid #5a4a26;border-radius:7px;overflow:hidden;position:relative;font-size:10px}
@@ -209,8 +213,8 @@ const GIFTS=[
  {id:"pet_xuenv",need:498,kind:"pet",pid:"xuenv",name:"神级宠物「冰天雪女」",desc:"神级魂兽，极北天王"},
  {id:"title_shenzhi",need:998,kind:"title",eid:"shenzhi",name:"稀有称号「🌟神之眷顾」",desc:"攻击+50 气血+500 幸运+3，可叠加"}
 ];
-/* 称号牌渲染：牌匾+两侧翼饰 */
-function titleBadge(name,cls){return `<span class="rtx ${cls}"><i class="wing"></i><b>${name}</b><i class="wing r"></i></span>`;}
+/* 称号牌渲染：皇冠+翼饰+缎带 */
+function titleBadge(name,cls){return `<span class="rtx ${cls}"><i class="crown"></i><i class="wing"></i><b>${name}</b><i class="wing r"></i></span>`;}
 function myRankTitles(){
  const t=[],zl=zhanli();
  const zr=[...RANKS.map(r=>({...r})),{zl,me:true}].sort((a,b)=>b.zl-a.zl).findIndex(r=>r.me);
