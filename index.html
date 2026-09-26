@@ -12,6 +12,12 @@ body{background:#141009;color:#e8dcc0;font-family:"Songti SC","STSong","SimSun",
 #topbar .pname{font-size:16px;font-weight:bold;color:#f5d67b;letter-spacing:1px}
 #topbar .pname .lv{background:#8a6d2f;color:#141009;font-size:12px;padding:1px 8px;border-radius:10px;margin-left:6px;vertical-align:2px}
 #topbar .pname .vip{background:linear-gradient(180deg,#f5d67b,#c8903c);color:#3a2a08;font-size:12px;font-weight:bold;padding:1px 8px;border-radius:10px;margin-left:6px;vertical-align:2px}
+.ptier{font-size:11px;padding:1px 6px;border-radius:8px;margin-left:4px;white-space:nowrap}
+.ptier.黄{background:#5a4a1a;color:#f5d67b}
+.ptier.玄{background:#3a3a6a;color:#b8b0f0}
+.ptier.地{background:#2a4a2a;color:#9ae09a}
+.ptier.天{background:#5a2a2a;color:#f0a8a8}
+.ptier.神{background:#6a4a00;color:#ffe97b;font-weight:bold}
 #topbar .pname .title{color:#ffe9a8;font-size:13px;margin-right:4px;text-shadow:0 0 6px rgba(245,214,123,.6)}
 .bars{margin-top:6px;display:flex;flex-direction:column;gap:4px}
 .bar{height:14px;background:#0d0a06;border:1px solid #5a4a26;border-radius:7px;overflow:hidden;position:relative;font-size:10px}
@@ -170,13 +176,42 @@ if(itemExpired(it)){S.bag.push(it);S.equip[s]=null;ch=true;}}
 if(ch){calcStats();save();}return ch;}
 /* ============ 功法 ============ */
 const GONGFA={
- jingangzhao:{name:"金钟罩",desc:"少林护体神功，刀枪不入",max:5,req:1,bonus:{def:4,hp:40}},
- yijinjing:{name:"易筋经",desc:"达摩祖师绝学，易筋洗髓",max:5,req:5,bonus:{atk:3,hp:30}},
- taijishengong:{name:"太极神功",desc:"武当镇派心法，以柔克刚",max:5,req:8,bonus:{def:3,spd:2,hp:30}},
- jiuyang:{name:"九阳神功",desc:"至阳至刚，内力生生不息",max:5,req:10,bonus:{atk:5,hp:60,mp:12}},
- kuihua:{name:"葵花宝典",desc:"天下武功，唯快不破",max:5,req:12,bonus:{spd:4,atk:4}},
- dugujiujian:{name:"独孤九剑",desc:"剑魔独孤求败绝学，无招胜有招",max:5,req:15,bonus:{atk:8,luck:1}}
+ jingangzhao:{name:"金钟罩",tier:"黄",desc:"少林护体神功，刀枪不入",max:5,req:1,bonus:{def:4,hp:40}},
+ yijinjing:{name:"易筋经",tier:"玄",desc:"达摩祖师绝学，易筋洗髓",max:5,req:5,bonus:{atk:3,hp:30}},
+ taijishengong:{name:"太极神功",tier:"玄",desc:"武当镇派心法，以柔克刚",max:5,req:8,bonus:{def:3,spd:2,hp:30}},
+ jiuyang:{name:"九阳神功",tier:"地",desc:"至阳至刚，内力生生不息",max:5,req:10,bonus:{atk:5,hp:60,mp:12}},
+ kuihua:{name:"葵花宝典",tier:"地",desc:"天下武功，唯快不破",max:5,req:12,bonus:{spd:4,atk:4}},
+ dugujiujian:{name:"独孤九剑",tier:"天",desc:"剑魔独孤求败绝学，无招胜有招",max:5,req:15,bonus:{atk:8,luck:1}}
 };
+/* 焚诀：可吞噬异火进化，黄→玄→地→天→神 */
+const FENJUE_TIERS=["黄","玄","地","天","神"];
+/* 斗气境界 */
+const DOUQI=[
+ {name:"斗之气",bonus:{}},
+ {name:"斗者",bonus:{atk:5,hp:50}},
+ {name:"斗师",bonus:{atk:12,hp:120}},
+ {name:"大斗师",bonus:{atk:22,hp:220,def:5}},
+ {name:"斗灵",bonus:{atk:35,hp:350,def:10}},
+ {name:"斗王",bonus:{atk:55,hp:550,def:16,spd:3}},
+ {name:"斗皇",bonus:{atk:85,hp:850,def:24,spd:5}},
+ {name:"斗宗",bonus:{atk:130,hp:1300,def:34,spd:8}},
+ {name:"斗尊",bonus:{atk:200,hp:2000,def:48,spd:12}},
+ {name:"斗圣",bonus:{atk:320,hp:3200,def:70,spd:18}},
+ {name:"斗帝",bonus:{atk:520,hp:5200,def:100,spd:28}}
+];
+const DQ_REQLV=[0,3,6,10,14,18,24,30,36,44,99];
+function dqCost(idx){return 800*Math.pow(2,idx);}
+/* 异火榜 */
+const YIHUO=[
+ {name:"青莲地心火",rank:19,req:1,price:5000,coin:1,bonus:{atk:8,hp:80}},
+ {name:"陨落心炎",rank:14,req:2,price:15000,coin:1,bonus:{atk:14,hp:140,mp:30}},
+ {name:"骨灵冷火",rank:11,req:3,price:30000,coin:1,bonus:{atk:22,hp:220,def:8}},
+ {name:"三千焱炎火",rank:9,req:4,price:120,gold:1,bonus:{atk:32,hp:320,spd:4}},
+ {name:"净莲妖火",rank:3,req:5,price:300,gold:1,bonus:{atk:50,hp:500,luck:3}},
+ {name:"帝炎",rank:1,req:6,price:880,gold:1,bonus:{atk:90,hp:900,def:20}}
+];
+function fenjueTier(){return Math.min(4,(S.yihuo||[]).length);}
+function bonusStr(b){return Object.entries(b||{}).map(([k,v])=>`${GFNAME[k]||k}+${v}`).join(" ");}
 function gfLv(gid){return (S.gongfa&&S.gongfa[gid])||0;}
 function gfCost(lv){return 300*Math.pow(2,lv);}
 const GFNAME={atk:"攻击",def:"防御",hp:"气血",mp:"内力",spd:"速度",luck:"幸运"};
@@ -215,6 +250,12 @@ function calcStats(){
  for(const[gid,lv]of Object.entries(S.gongfa||{})){const g=GONGFA[gid];if(!g||!lv)continue; // 功法加成
   for(const[k,v]of Object.entries(g.bonus)){
    if(k==="hp")p.maxhp+=v*lv;else if(k==="mp")p.maxmp+=v*lv;else p[k]=(p[k]||0)+v*lv;}}
+ const dq=DOUQI[S.douqi||0]; // 斗气境界加成
+ if(dq)for(const[k,v]of Object.entries(dq.bonus)){if(k==="hp")p.maxhp+=v;else if(k==="mp")p.maxmp+=v;else p[k]=(p[k]||0)+v;}
+ for(const fn of(S.yihuo||[])){const f=YIHUO.find(x=>x.name===fn);if(!f)continue; // 异火加成
+  for(const[k,v]of Object.entries(f.bonus)){if(k==="hp")p.maxhp+=v;else if(k==="mp")p.maxmp+=v;else p[k]=(p[k]||0)+v;}}
+ const fjlv=(S.fenjue&&S.fenjue.lv)||0,fm=fenjueTier()+1; // 焚诀加成（随异火进化）
+ if(fjlv){p.atk+=4*fm*fjlv;p.maxhp+=50*fm*fjlv;p.maxmp+=10*fm*fjlv;}
  const vb=1+vipLevel()*0.02; // VIP加成：每级攻击/气血+2%
  p.atk=Math.floor(p.atk*vb); p.maxhp=Math.floor(p.maxhp*vb);
  p.hp=Math.min(p.hp,p.maxhp); p.mp=Math.min(p.mp,p.maxmp);
@@ -230,7 +271,7 @@ function newGame(name,sectKey){
    stamina:50,maxStamina:50,skills:[sc.skill],task:null,taskDone:false,
    base:{maxhp:sc.hp,maxmp:sc.mp,atk:sc.atk,def:sc.def,spd:sc.spd}},
   equip:{weapon:null,armor:null,boots:null,charm:null},bag:[],pets:[],activePet:-1,
-  orders:[],zone:0,created:nowStr(),gongfa:{}};
+  orders:[],zone:0,created:nowStr(),gongfa:{},douqi:0,yihuo:[],fenjue:{lv:0}};
  calcStats();S.player.hp=S.player.maxhp;S.player.mp=S.player.maxmp;save();
 }
 /* ============ 顶栏/导航 ============ */
@@ -525,22 +566,56 @@ function gainExpSilent(n){const p=S.player;p.exp+=n;while(p.exp>=expNeed(p.level
 /* ============ 功法 ============ */
 function rGongfa(){
 const m=$("main"),p=S.player;
-let h=`<div class="card"><h3>📖 功法修炼</h3><p class="dim">修炼功法永久提升属性，每本最高5重，费用随重数翻倍。</p>`;
+const di=S.douqi||0,dq=DOUQI[di],nd=DOUQI[di+1];
+const bcost=dqCost(di),breq=DQ_REQLV[di+1],canB=!!(nd&&p.level>=breq);
+let h=`<div class="card"><h3>🔥 斗气境界</h3>
+<div class="tier"><div><div class="gold">${dq.name}</div><div class="m">${bonusStr(dq.bonus)||"初入斗气，仍需修炼"}</div>
+${nd?`<div class="m">下一境：${nd.name}（需${breq}级）</div>`:`<div class="m">已至斗帝巅峰，睥睨天下！</div>`}</div>
+${nd?`<button class="btn small primary" style="width:auto;margin:0" id="dqB"${canB?"":" disabled"}>突破·${bcost}铜币</button>`:""}</div></div>`;
+h+=`<div class="card"><h3>📖 功法修炼</h3><p class="dim">功法分黄/玄/地/天/神五级，花费铜币修炼，每本最高5重。</p>`;
 for(const[gid,g]of Object.entries(GONGFA)){
  const lv=gfLv(gid),maxed=lv>=g.max,locked=p.level<g.req,cost=gfCost(lv);
  const per=Object.entries(g.bonus).map(([k,v])=>`${GFNAME[k]}+${v}`).join(" ");
- h+=`<div class="tier"><div><div class="gold">《${g.name}》 <span class="dim">${lv}/${g.max}重</span></div>
+ h+=`<div class="tier"><div><div class="gold">《${g.name}》 <span class="ptier ${g.tier}">${g.tier}级</span> <span class="dim">${lv}/${g.max}重</span></div>
  <div class="m">${g.desc}</div><div class="m">每重：${per}</div>
  ${locked?`<div class="m" style="color:#e08a8a">需要 ${g.req} 级解锁</div>`:""}
  </div><button class="btn small primary" style="width:auto;margin:0" data-gf="${gid}"${(maxed||locked)?" disabled":""}>${maxed?"已满重":`修炼·${cost}铜币`}</button></div>`;
 }
+const ft=fenjueTier(),flv=(S.fenjue&&S.fenjue.lv)||0,fmaxed=flv>=5,fcost=gfCost(flv);
+h+=`<div class="tier"><div><div class="gold">《焚诀》 <span class="ptier ${FENJUE_TIERS[ft]}">${FENJUE_TIERS[ft]}级·可进化</span> <span class="dim">${flv}/5重</span></div>
+<div class="m">斗破绝学，吞噬异火不断进化。已炼化${(S.yihuo||[]).length}种异火。</div>
+<div class="m">每重：攻击+${4*(ft+1)} 气血+${50*(ft+1)} 内力+${10*(ft+1)}</div></div>
+<button class="btn small primary" style="width:auto;margin:0" id="fenjueB"${fmaxed?" disabled":""}>${fmaxed?"已满重":`修炼·${fcost}铜币`}</button></div>`;
+h+=`</div><div class="card"><h3>🔥 异火榜</h3><p class="dim">炼化异火获永久属性，并助焚诀进化（每种异火提升一档品级）。</p>`;
+for(const f of YIHUO){
+ const owned=(S.yihuo||[]).includes(f.name),okd=di>=f.req;
+ const price=f.gold?`${f.price}元宝`:`${f.price}铜币`;
+ h+=`<div class="tier"><div><div class="gold">${f.name} <span class="dim">异火榜第${f.rank}</span></div>
+ <div class="m">${bonusStr(f.bonus)}</div>
+ ${!okd?`<div class="m" style="color:#e08a8a">需要境界：${DOUQI[f.req].name}</div>`:""}</div>
+ <button class="btn small primary" style="width:auto;margin:0" data-yh="${f.name}"${(owned||!okd)?" disabled":""}>${owned?"已炼化":`炼化·${price}`}</button></div>`;
+}
 h+=`</div>`;m.innerHTML=h;
+const bb=$("dqB");
+if(bb)bb.onclick=()=>{if(!canB)return;if(p.coins<bcost){toast("铜币不足");return;}
+ p.coins-=bcost;S.douqi=di+1;calcStats();save();render();toast(`🔥突破成功！踏入${DOUQI[di+1].name}！`);};
+const fb=$("fenjueB");
+if(fb)fb.onclick=()=>{if(fmaxed)return;if(p.coins<fcost){toast("铜币不足");return;}
+ p.coins-=fcost;S.fenjue=S.fenjue||{lv:0};S.fenjue.lv=flv+1;calcStats();save();render();toast(`📖《焚诀》突破至第${flv+1}重！`);};
 m.querySelectorAll("[data-gf]").forEach(b=>b.onclick=()=>{
  const gid=b.dataset.gf,g=GONGFA[gid],lv=gfLv(gid),cost=gfCost(lv);
  if(lv>=g.max||p.level<g.req)return;
  if(p.coins<cost){toast("铜币不足");return;}
  p.coins-=cost;S.gongfa[gid]=lv+1;calcStats();save();render();
  toast(`📖《${g.name}》突破至第${lv+1}重！`);
+});
+m.querySelectorAll("[data-yh]").forEach(b=>b.onclick=()=>{
+ const f=YIHUO.find(x=>x.name===b.dataset.yh);
+ if(!f||(S.yihuo||[]).includes(f.name)||di<f.req)return;
+ if(f.gold){if(p.gold<f.price){toast("元宝不足");return;}p.gold-=f.price;}
+ else{if(p.coins<f.price){toast("铜币不足");return;}p.coins-=f.price;}
+ S.yihuo=S.yihuo||[];S.yihuo.push(f.name);calcStats();save();render();
+ toast(`🔥炼化${f.name}成功！焚诀品级：${FENJUE_TIERS[fenjueTier()]}级`);
 });
 }
 /* ============ 商店 ============ */
@@ -674,7 +749,7 @@ function rMore(){
  · 「门派」学高级武功、做师门任务<br>
  · 体力不够就打坐，或去商城买体力丹<br>
  · 「充值」是模拟的，不花真钱，随便点！累计充值提升VIP等级，加攻击气血、每日领礼包<br>
- · 首充送小红剑（攻击26、🍀幸运+9，暴击率更高，限时3天）；VIP称号可佩戴，加攻击气血；📖功法页可修炼功法永久加属性</p></div>
+ · 首充送小红剑（攻击26、🍀幸运+9，暴击率更高，限时3天）；VIP称号可佩戴，加攻击气血；📖功法页可修炼功法（黄/玄/地/天/神五级）、突破斗气境界（斗者→斗帝）、炼化异火进化焚诀</p></div>
  <div class="card"><h3>💾 存档</h3>
  <button class="btn small" id="resave">手动保存</button>
  <button class="btn small danger" id="reset">删号重来（清空存档）</button></div>`;
