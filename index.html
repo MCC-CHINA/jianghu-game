@@ -123,6 +123,7 @@ input[type=text]{width:100%;background:#0d0a06;border:1px solid #8a6d2f;color:#f
 .vplink{cursor:pointer;border-bottom:1px dotted #8a6d3b}
 .good{color:#7bed9f;font-weight:bold}
 .bad{color:#ff6b6b;font-weight:bold}
+.expbuff{color:#ffd700;font-size:12px;text-align:center;margin-top:4px;font-weight:bold}
 </style>
 </head>
 <body>
@@ -698,7 +699,7 @@ function newGame(name,sectKey){
  base:{maxhp:sc.hp,maxmp:sc.mp,atk:sc.atk,def:sc.def,spd:sc.spd}},
  equip:{weapon:null,armor:null,boots:null,charm:null},bag:[],pets:[],activePet:-1,wing:{tier:0},
  partners:[],activePartner:-1,arena:{rank:1000,date:"",left:5,reward:"",top:ARENA_TOP.map((n,i)=>({name:n,rank:i+1}))},
- orders:[],zone:0,created:nowStr(),wornTitle:null,gongfa:{},gongfaLearned:{},claimedGifts:{},douqi:0,yihuo:[],fenjue:{lv:0},eventTitles:[],chat:{world:[{sys:1,txt:"欢迎来到江湖世界，谨言慎行，行侠仗义！",t:Date.now()}],sect:[],ch:"world",cd:0}};
+ orders:[],zone:0,created:nowStr(),wornTitle:null,expBuff:null,gongfa:{},gongfaLearned:{},claimedGifts:{},douqi:0,yihuo:[],fenjue:{lv:0},eventTitles:[],chat:{world:[{sys:1,txt:"欢迎来到江湖世界，谨言慎行，行侠仗义！",t:Date.now()}],sect:[],ch:"world",cd:0}};
  calcStats();S.player.hp=S.player.maxhp;S.player.mp=S.player.maxmp;save();
 }
 /* ============ 顶栏/导航 ============ */
@@ -714,6 +715,7 @@ function renderTop(){
  <div class="bar mp"><i style="width:${p.mp/p.maxmp*100}%"></i><span>内力 ${p.mp}/${p.maxmp}</span></div>
  <div class="bar exp"><i style="width:${p.exp/expNeed(p.level)*100}%"></i><span>修为 ${p.exp}/${expNeed(p.level)}</span></div>
  </div>
+ ${expMult()>1?`<div class="expbuff">${expMult()}倍经验 · 剩余${expBuffLeft()}分</div>`:""}
  <div class="wallet"><span>铜币 <b>${p.coins}</b></span><span>元宝 <b>${p.gold}</b></span><span>体力 <b>${p.stamina}/${p.maxStamina}</b></span><span>幸运 <b>${p.luck||0}</b></span><span>战力 <b>${zhanli()}</b></span></div>`;
  t.innerHTML+=`<button class="btn small primary" id="topPay">充值</button>`;
  $("topPay").onclick=()=>{TAB="pay";B=null;render();window.scrollTo(0,0);};
@@ -819,6 +821,9 @@ f.hp=Math.max(0,f.hp-d);
 log(`<span class="pet">协助攻击，造成 ${d} 点伤害</span>`);
 if(f.hp<=0)endBattle(true);
 }
+const EXPDAN={exp2:{name:"双倍经验丹",mult:2,price:25},exp3:{name:"三倍经验丹",mult:3,price:45},exp5:{name:"五倍经验丹",mult:5,price:80}};
+function expMult(){const b=S.expBuff;if(b&&Date.now()<b.until)return b.mult;return 1;}
+function expBuffLeft(){const b=S.expBuff;if(b&&Date.now()<b.until)return Math.ceil((b.until-Date.now())/60000);return 0;}
 function gainExp(n){
 const p=S.player;p.exp+=n;
 let ups=0;
@@ -833,9 +838,10 @@ while(pet.exp>=petExpNeed(pet.level)){pet.exp-=petExpNeed(pet.level);pet.level++
 function endBattle(win){
 B.over=true;const p=S.player,f=B.foe;
 if(win){
-log(`<span class="sys">战胜了！获得修为 ${f.exp}、铜币 ${f.coins}</span>`);
+const em=expMult(),ge=Math.floor(f.exp*em);
+log(`<span class="sys">战胜了！获得修为 ${ge}${em>1?`（${em}倍经验）`:""}、铜币 ${f.coins}</span>`);
 if(f.boss)pushChat("world",{sys:1,txt:`恭喜「${p.name}」击败了${f.name}，威震江湖！`,t:Date.now()});
-gainExp(f.exp);p.coins+=f.coins;gainPetExp(Math.floor(f.exp/2));gainPartnerExp(Math.floor(f.exp/2));
+gainExp(ge);p.coins+=f.coins;gainPetExp(Math.floor(ge/2));gainPartnerExp(Math.floor(ge/2));
 if(B.wb){ // 世界BOSS：掉落功法（神级以下）
  const cand=Object.keys(GONGFA).filter(g=>!["神","圣"].includes(GONGFA[g].tier)&&!gfLearned(g));
  if(cand.length){
@@ -1007,6 +1013,7 @@ S.bag.splice(+b.dataset.use,1);
 if(it.use==="hp150")p.hp=Math.min(p.maxhp,p.hp+150);
 if(it.use==="hp450")p.hp=Math.min(p.maxhp,p.hp+450);
 if(it.use==="mpfull")p.mp=p.maxmp;
+if(EXPDAN[it.use]){const d=EXPDAN[it.use];S.expBuff={mult:d.mult,until:Date.now()+1800000};calcStats();save();render();toast(d.name+"生效，"+d.mult+"倍经验持续30分钟！");return;}
 calcStats();save();render();toast("用药了，效果拔群！");
 });
 $("synth").onclick=()=>synthModal();
@@ -1244,6 +1251,9 @@ h+=`</div><div class="card"><h3>元宝商城</h3><p class="dim">你有元宝 <b 
 <div class="tier"><div><div class="gold">神兵宝箱</div><div class="m">随机开出${tier}阶武器 · 68元宝</div></div><button class="btn small" style="width:auto;margin:0" data-g="box">购买</button></div>
 <div class="tier"><div><div class="gold">灵羽</div><div class="m">翅膀升阶材料 · 10元宝/个</div></div><button class="btn small" style="width:auto;margin:0" data-g="feather">购买</button></div>
 <div class="tier"><div><div class="gold">洗炼石</div><div class="m">重置武器随机属性 · 38元宝</div></div><button class="btn small" style="width:auto;margin:0" data-g="xilian">购买</button></div>
+<div class="tier"><div><div class="gold">双倍经验丹</div><div class="m">打怪修为×2，持续30分钟 · 25元宝</div></div><button class="btn small" style="width:auto;margin:0" data-g="exp2">购买</button></div>
+<div class="tier"><div><div class="gold">三倍经验丹</div><div class="m">打怪修为×3，持续30分钟 · 45元宝</div></div><button class="btn small" style="width:auto;margin:0" data-g="exp3">购买</button></div>
+<div class="tier"><div><div class="gold">五倍经验丹</div><div class="m">打怪修为×5，持续30分钟 · 80元宝</div></div><button class="btn small" style="width:auto;margin:0" data-g="exp5">购买</button></div>
 </div>`;m.innerHTML=h;
 m.querySelectorAll("[data-buy]").forEach(b=>b.onclick=()=>{
 const s=SHOP.find(x=>x.id===b.dataset.buy);
@@ -1259,6 +1269,7 @@ else if(k==="box"&&p.gold>=68){p.gold-=68;const pool=Object.keys(ITEMS).filter(x
 const iid=pick(pool);S.bag.push(mkWeapon(iid));toast("开出了！");}
 else if(k==="feather"&&p.gold>=10){p.gold-=10;p.feather=(p.feather||0)+1;toast(" 灵羽+1！");}
 else if(k==="xilian"&&p.gold>=38){p.gold-=38;S.bag.push({name:"洗炼石",use:"xilian"});toast("洗炼石+1！");}
+else if(EXPDAN[k]&&p.gold>=EXPDAN[k].price){p.gold-=EXPDAN[k].price;S.bag.push({name:EXPDAN[k].name,use:k});toast(EXPDAN[k].name+"+1，在背包中使用生效！");}
 else{toast("元宝不足，请充值");return;}
 save();render();
 });
@@ -1670,13 +1681,13 @@ function rMore(){
  <div>建号时间<b style="font-size:11px">${S.created}</b></div></div>
  <p class="dim" style="margin-top:8px">正式版这里会显示所有玩家的订单，并支持订单查询、补发、封号等管理功能。</p></div>
  <div class="card"><h3>玩法说明</h3><p class="dim">
- · 去「江湖」挑战敌人，升级变强<br>· 四门派属性/特性/技能各不相同（少林防御、武当内力、峨眉速度暴击、丐帮攻击），「技能」页可学习本门专属技能；「聊天」可世界/门派频道发言，NPC会互动，VIP名字彩色显示；12个装备栏位：武器/帽子/护甲/裤子/护腕×2/戒指×2/项链/勋章/鞋子/饰品；BOSS概率掉落本关最高级武器和防具（概率受爆率加成），集齐BOSS装备可在背包「神兵合成」打造轩辕系列终极装备；武器带随机属性，洗炼石可重置（爆率加成提升概率），集齐四把BOSS神兵+300万铜币可在背包「神兵合成」打造终极武器轩辕神剑<br>
+ · 去「江湖」挑战敌人，升级变强<br>· 四门派属性/特性/技能各不相同（少林防御、武当内力、峨眉速度暴击、丐帮攻击），「技能」页可学习本门专属技能；「聊天」可世界/门派频道发言，NPC会互动，VIP6及以上名字彩色显示；12个装备栏位：武器/帽子/护甲/裤子/护腕×2/戒指×2/项链/勋章/鞋子/饰品；BOSS概率掉落本关最高级武器和防具（概率受爆率加成），集齐BOSS装备可在背包「神兵合成」打造轩辕系列终极装备；武器带随机属性，洗炼石可重置（爆率加成提升概率），集齐四把BOSS神兵+300万铜币可在背包「神兵合成」打造终极武器轩辕神剑<br>
  · 野怪打到30%血可捕捉为宠物，宠物会帮你打架<br>
  · 技能全是斗破斗技：八极崩、焰分噬浪尺、佛怒火莲、三千雷动、帝印诀等，去「门派」学习<br>
  · 竞技场：底部「竞技」页，每日5次挑战排名更高的对手，获胜排名上升；前三名每日可领元宝/铜币/灵羽<br>
  · 伙伴：在「宠物」页招募（铜币/元宝），可穿戴武器护甲靴子饰品，出战后30%属性加给你，战斗胜利获得修为升级<br>
  · 排行新增宠物榜、翅膀榜、等级榜，前三名同样获得可叠加荣誉称号<br>
- · 体力不够就打坐，或去商城买体力丹<br>
+ · 体力不够就打坐，或去商城买体力丹；元宝商城有双倍/三倍/五倍经验丹，背包使用后打怪修为加倍30分钟<br>
  · 「充值」是模拟的，不花真钱，随便点！首充自动赠小红剑（限时3天），另有首充礼包可领（288元宝+2万铜币+体力+4阶灵兽蛋）；累计充值提升VIP等级，加攻击气血、每日领礼包<br>
  · 宠物可捕捉斗罗魂兽：柔骨兔·小舞、蓝银皇·阿银、鬼虎、人面魔蛛、泰坦巨猿·二明、暗魔邪神虎、天青牛蟒·大明、冰碧帝皇蝎<br>
  · 「排行」有战力榜和充值榜，前三名自动获得炫酷称号（属性可叠加）：战力之巅/武林传奇/江湖豪杰，神豪无双/富甲天下/一掷千金<br>
