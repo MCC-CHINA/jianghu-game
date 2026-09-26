@@ -49,7 +49,7 @@ body{background:#141009;color:#e8dcc0;font-family:"Songti SC","STSong","SimSun",
 .rtx.rt3 b{background:linear-gradient(180deg,rgba(255,215,175,.34) 0%,rgba(240,175,115,.22) 35%,rgba(205,120,60,.30) 70%,rgba(150,75,25,.38) 100%);border-color:rgba(255,220,185,.65);color:#fff6ec;text-shadow:0 0 8px rgba(255,175,110,1),0 0 3px #fff,0 1px 3px rgba(110,50,10,.9);box-shadow:0 0 12px rgba(255,165,100,.5),inset 0 1px 2px rgba(255,255,255,.5),inset 0 -3px 6px rgba(200,110,50,.35)}
 .rtx.rt-moon b{background:linear-gradient(180deg,rgba(255,205,230,.34) 0%,rgba(245,160,200,.22) 35%,rgba(215,100,160,.30) 70%,rgba(160,50,110,.38) 100%);border-color:rgba(255,215,235,.7);color:#fff2f8;text-shadow:0 0 8px rgba(255,165,205,1),0 0 3px #fff,0 1px 3px rgba(120,20,70,.9);box-shadow:0 0 12px rgba(255,150,200,.5),inset 0 1px 2px rgba(255,255,255,.5),inset 0 -3px 6px rgba(210,90,150,.35)}
 .rtx.rvip b{background:linear-gradient(180deg,rgba(255,242,200,.45) 0%,rgba(245,214,123,.30) 35%,rgba(212,160,60,.36) 70%,rgba(160,110,25,.45) 100%);border-color:rgba(255,226,150,.85);color:#fff8e0;text-shadow:0 0 10px rgba(255,200,90,1),0 0 3px #fff,0 1px 3px rgba(120,70,10,.9);box-shadow:0 0 16px rgba(255,200,90,.6),inset 0 1px 2px rgba(255,255,255,.55),inset 0 -3px 6px rgba(200,140,40,.45)}
-.rtx.rtev b{background:linear-gradient(90deg,#ff2d2d,#ff7f00,#ffe600,#2dff2d,#00e5ff,#2d7fff,#a52dff,#ff2d2d);background-size:300% 100%;animation:rainbow 3s linear infinite;border-color:rgba(255,255,255,.8);color:#fff;text-shadow:0 0 8px rgba(255,255,255,.95),0 1px 3px rgba(60,10,60,.9);box-shadow:0 0 16px rgba(200,120,255,.6),inset 0 1px 2px rgba(255,255,255,.55)}
+.rtx .tn{font-style:normal}.rtx.rtcust b{background:linear-gradient(180deg,hsl(var(--h),85%,72%,.42) 0%,hsl(var(--h),80%,60%,.28) 35%,hsl(var(--h),82%,48%,.34) 70%,hsl(var(--h),88%,34%,.42) 100%);border-color:hsl(var(--h),90%,78%,.85);color:#fff;text-shadow:0 0 10px hsl(var(--h),95%,66%,1),0 0 3px #fff,0 1px 3px hsla(var(--h),85%,22%,.9);box-shadow:0 0 16px hsla(var(--h),90%,60%,.55),inset 0 1px 2px rgba(255,255,255,.55),inset 0 -3px 6px hsla(var(--h),80%,40%,.4)}.rtx.rvip b{text-shadow:0 1px 2px rgba(90,50,5,.9)}.rtx.rvip .tn{background:linear-gradient(90deg,#ff2d2d,#ff7f00,#ffe600,#2dff2d,#00e5ff,#2d7fff,#a52dff,#ff2d2d);background-size:300% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:rainbow 3s linear infinite;text-shadow:0 1px 2px rgba(90,50,5,.45)}
 .rtx.rt0 b{background:linear-gradient(180deg,rgba(60,50,90,.55) 0%,rgba(35,28,60,.50) 40%,rgba(15,12,28,.60) 100%);border-color:rgba(255,225,150,.8);color:#ffe9a8;text-shadow:0 0 10px rgba(255,210,110,1),0 0 3px #fff,0 1px 3px #000;box-shadow:0 0 16px rgba(255,205,95,.65),inset 0 1px 2px rgba(255,255,255,.35)}
 .rtx.rt0{filter:drop-shadow(0 0 10px rgba(255,205,95,.6))}
 #topbar .pname .title{color:#ffe9a8;font-size:13px;margin-right:4px;text-shadow:0 0 6px rgba(245,214,123,.6)}
@@ -229,108 +229,108 @@ const RANK_TITLES={
 };
 /* 节日限定称号 */
 const EVENT_TITLES={
- midautumn:{name:"中秋快乐",cls:"rtev",bonus:{atk:15,hp:150},desc:"2026中秋限定"},
- shenzhi:{name:"神之眷顾",cls:"rtev",bonus:{atk:50,hp:500,luck:3},desc:"充值豪礼·稀有称号"},
- springfest:{name:"新春大吉",cls:"rtev",bonus:{atk:20,hp:200},desc:"春节限定"},
- yuanxiao:{name:"元宵灯会",cls:"rtev",bonus:{atk:15,hp:150},desc:"元宵节限定"},
- longtaitou:{name:"龙抬头",cls:"rtev",bonus:{atk:12,hp:120},desc:"二月二限定"},
- shangsi:{name:"上巳春禊",cls:"rtev",bonus:{atk:10,hp:100},desc:"上巳节限定"},
- hanshi:{name:"寒食禁火",cls:"rtev",bonus:{atk:8,hp:80},desc:"寒食节限定"},
- huazhao:{name:"花朝绽放",cls:"rtev",bonus:{atk:10,hp:100},desc:"花朝节限定"},
- qingmingfest:{name:"清明踏青",cls:"rtev",bonus:{atk:10,hp:100},desc:"清明节限定"},
- duanwu:{name:"端午安康",cls:"rtev",bonus:{atk:18,hp:180},desc:"端午节限定"},
- qixi:{name:"七夕鹊桥",cls:"rtev",bonus:{atk:15,hp:150,luck:1},desc:"七夕节限定"},
- zhongyuan:{name:"中元夜行",cls:"rtev",bonus:{atk:12,hp:120},desc:"中元节限定"},
- qiushe:{name:"秋社丰收",cls:"rtev",bonus:{atk:10,hp:100},desc:"社日限定"},
- chongyang:{name:"重阳登高",cls:"rtev",bonus:{atk:15,hp:150},desc:"重阳节限定"},
- dongzhifest:{name:"冬至团圆",cls:"rtev",bonus:{atk:12,hp:120},desc:"冬至节限定"},
- laba:{name:"腊八飘香",cls:"rtev",bonus:{atk:10,hp:100},desc:"腊八节限定"},
- xiaonian:{name:"小年纳福",cls:"rtev",bonus:{atk:10,hp:100},desc:"小年限定"},
- chuxi:{name:"除夕守岁",cls:"rtev",bonus:{atk:25,hp:250},desc:"除夕限定"},
- yuandan:{name:"元旦迎新",cls:"rtev",bonus:{atk:12,hp:120},desc:"元旦限定"},
- guoqing:{name:"国庆华诞",cls:"rtev",bonus:{atk:25,hp:250},desc:"国庆节限定"},
- valentine:{name:"情定终身",cls:"rtev",bonus:{atk:15,hp:150,luck:1},desc:"情人节限定"},
- whiteval:{name:"白色约定",cls:"rtev",bonus:{atk:10,hp:100},desc:"白色情人节限定"},
- womensday:{name:"巾帼英豪",cls:"rtev",bonus:{atk:15,hp:150},desc:"妇女节限定"},
- fools:{name:"愚人乐翻天",cls:"rtev",bonus:{atk:8,hp:80,luck:2},desc:"愚人节限定"},
- labour:{name:"劳动光荣",cls:"rtev",bonus:{atk:15,hp:150},desc:"劳动节限定"},
- children:{name:"童心未泯",cls:"rtev",bonus:{atk:10,hp:100},desc:"儿童节限定"},
- mothers:{name:"慈母情深",cls:"rtev",bonus:{atk:12,hp:120},desc:"母亲节限定"},
- fathers:{name:"父爱如山",cls:"rtev",bonus:{atk:12,hp:120},desc:"父亲节限定"},
- teachers:{name:"师恩难忘",cls:"rtev",bonus:{atk:15,hp:150},desc:"教师节限定"},
- halloween:{name:"万圣狂欢",cls:"rtev",bonus:{atk:18,hp:180},desc:"万圣节限定"},
- thanks:{name:"感恩有你",cls:"rtev",bonus:{atk:12,hp:120},desc:"感恩节限定"},
- xmasave:{name:"平安喜乐",cls:"rtev",bonus:{atk:15,hp:150},desc:"平安夜限定"},
- xmas:{name:"圣诞狂欢",cls:"rtev",bonus:{atk:20,hp:200},desc:"圣诞节限定"},
- singles:{name:"单身贵族",cls:"rtev",bonus:{atk:10,hp:100,luck:1},desc:"光棍节限定"},
- double11:{name:"剁手之王",cls:"rtev",bonus:{atk:12,hp:120},desc:"双十一限定"},
- double12:{name:"年终盛典",cls:"rtev",bonus:{atk:12,hp:120},desc:"双十二限定"},
- lichun:{name:"立春迎春",cls:"rtev",bonus:{atk:8,hp:80},desc:"二十四节气·立春"},
- yushui:{name:"雨水润物",cls:"rtev",bonus:{atk:8,hp:80},desc:"二十四节气·雨水"},
- jingzhe:{name:"惊蛰雷动",cls:"rtev",bonus:{atk:8,hp:80},desc:"二十四节气·惊蛰"},
- chunfen:{name:"春分昼夜",cls:"rtev",bonus:{atk:8,hp:80},desc:"二十四节气·春分"},
- qingmingjq:{name:"清明时节",cls:"rtev",bonus:{atk:8,hp:80},desc:"二十四节气·清明"},
- guyu:{name:"谷雨生百谷",cls:"rtev",bonus:{atk:8,hp:80},desc:"二十四节气·谷雨"},
- lixia:{name:"立夏初鸣",cls:"rtev",bonus:{atk:8,hp:80},desc:"二十四节气·立夏"},
- xiaoman:{name:"小满将满",cls:"rtev",bonus:{atk:8,hp:80},desc:"二十四节气·小满"},
- mangzhong:{name:"芒种播种",cls:"rtev",bonus:{atk:8,hp:80},desc:"二十四节气·芒种"},
- xiazhi:{name:"夏至日长",cls:"rtev",bonus:{atk:8,hp:80},desc:"二十四节气·夏至"},
- xiaoshu:{name:"小暑温风",cls:"rtev",bonus:{atk:8,hp:80},desc:"二十四节气·小暑"},
- dashu:{name:"大暑炎炎",cls:"rtev",bonus:{atk:8,hp:80},desc:"二十四节气·大暑"},
- liqiu:{name:"立秋凉风",cls:"rtev",bonus:{atk:8,hp:80},desc:"二十四节气·立秋"},
- chushu:{name:"处暑出暑",cls:"rtev",bonus:{atk:8,hp:80},desc:"二十四节气·处暑"},
- bailu:{name:"白露凝霜",cls:"rtev",bonus:{atk:8,hp:80},desc:"二十四节气·白露"},
- qiufen:{name:"秋分平分",cls:"rtev",bonus:{atk:8,hp:80},desc:"二十四节气·秋分"},
- hanlu:{name:"寒露深秋",cls:"rtev",bonus:{atk:8,hp:80},desc:"二十四节气·寒露"},
- shuangjiang:{name:"霜降初霜",cls:"rtev",bonus:{atk:8,hp:80},desc:"二十四节气·霜降"},
- lidong:{name:"立冬藏水",cls:"rtev",bonus:{atk:8,hp:80},desc:"二十四节气·立冬"},
- xiaoxue:{name:"小雪初雪",cls:"rtev",bonus:{atk:8,hp:80},desc:"二十四节气·小雪"},
- daxue:{name:"大雪纷飞",cls:"rtev",bonus:{atk:8,hp:80},desc:"二十四节气·大雪"},
- dongzhijq:{name:"冬至一阳生",cls:"rtev",bonus:{atk:8,hp:80},desc:"二十四节气·冬至"},
- xiaohan:{name:"小寒料峭",cls:"rtev",bonus:{atk:8,hp:80},desc:"二十四节气·小寒"},
- dahan:{name:"大寒岁暮",cls:"rtev",bonus:{atk:8,hp:80},desc:"二十四节气·大寒"},
- zhengyue:{name:"正月瑞雪",cls:"rtev",bonus:{atk:10,hp:100},desc:"正月限定"},
- eryue:{name:"二月春风",cls:"rtev",bonus:{atk:10,hp:100},desc:"二月限定"},
- sanyue:{name:"三月桃花",cls:"rtev",bonus:{atk:10,hp:100},desc:"三月限定"},
- siyue:{name:"人间四月",cls:"rtev",bonus:{atk:10,hp:100},desc:"四月限定"},
- wuyue:{name:"五月榴花",cls:"rtev",bonus:{atk:10,hp:100},desc:"五月限定"},
- liuyue:{name:"六月荷香",cls:"rtev",bonus:{atk:10,hp:100},desc:"六月限定"},
- qiyue:{name:"七月流火",cls:"rtev",bonus:{atk:10,hp:100},desc:"七月限定"},
- bayue:{name:"八月桂香",cls:"rtev",bonus:{atk:10,hp:100},desc:"八月限定"},
- jiuyue:{name:"九月菊黄",cls:"rtev",bonus:{atk:10,hp:100},desc:"九月限定"},
- shiyue:{name:"十月小阳春",cls:"rtev",bonus:{atk:10,hp:100},desc:"十月限定"},
- dongyue:{name:"冬月藏锋",cls:"rtev",bonus:{atk:10,hp:100},desc:"冬月限定"},
- layue:{name:"腊月迎春",cls:"rtev",bonus:{atk:10,hp:100},desc:"腊月限定"},
- churujh:{name:"初入江湖",cls:"rtev",bonus:{atk:5,hp:50},desc:"初入江湖纪念"},
- xingxia:{name:"行侠仗义",cls:"rtev",bonus:{atk:20,hp:200},desc:"游历江湖可得"},
- chueqiang:{name:"锄强扶弱",cls:"rtev",bonus:{atk:20,hp:200},desc:"游历江湖可得"},
- kydq:{name:"快意恩仇",cls:"rtev",bonus:{atk:25,hp:250},desc:"游历江湖可得"},
- xajh:{name:"笑傲江湖",cls:"rtev",bonus:{atk:30,hp:300},desc:"游历江湖可得"},
- yijian:{name:"一剑西来",cls:"rtev",bonus:{atk:30,hp:300,spd:1},desc:"游历江湖可得"},
- jiandan:{name:"剑胆琴心",cls:"rtev",bonus:{atk:15,hp:150},desc:"游历江湖可得"},
- xiagu:{name:"侠骨柔情",cls:"rtev",bonus:{atk:15,hp:150,luck:1},desc:"游历江湖可得"},
- zuiwo:{name:"醉卧沙场",cls:"rtev",bonus:{atk:20,hp:200},desc:"游历江湖可得"},
- zongheng:{name:"纵横四海",cls:"rtev",bonus:{atk:25,hp:250},desc:"游历江湖可得"},
- taxue:{name:"踏雪寻梅",cls:"rtev",bonus:{atk:12,hp:120},desc:"游历江湖可得"},
- tingyu:{name:"听雨观澜",cls:"rtev",bonus:{atk:12,hp:120},desc:"游历江湖可得"},
- zhujiu:{name:"煮酒论剑",cls:"rtev",bonus:{atk:18,hp:180},desc:"游历江湖可得"},
- bajiu:{name:"把酒言欢",cls:"rtev",bonus:{atk:15,hp:150},desc:"游历江湖可得"},
- zhangjian:{name:"仗剑天涯",cls:"rtev",bonus:{atk:25,hp:250,spd:1},desc:"游历江湖可得"},
- guiyin:{name:"归隐田园",cls:"rtev",bonus:{atk:10,hp:100},desc:"游历江湖可得"},
- mingyang:{name:"名扬四海",cls:"rtev",bonus:{atk:30,hp:300},desc:"游历江湖可得"},
- weizhen:{name:"威震八方",cls:"rtev",bonus:{atk:30,hp:300},desc:"游历江湖可得"},
- zongshi:{name:"一代宗师",cls:"rtev",bonus:{atk:35,hp:350},desc:"游历江湖可得"},
- kaizong:{name:"开宗立派",cls:"rtev",bonus:{atk:35,hp:350},desc:"游历江湖可得"},
- taoli:{name:"桃李满园",cls:"rtev",bonus:{atk:15,hp:150},desc:"游历江湖可得"},
- miaoshou:{name:"妙手仁心",cls:"rtev",bonus:{atk:18,hp:180},desc:"游历江湖可得"},
- shenji:{name:"神机妙算",cls:"rtev",bonus:{atk:20,hp:200,luck:1},desc:"游历江湖可得"},
- tiemian:{name:"铁面无私",cls:"rtev",bonus:{atk:18,hp:180},desc:"游历江湖可得"},
- jiemian:{name:"嫉恶如仇",cls:"rtev",bonus:{atk:20,hp:200},desc:"游历江湖可得"},
- lujian:{name:"路见不平",cls:"rtev",bonus:{atk:15,hp:150},desc:"游历江湖可得"},
- badao:{name:"拔刀相助",cls:"rtev",bonus:{atk:20,hp:200},desc:"游历江湖可得"},
- pingshui:{name:"萍水相逢",cls:"rtev",bonus:{atk:10,hp:100,luck:1},desc:"游历江湖可得"},
- yijianrugu:{name:"一见如故",cls:"rtev",bonus:{atk:12,hp:120},desc:"游历江湖可得"},
- gandan:{name:"肝胆相照",cls:"rtev",bonus:{atk:25,hp:250},desc:"游历江湖可得"},
+ midautumn:{name:"中秋快乐",cls:"rtcust",hue:315,bonus:{atk:15,hp:150},desc:"2026中秋限定"},
+ shenzhi:{name:"神之眷顾",cls:"rtcust",hue:48,bonus:{atk:50,hp:500,luck:3},desc:"充值豪礼·稀有称号"},
+ springfest:{name:"新春大吉",cls:"rtcust",hue:355,bonus:{atk:20,hp:200},desc:"春节限定"},
+ yuanxiao:{name:"元宵灯会",cls:"rtcust",hue:356,bonus:{atk:15,hp:150},desc:"元宵节限定"},
+ longtaitou:{name:"龙抬头",cls:"rtcust",hue:357,bonus:{atk:12,hp:120},desc:"二月二限定"},
+ shangsi:{name:"上巳春禊",cls:"rtcust",hue:358,bonus:{atk:10,hp:100},desc:"上巳节限定"},
+ hanshi:{name:"寒食禁火",cls:"rtcust",hue:359,bonus:{atk:8,hp:80},desc:"寒食节限定"},
+ huazhao:{name:"花朝绽放",cls:"rtcust",hue:0,bonus:{atk:10,hp:100},desc:"花朝节限定"},
+ qingmingfest:{name:"清明踏青",cls:"rtcust",hue:2,bonus:{atk:10,hp:100},desc:"清明节限定"},
+ duanwu:{name:"端午安康",cls:"rtcust",hue:3,bonus:{atk:18,hp:180},desc:"端午节限定"},
+ qixi:{name:"七夕鹊桥",cls:"rtcust",hue:4,bonus:{atk:15,hp:150,luck:1},desc:"七夕节限定"},
+ zhongyuan:{name:"中元夜行",cls:"rtcust",hue:5,bonus:{atk:12,hp:120},desc:"中元节限定"},
+ qiushe:{name:"秋社丰收",cls:"rtcust",hue:6,bonus:{atk:10,hp:100},desc:"社日限定"},
+ chongyang:{name:"重阳登高",cls:"rtcust",hue:7,bonus:{atk:15,hp:150},desc:"重阳节限定"},
+ dongzhifest:{name:"冬至团圆",cls:"rtcust",hue:9,bonus:{atk:12,hp:120},desc:"冬至节限定"},
+ laba:{name:"腊八飘香",cls:"rtcust",hue:10,bonus:{atk:10,hp:100},desc:"腊八节限定"},
+ xiaonian:{name:"小年纳福",cls:"rtcust",hue:11,bonus:{atk:10,hp:100},desc:"小年限定"},
+ chuxi:{name:"除夕守岁",cls:"rtcust",hue:12,bonus:{atk:25,hp:250},desc:"除夕限定"},
+ yuandan:{name:"元旦迎新",cls:"rtcust",hue:13,bonus:{atk:12,hp:120},desc:"元旦限定"},
+ guoqing:{name:"国庆华诞",cls:"rtcust",hue:15,bonus:{atk:25,hp:250},desc:"国庆节限定"},
+ valentine:{name:"情定终身",cls:"rtcust",hue:290,bonus:{atk:15,hp:150,luck:1},desc:"情人节限定"},
+ whiteval:{name:"白色约定",cls:"rtcust",hue:292,bonus:{atk:10,hp:100},desc:"白色情人节限定"},
+ womensday:{name:"巾帼英豪",cls:"rtcust",hue:294,bonus:{atk:15,hp:150},desc:"妇女节限定"},
+ fools:{name:"愚人乐翻天",cls:"rtcust",hue:297,bonus:{atk:8,hp:80,luck:2},desc:"愚人节限定"},
+ labour:{name:"劳动光荣",cls:"rtcust",hue:299,bonus:{atk:15,hp:150},desc:"劳动节限定"},
+ children:{name:"童心未泯",cls:"rtcust",hue:301,bonus:{atk:10,hp:100},desc:"儿童节限定"},
+ mothers:{name:"慈母情深",cls:"rtcust",hue:304,bonus:{atk:12,hp:120},desc:"母亲节限定"},
+ fathers:{name:"父爱如山",cls:"rtcust",hue:306,bonus:{atk:12,hp:120},desc:"父亲节限定"},
+ teachers:{name:"师恩难忘",cls:"rtcust",hue:308,bonus:{atk:15,hp:150},desc:"教师节限定"},
+ halloween:{name:"万圣狂欢",cls:"rtcust",hue:311,bonus:{atk:18,hp:180},desc:"万圣节限定"},
+ thanks:{name:"感恩有你",cls:"rtcust",hue:313,bonus:{atk:12,hp:120},desc:"感恩节限定"},
+ xmasave:{name:"平安喜乐",cls:"rtcust",hue:315,bonus:{atk:15,hp:150},desc:"平安夜限定"},
+ xmas:{name:"圣诞狂欢",cls:"rtcust",hue:318,bonus:{atk:20,hp:200},desc:"圣诞节限定"},
+ singles:{name:"单身贵族",cls:"rtcust",hue:320,bonus:{atk:10,hp:100,luck:1},desc:"光棍节限定"},
+ double11:{name:"剁手之王",cls:"rtcust",hue:322,bonus:{atk:12,hp:120},desc:"双十一限定"},
+ double12:{name:"年终盛典",cls:"rtcust",hue:325,bonus:{atk:12,hp:120},desc:"双十二限定"},
+ lichun:{name:"立春迎春",cls:"rtcust",hue:115,bonus:{atk:8,hp:80},desc:"二十四节气·立春"},
+ yushui:{name:"雨水润物",cls:"rtcust",hue:116,bonus:{atk:8,hp:80},desc:"二十四节气·雨水"},
+ jingzhe:{name:"惊蛰雷动",cls:"rtcust",hue:118,bonus:{atk:8,hp:80},desc:"二十四节气·惊蛰"},
+ chunfen:{name:"春分昼夜",cls:"rtcust",hue:120,bonus:{atk:8,hp:80},desc:"二十四节气·春分"},
+ qingmingjq:{name:"清明时节",cls:"rtcust",hue:121,bonus:{atk:8,hp:80},desc:"二十四节气·清明"},
+ guyu:{name:"谷雨生百谷",cls:"rtcust",hue:123,bonus:{atk:8,hp:80},desc:"二十四节气·谷雨"},
+ lixia:{name:"立夏初鸣",cls:"rtcust",hue:125,bonus:{atk:8,hp:80},desc:"二十四节气·立夏"},
+ xiaoman:{name:"小满将满",cls:"rtcust",hue:127,bonus:{atk:8,hp:80},desc:"二十四节气·小满"},
+ mangzhong:{name:"芒种播种",cls:"rtcust",hue:128,bonus:{atk:8,hp:80},desc:"二十四节气·芒种"},
+ xiazhi:{name:"夏至日长",cls:"rtcust",hue:130,bonus:{atk:8,hp:80},desc:"二十四节气·夏至"},
+ xiaoshu:{name:"小暑温风",cls:"rtcust",hue:132,bonus:{atk:8,hp:80},desc:"二十四节气·小暑"},
+ dashu:{name:"大暑炎炎",cls:"rtcust",hue:134,bonus:{atk:8,hp:80},desc:"二十四节气·大暑"},
+ liqiu:{name:"立秋凉风",cls:"rtcust",hue:135,bonus:{atk:8,hp:80},desc:"二十四节气·立秋"},
+ chushu:{name:"处暑出暑",cls:"rtcust",hue:137,bonus:{atk:8,hp:80},desc:"二十四节气·处暑"},
+ bailu:{name:"白露凝霜",cls:"rtcust",hue:139,bonus:{atk:8,hp:80},desc:"二十四节气·白露"},
+ qiufen:{name:"秋分平分",cls:"rtcust",hue:141,bonus:{atk:8,hp:80},desc:"二十四节气·秋分"},
+ hanlu:{name:"寒露深秋",cls:"rtcust",hue:142,bonus:{atk:8,hp:80},desc:"二十四节气·寒露"},
+ shuangjiang:{name:"霜降初霜",cls:"rtcust",hue:144,bonus:{atk:8,hp:80},desc:"二十四节气·霜降"},
+ lidong:{name:"立冬藏水",cls:"rtcust",hue:146,bonus:{atk:8,hp:80},desc:"二十四节气·立冬"},
+ xiaoxue:{name:"小雪初雪",cls:"rtcust",hue:148,bonus:{atk:8,hp:80},desc:"二十四节气·小雪"},
+ daxue:{name:"大雪纷飞",cls:"rtcust",hue:149,bonus:{atk:8,hp:80},desc:"二十四节气·大雪"},
+ dongzhijq:{name:"冬至一阳生",cls:"rtcust",hue:151,bonus:{atk:8,hp:80},desc:"二十四节气·冬至"},
+ xiaohan:{name:"小寒料峭",cls:"rtcust",hue:153,bonus:{atk:8,hp:80},desc:"二十四节气·小寒"},
+ dahan:{name:"大寒岁暮",cls:"rtcust",hue:155,bonus:{atk:8,hp:80},desc:"二十四节气·大寒"},
+ zhengyue:{name:"正月瑞雪",cls:"rtcust",hue:205,bonus:{atk:10,hp:100},desc:"正月限定"},
+ eryue:{name:"二月春风",cls:"rtcust",hue:208,bonus:{atk:10,hp:100},desc:"二月限定"},
+ sanyue:{name:"三月桃花",cls:"rtcust",hue:211,bonus:{atk:10,hp:100},desc:"三月限定"},
+ siyue:{name:"人间四月",cls:"rtcust",hue:214,bonus:{atk:10,hp:100},desc:"四月限定"},
+ wuyue:{name:"五月榴花",cls:"rtcust",hue:217,bonus:{atk:10,hp:100},desc:"五月限定"},
+ liuyue:{name:"六月荷香",cls:"rtcust",hue:220,bonus:{atk:10,hp:100},desc:"六月限定"},
+ qiyue:{name:"七月流火",cls:"rtcust",hue:224,bonus:{atk:10,hp:100},desc:"七月限定"},
+ bayue:{name:"八月桂香",cls:"rtcust",hue:227,bonus:{atk:10,hp:100},desc:"八月限定"},
+ jiuyue:{name:"九月菊黄",cls:"rtcust",hue:230,bonus:{atk:10,hp:100},desc:"九月限定"},
+ shiyue:{name:"十月小阳春",cls:"rtcust",hue:233,bonus:{atk:10,hp:100},desc:"十月限定"},
+ dongyue:{name:"冬月藏锋",cls:"rtcust",hue:236,bonus:{atk:10,hp:100},desc:"冬月限定"},
+ layue:{name:"腊月迎春",cls:"rtcust",hue:240,bonus:{atk:10,hp:100},desc:"腊月限定"},
+ churujh:{name:"初入江湖",cls:"rtcust",hue:22,bonus:{atk:5,hp:50},desc:"初入江湖纪念"},
+ xingxia:{name:"行侠仗义",cls:"rtcust",hue:22,bonus:{atk:20,hp:200},desc:"游历江湖可得"},
+ chueqiang:{name:"锄强扶弱",cls:"rtcust",hue:23,bonus:{atk:20,hp:200},desc:"游历江湖可得"},
+ kydq:{name:"快意恩仇",cls:"rtcust",hue:24,bonus:{atk:25,hp:250},desc:"游历江湖可得"},
+ xajh:{name:"笑傲江湖",cls:"rtcust",hue:25,bonus:{atk:30,hp:300},desc:"游历江湖可得"},
+ yijian:{name:"一剑西来",cls:"rtcust",hue:26,bonus:{atk:30,hp:300,spd:1},desc:"游历江湖可得"},
+ jiandan:{name:"剑胆琴心",cls:"rtcust",hue:27,bonus:{atk:15,hp:150},desc:"游历江湖可得"},
+ xiagu:{name:"侠骨柔情",cls:"rtcust",hue:28,bonus:{atk:15,hp:150,luck:1},desc:"游历江湖可得"},
+ zuiwo:{name:"醉卧沙场",cls:"rtcust",hue:28,bonus:{atk:20,hp:200},desc:"游历江湖可得"},
+ zongheng:{name:"纵横四海",cls:"rtcust",hue:29,bonus:{atk:25,hp:250},desc:"游历江湖可得"},
+ taxue:{name:"踏雪寻梅",cls:"rtcust",hue:30,bonus:{atk:12,hp:120},desc:"游历江湖可得"},
+ tingyu:{name:"听雨观澜",cls:"rtcust",hue:31,bonus:{atk:12,hp:120},desc:"游历江湖可得"},
+ zhujiu:{name:"煮酒论剑",cls:"rtcust",hue:32,bonus:{atk:18,hp:180},desc:"游历江湖可得"},
+ bajiu:{name:"把酒言欢",cls:"rtcust",hue:33,bonus:{atk:15,hp:150},desc:"游历江湖可得"},
+ zhangjian:{name:"仗剑天涯",cls:"rtcust",hue:34,bonus:{atk:25,hp:250,spd:1},desc:"游历江湖可得"},
+ guiyin:{name:"归隐田园",cls:"rtcust",hue:34,bonus:{atk:10,hp:100},desc:"游历江湖可得"},
+ mingyang:{name:"名扬四海",cls:"rtcust",hue:35,bonus:{atk:30,hp:300},desc:"游历江湖可得"},
+ weizhen:{name:"威震八方",cls:"rtcust",hue:36,bonus:{atk:30,hp:300},desc:"游历江湖可得"},
+ zongshi:{name:"一代宗师",cls:"rtcust",hue:37,bonus:{atk:35,hp:350},desc:"游历江湖可得"},
+ kaizong:{name:"开宗立派",cls:"rtcust",hue:38,bonus:{atk:35,hp:350},desc:"游历江湖可得"},
+ taoli:{name:"桃李满园",cls:"rtcust",hue:39,bonus:{atk:15,hp:150},desc:"游历江湖可得"},
+ miaoshou:{name:"妙手仁心",cls:"rtcust",hue:40,bonus:{atk:18,hp:180},desc:"游历江湖可得"},
+ shenji:{name:"神机妙算",cls:"rtcust",hue:40,bonus:{atk:20,hp:200,luck:1},desc:"游历江湖可得"},
+ tiemian:{name:"铁面无私",cls:"rtcust",hue:41,bonus:{atk:18,hp:180},desc:"游历江湖可得"},
+ jiemian:{name:"嫉恶如仇",cls:"rtcust",hue:42,bonus:{atk:20,hp:200},desc:"游历江湖可得"},
+ lujian:{name:"路见不平",cls:"rtcust",hue:43,bonus:{atk:15,hp:150},desc:"游历江湖可得"},
+ badao:{name:"拔刀相助",cls:"rtcust",hue:44,bonus:{atk:20,hp:200},desc:"游历江湖可得"},
+ pingshui:{name:"萍水相逢",cls:"rtcust",hue:45,bonus:{atk:10,hp:100,luck:1},desc:"游历江湖可得"},
+ yijianrugu:{name:"一见如故",cls:"rtcust",hue:46,bonus:{atk:12,hp:120},desc:"游历江湖可得"},
+ gandan:{name:"肝胆相照",cls:"rtcust",hue:47,bonus:{atk:25,hp:250},desc:"游历江湖可得"},
 };
 /* 充值豪礼：累计充值领取神级宠物/稀有称号 */
 const GIFTS=[
@@ -366,13 +366,13 @@ function grantReward(g){
  else if(k==="partner"){if(!Array.isArray(S.partners))S.partners=[];const used=S.partners.map(x=>x.name);const name=pick(PARTNER_NAMES.filter(n=>!used.includes(n)))||pick(PARTNER_NAMES);S.partners.push({name,quality:v,level:p.level,exp:0,equip:{weapon:null,armor:null,boots:null,charm:null}});if(S.activePartner===-1||S.activePartner===undefined)S.activePartner=0;}
 }
 /* 称号牌渲染：皇冠+翼饰+缎带 */
-function titleBadge(name,cls){return `<span class="rtx ${cls}"><b>${name}</b></span>`;}
+function titleBadge(name,cls,hue){return `<span class="rtx ${cls}"${hue==null?"":` style="--h:${hue}"`}><b><em class="tn">${name}</em></b></span>`;}
 function vipTitleCls(t){return "rvip";} // VIP称号统一渐变金
 // 统一佩戴称号：{k:"vip",id:等级} | {k:"ev",id:称号eid} | {k:"rank",id:"榜:名次"}
 function migrateTitle(){if(S&&S.player&&S.wornTitle===undefined){const t=S.title||0;S.wornTitle=t?{k:"vip",id:t}:null;}}
 function wornTitleInfo(){const w=S.wornTitle;if(!w)return null;
  if(w.k==="vip"){const t=VIP_TITLES[w.id];return t?{name:t.name,cls:vipTitleCls(w.id),bonus:t}:null;}
- if(w.k==="ev"){const e=EVENT_TITLES[w.id];return e?{name:e.name,cls:e.cls,bonus:e.bonus}:null;}
+ if(w.k==="ev"){const e=EVENT_TITLES[w.id];return e?{name:e.name,cls:e.cls,hue:e.hue,bonus:e.bonus}:null;}
  if(w.k==="rank"){const bi=String(w.id).split(":"),t=(RANK_TITLES[bi[0]]||[])[+bi[1]];return t?{name:t.name,cls:t.cls,bonus:t.bonus}:null;}
  return null;}
 function godName(n){return `<span class="godflow">${n}</span>`;} // 神级名：七彩流光
@@ -549,7 +549,7 @@ function calcStats(){
  p.luck=0;
  for(const slot of["weapon","armor","boots","charm"]){
  const it=S.equip[slot]; if(!it)continue; const d=ITEMS[it.iid],e=it.enh||0;
- p.atk+=d.atk||0; p.def+=d.def||0; p.hp0=(p.hp0||0); p.spd+=d.spd||0; p.luck+=d.luck||0;
+ p.atk+=d.atk||0; p.def+=d.def||0; p.hp0=(p.hp0||0); p.spd+=d.spd||0; p.luck+=(slot==="weapon"?Math.min(9,d.luck||0):(d.luck||0)); // 武器幸运最高为9
  if(d.hp)p.maxhp+=d.hp;
  if(slot==="weapon")p.atk+=e*2; if(slot==="armor")p.def+=e*2;
  if(slot==="boots")p.spd+=e*1; if(slot==="charm"){p.maxhp+=e*15;}
@@ -597,7 +597,7 @@ function renderTop(){
  const p=S.player,t=$("topbar");t.style.display="block";
  const v=vipLevel();
  const wt=wornTitleInfo();
- t.innerHTML=`<div class="pname">${wt?titleBadge(wt.name,wt.cls):""}<span class="${v>=6?"vipn"+Math.min(v,12):""}">${p.name}</span><span class="lv">Lv.${p.level} ${SECTS[p.sect].name}</span>${v?`<span class="vip" id="topVip" title="查看VIP详情">VIP${v}</span>`:""}</div>
+ t.innerHTML=`<div class="pname">${wt?titleBadge(wt.name,wt.cls,wt.hue):""}<span class="${v>=6?"vipn"+Math.min(v,12):""}">${p.name}</span><span class="lv">Lv.${p.level} ${SECTS[p.sect].name}</span>${v?`<span class="vip" id="topVip" title="查看VIP详情">VIP${v}</span>`:""}</div>
  <div class="bars">
  <div class="bar hp"><i style="width:${p.hp/p.maxhp*100}%"></i><span>气血 ${p.hp}/${p.maxhp}</span></div>
  <div class="bar mp"><i style="width:${p.mp/p.maxmp*100}%"></i><span>内力 ${p.mp}/${p.maxmp}</span></div>
@@ -1301,7 +1301,7 @@ function rTitle(){
  rkHtml+=`<span class="tt${got?"":" locked"}${isWorn("rank",wid)?" worn":""}"${got?` data-wk="rank" data-wid="${wid}"`:""}>${titleBadge(t.name,t.cls)}</span>`;}
  let evHtml="";
  for(const eid of Object.keys(EVENT_TITLES)){const e=EVENT_TITLES[eid],got=evGot.includes(eid);
- evHtml+=`<span class="tt${got?"":" locked"}${isWorn("ev",eid)?" worn":""}"${got?` data-wk="ev" data-wid="${eid}"`:""}>${titleBadge(e.name,e.cls)}</span>`;}
+ evHtml+=`<span class="tt${got?"":" locked"}${isWorn("ev",eid)?" worn":""}"${got?` data-wk="ev" data-wid="${eid}"`:""}>${titleBadge(e.name,e.cls,e.hue)}</span>`;}
  m.innerHTML=`<div class="card"><h3>VIP称号</h3><p class="dim">点击已获得的称号进行佩戴/切换</p><div class="tgrid">${vipHtml}</div></div>`
  +`<div class="card"><h3>排行榜荣誉称号</h3><div class="tgrid">${rkHtml}</div></div>`
  +`<div class="card"><h3>限定称号</h3><div class="tgrid">${evHtml}</div></div>`;
@@ -1349,7 +1349,7 @@ function rEvent(){
  const darinGot=gfLearned("darin"),canDarin=total>=498&&!darinGot;
  const mythicGot=!!S.claimedMythicEvent,canMythic=total>=1288&&!mythicGot;
  h+=`<div class="card"><h3> 限时活动</h3>
- <div class="tier"><div><div class="gold">中秋赏月</div><div class="m">限定称号 ${titleBadge(EVENT_TITLES.midautumn.name,"rtev")}<br>攻击+15 气血+150，可叠加</div></div>
+ <div class="tier"><div><div class="gold">中秋赏月</div><div class="m">限定称号 ${titleBadge(EVENT_TITLES.midautumn.name,"rtcust",EVENT_TITLES.midautumn.hue)}<br>攻击+15 气血+150，可叠加</div></div>
  <button class="btn small primary" style="width:auto;margin:0" id="evtMid"${midGot?" disabled":""}>${midGot?"已领取":"领取"}</button></div>
  <div class="tier"><div><div class="gold">节日庆典</div><div class="m">每日可领取一个随机限定称号<br>剩余未获得：${festLeft} 个</div></div>
  <button class="btn small primary" style="width:auto;margin:0" id="evtFest"${festCan?"":" disabled"}>${festClaimed?"今日已领取":(festLeft?"领取今日称号":"已集齐")}</button></div>
