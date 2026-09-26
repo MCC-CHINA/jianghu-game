@@ -111,20 +111,22 @@ function nowStr(){const d=new Date();return d.getFullYear()+"-"+String(d.getMont
 "use strict";
 /* ============ 数值表 ============ */
 const SECTS={
- shaolin:{name:"少林派",desc:"刚猛无俦，铜皮铁骨。擅长：防御、气血",hp:130,mp:40,atk:12,def:11,spd:6,skill:"luohan"},
- wudang:{name:"武当派",desc:"以柔克刚，绵里藏针。擅长：内力、均衡",hp:105,mp:65,atk:13,def:8,spd:8,skill:"mianzhang"},
- emei:{name:"峨眉派",desc:"身法灵动，出手如电。擅长：速度、暴击",hp:95,mp:55,atk:14,def:7,spd:12,skill:"emeici"},
- gaibang:{name:"丐帮",desc:"豪气干云，掌力雄浑。擅长：攻击、爆发",hp:110,mp:45,atk:16,def:7,spd:9,skill:"dagoubang"}
+ shaolin:{name:"少林派",desc:"刚猛无俦，铜皮铁骨。擅长：防御、气血",hp:130,mp:40,atk:12,def:11,spd:6,skill:"bajibeng"},
+ wudang:{name:"武当派",desc:"以柔克刚，绵里藏针。擅长：内力、均衡",hp:105,mp:65,atk:13,def:8,spd:8,skill:"shihuyin"},
+ emei:{name:"峨眉派",desc:"身法灵动，出手如电。擅长：速度、暴击",hp:95,mp:55,atk:14,def:7,spd:12,skill:"bajibeng"},
+ gaibang:{name:"丐帮",desc:"豪气干云，掌力雄浑。擅长：攻击、爆发",hp:110,mp:45,atk:16,def:7,spd:9,skill:"shihuyin"}
 };
-const SKILLS={
- luohan:{name:"罗汉拳",mp:8,mult:1.5,desc:"少林入门拳法，稳扎稳打"},
- mianzhang:{name:"绵掌",mp:10,mult:1.6,desc:"看似轻柔，内劲绵长"},
- emeici:{name:"峨眉刺法",mp:9,mult:1.6,desc:"快如闪电，连刺三下"},
- dagoubang:{name:"打狗棒法",mp:10,mult:1.7,desc:"丐帮绝技，专打恶犬"},
- jingang:{name:"大力金刚掌",mp:22,mult:2.6,desc:"少林七十二绝技之一，开碑裂石",sect:"shaolin",cost:500,lv:8},
- taiji:{name:"太极剑法",mp:20,mult:2.5,desc:"以静制动，后发先至",sect:"wudang",cost:500,lv:8},
- jinding:{name:"金顶绵掌",mp:20,mult:2.5,desc:"峨眉绝学，掌风如绵似针",sect:"emei",cost:500,lv:8},
- xianglong:{name:"降龙十八掌",mp:25,mult:2.9,desc:"天下第一刚猛掌法，见龙在田",sect:"gaibang",cost:800,lv:10}
+const SKILLS={ // 斗破苍穹·斗技
+ bajibeng:{name:"八极崩",dj:"玄阶高级",mp:12,mult:1.8,desc:"萧炎招牌斗技，贴身八重暗劲"},
+ shihuyin:{name:"狮虎碎金吟",dj:"玄阶高级",mp:14,mult:1.9,desc:"音波斗技，吼声碎金裂石"},
+ yanzhi:{name:"焰分噬浪尺",dj:"地阶低级",mp:30,mult:2.6,desc:"尺法斗技，焰浪分海",sect:"shaolin",cost:800,lv:10},
+ zaohua:{name:"大天造化掌",dj:"天阶低级",mp:60,mult:3.4,desc:"造化圣者绝学，一掌造化",sect:"shaolin",cost:3000,lv:20},
+ sanqian:{name:"三千雷动",dj:"地阶低级",mp:28,mult:2.4,desc:"风雷阁镇阁之宝，身如雷动",sect:"wudang",cost:800,lv:10},
+ fengji:{name:"风之极·陨杀",dj:"地阶中级",mp:55,mult:3.2,desc:"风属性斗技，陨杀无形",sect:"wudang",cost:2500,lv:18},
+ nongyan:{name:"弄炎诀",dj:"地阶低级",mp:30,mult:2.6,desc:"控火法门，玩火自如",sect:"emei",cost:800,lv:10},
+ wulun:{name:"五轮离火法",dj:"地阶高级",mp:65,mult:3.6,desc:"五种兽火凝形，焚天煮海",sect:"emei",cost:3000,lv:22},
+ diyin:{name:"帝印诀",dj:"天阶低级",mp:70,mult:3.8,desc:"古帝绝学，五印合一",sect:"gaibang",cost:3500,lv:24},
+ huolian:{name:"佛怒火莲",dj:"自创斗技",mp:100,mult:5.0,desc:"异火相融，毁天灭地",sect:"gaibang",cost:5000,lv:28}
 };
 const ITEMS={ // iid: {name,slot,atk,def,hp,spd,luck,tier}
  w0:{name:"小红剑·开荒神兵",slot:"weapon",atk:26,luck:9,tier:1,gift:1},
@@ -286,9 +288,10 @@ const VIP_NEED=[0,6,30,98,198,498,998]; // 索引即VIP等级：升到该级所�
 function vipTotal(){return S.orders.reduce((a,o)=>a+o.money,0);}
 function vipLevel(){const t=vipTotal();let v=0;for(let i=1;i<VIP_NEED.length;i++)if(t>=VIP_NEED[i])v=i;return v;}
 function vipGift(){const v=vipLevel();return{coins:v*300,stam:10+v*5,gold:v*8};}
-const VIP_TITLES=[null, // 索引=VIP等级：称号名+属性
- {name:"初露锋芒",atk:8,hp:80},{name:"江湖新秀",atk:16,hp:160},{name:"一方豪杰",atk:28,hp:280},
- {name:"武林名宿",atk:45,hp:450},{name:"绝世高手",atk:70,hp:700},{name:"武林神话",atk:110,hp:1100}];
+const VIP_TITLES=[null, // 索引=VIP等级：称号名+属性+爆率
+ {name:"初露锋芒",atk:8,hp:80,drop:5},{name:"江湖新秀",atk:16,hp:160,drop:8},{name:"一方豪杰",atk:28,hp:280,drop:12},
+ {name:"武林名宿",atk:45,hp:450,drop:16},{name:"绝世高手",atk:70,hp:700,drop:20},{name:"武林神话",atk:110,hp:1100,drop:30}];
+function vipDrop(){const t=VIP_TITLES[S.title||0];return t?(t.drop||0):0;} // 当前佩戴VIP称号的爆率加成%
 </script>
 <script>
 "use strict";
@@ -483,11 +486,17 @@ if(B.wb){ // 世界BOSS：掉落功法（神级以下）
   S.gongfaLearned=S.gongfaLearned||{};S.gongfaLearned[pg]=1;
   log(`<span class="sys">🎁 世界BOSS掉落：功法《${GONGFA[pg].name}》！去功法页修炼吧</span>`);
  }else{p.gold+=88;log(`<span class="sys">🎁 功法已集齐，获得88元宝！</span>`);}
+ // 异火掉落（极低概率，VIP称号提升爆率）
+ const unownedYH=YIHUO.filter(f=>!(S.yihuo||[]).includes(f.name));
+ if(unownedYH.length&&Math.random()<0.03*(1+vipDrop()/100)){
+  const yf=pick(unownedYH);S.yihuo=S.yihuo||[];S.yihuo.push(yf.name);
+  log(`<span class="sys">🔥 天降机缘！世界BOSS掉落${yf.name}，已自动炼化！</span>`);
+ }
 }else{
-// 掉落
+// 掉落（VIP称号提升爆率）
 const tier=ZONES[B.zi].tier;
 const pool=Object.keys(ITEMS).filter(k=>ITEMS[k].tier===tier&&!ITEMS[k].gift);
-if(f.boss||Math.random()<0.3){
+if(f.boss||Math.random()<0.3*(1+vipDrop()/100)){
 const iid=pick(pool);
 S.bag.push({iid,enh:0});
 log(`<span class="sys">🎁 获得了！</span>`);
@@ -509,7 +518,7 @@ if(B.over){
 h+=`<button class="btn primary" id="bback">继续闯荡</button></div>`;
 }else{
 h+=`<div class="rowbtns"><button class="btn" id="a_atk">普通攻击</button><button class="btn" id="a_med">吃药</button></div>
-<div class="rowbtns">${p.skills.map(s=>`<button class="btn small" data-sk="${s}">${SKILLS[s].name}(${SKILLS[s].mp}内)</button>`).join("")}</div>
+<div class="rowbtns">${p.skills.filter(s=>SKILLS[s]).map(s=>`<button class="btn small" data-sk="${s}">${SKILLS[s].name}(${SKILLS[s].mp}内)</button>`).join("")}</div>
 <div class="rowbtns">${f.catchPet?`<button class="btn small" id="a_cap">🪤 捕捉</button>`:""}<button class="btn small danger" id="a_flee">逃跑</button></div></div>`;
 }
 m.innerHTML=h;
@@ -628,11 +637,12 @@ m.querySelectorAll("[data-pet]").forEach(b=>b.onclick=()=>{S.activePet=+b.datase
 /* ============ 门派 ============ */
 function rSect(){
 const m=$("main"),p=S.player,sc=SECTS[p.sect];
-let h=`<div class="card"><h3>🥋 ${sc.name}</h3><p class="dim">${sc.desc}</p><p>已学武功：${p.skills.map(s=>SKILLS[s].name).join("、")}</p>`;
+let h=`<div class="card"><h3>🥋 ${sc.name}</h3><p class="dim">${sc.desc}</p><p>已学斗技：${p.skills.filter(s=>SKILLS[s]).map(s=>SKILLS[s].name).join("、")||"无"}</p>
+<p class="dim">斗技品阶：玄阶→地阶→天阶，品阶越高威力越强。</p>`;
 Object.entries(SKILLS).forEach(([id,sk])=>{
 if(sk.sect!==p.sect||p.skills.includes(id))return;
 const can=p.level>=sk.lv&&p.coins>=sk.cost;
-h+=`<div class="tier"><div><div class="gold">${sk.name}</div><div class="m">${sk.desc} · 需${sk.lv}级 ${sk.cost}铜币</div></div>
+h+=`<div class="tier"><div><div class="gold">${sk.name} <span class="ptier ${{玄:"玄",地:"地",天:"天"}[sk.dj[0]]||"神"}">${sk.dj}</span></div><div class="m">${sk.desc} · 需${sk.lv}级 ${sk.cost}铜币</div></div>
 <button class="btn small" style="width:auto;margin:0" ${can?"":"disabled"} data-sk="${id}">${can?"学习":"未达标"}</button></div>`;
 });
 h+=`</div><div class="card"><h3>📜 师门任务</h3>`;
@@ -774,8 +784,8 @@ function rPay(){
  let h=`<div class="card"><h3>👑 VIP特权</h3>
  <p>当前等级：<b class="gold">VIP${v}</b> · 累计充值 <b class="gold">￥${total}</b></p>
  <p class="dim">${next?`再充 ￥${next-total} 晋升 VIP${v+1}`:`已达最高 VIP${v}，威震江湖！`}</p>
- <div class="statgrid"><div>攻击/气血加成<b>+${v*2}%</b></div><div>每日VIP礼包<b>${v?(claimed?"已领取":"可领取"):"VIP1开启"}</b></div></div>
- <p style="margin:8px 0 4px">我的称号：<b class="gold">${T?`「${T.name}」`:"暂无"}</b>${T?`<span class="dim"> 攻击+${T.atk} 气血+${T.hp}</span>`:""}</p>
+ <div class="statgrid"><div>攻击/气血加成<b>+${v*2}%</b></div><div>稀有爆率<b>+${T?T.drop:0}%</b></div><div>每日VIP礼包<b>${v?(claimed?"已领取":"可领取"):"VIP1开启"}</b></div></div>
+ <p style="margin:8px 0 4px">我的称号：<b class="gold">${T?`「${T.name}」`:"暂无"}</b>${T?`<span class="dim"> 攻击+${T.atk} 气血+${T.hp} 爆率+${T.drop}%</span>`:""}</p>
  <div class="rowbtns" style="flex-wrap:wrap">${titleBtns}</div>
  <p class="dim" style="margin:6px 0">今日礼包：铜币${g.coins} · 体力${g.stam} · 元宝${g.gold}</p>
  <button class="btn small primary" id="vipclaim" ${(!v||claimed)?"disabled":""}>${claimed?"今日已领取":(v?"领取今日VIP礼包":"充值任意金额开启VIP")}</button></div>
@@ -878,7 +888,8 @@ function rMore(){
  <div class="card"><h3>❓ 玩法说明</h3><p class="dim">
  · 去「江湖」挑战敌人，升级变强<br>· 怪物掉装备，去「背包」穿戴、铁匠铺强化<br>
  · 野怪打到30%血可捕捉为宠物，宠物会帮你打架<br>
- · 「门派」学高级武功、做师门任务<br>
+ · 🥋技能全是斗破斗技：八极崩、焰分噬浪尺、佛怒火莲、三千雷动、帝印诀等，去「门派」学习<br>
+ · 🔥异火极难掉落：世界BOSS有极低概率掉落异火；佩戴👑VIP称号提升稀有爆率（VIP6+30%），野外装备掉率也受加成<br>
  · 体力不够就打坐，或去商城买体力丹<br>
  · 「充值」是模拟的，不花真钱，随便点！累计充值提升VIP等级，加攻击气血、每日领礼包<br>
  · 宠物可捕捉斗罗魂兽：柔骨兔·小舞、蓝银皇·阿银、鬼虎、人面魔蛛、泰坦巨猿·二明、暗魔邪神虎、天青牛蟒·大明、冰碧帝皇蝎<br>
