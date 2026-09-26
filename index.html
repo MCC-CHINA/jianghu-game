@@ -120,6 +120,9 @@ input[type=text]{width:100%;background:#0d0a06;border:1px solid #8a6d2f;color:#f
 .chatline{margin:4px 0;font-size:14px;line-height:1.5;word-break:break-all}
 .chatinput{display:flex;gap:8px;margin-top:8px}
 .chatinput input{flex:1;background:#1a1410;border:1px solid #3a2c1c;color:#e8dcc0;border-radius:8px;padding:8px;font-size:14px}
+.vplink{cursor:pointer;border-bottom:1px dotted #8a6d3b}
+.good{color:#7bed9f;font-weight:bold}
+.bad{color:#ff6b6b;font-weight:bold}
 </style>
 </head>
 <body>
@@ -486,7 +489,7 @@ if(ch){calcStats();save();}return ch;}
 function rSkill(){
 const m=$("main"),p=S.player,sc=SECTS[p.sect];
 const djc={黄:"黄",玄:"玄",地:"地",天:"天"};
-let h=`<div class="card"><h3>门派技能 · ${sc.name}</h3><p class="dim">${sc.desc}</p><p class="dim">门派特性：<b class="gold">${sc.trait}</b></p><p>已学技能：${p.skills.filter(s=>SKILLS[s]).map(s=>`${SKILLS[s].name}<span class="dim">(耗内${SKILLS[s].mp}·${SKILLS[s].mult}倍)</span>`).join("、")||"无"}</p><p class="dim">战斗中可使用已学技能，消耗内力造成倍率伤害。各门派技能完全不同。</p></div><div class="card"><h3>可学技能</h3>`;
+let h=`<div class="card"><h3>门派技能 · ${sc.name}</h3><p class="dim">${sc.desc}</p><p class="dim">门派特性：<b class="gold">${sc.trait}</b></p><p>已学技能：${p.skills.filter(s=>SKILLS[s]).map(s=>`${SKILLS[s].name}<span class="dim">(耗内${SKILLS[s].mp}·${SKILLS[s].mult}倍)</span>`).join("、")||"无"}</p><p class="dim">战斗中点「攻击」会自动施展已学的最强技能（内力不足时用普通攻击）。各门派技能完全不同。</p></div><div class="card"><h3>可学技能</h3>`;
 let any=false;
 Object.entries(SKILLS).forEach(([id,sk])=>{
  if(sk.sect!==p.sect||p.skills.includes(id))return; any=true;
@@ -903,15 +906,13 @@ let h=`<div class="card"><h3>${f.name} ${f.boss?"":""} <span class="dim">Lv.${f.
 if(B.over){
 h+=`<button class="btn primary" id="bback">继续闯荡</button></div>`;
 }else{
-h+=`<div class="rowbtns"><button class="btn" id="a_atk">普通攻击</button><button class="btn" id="a_med">吃药</button></div>
-<div class="rowbtns">${p.skills.filter(s=>SKILLS[s]).map(s=>`<button class="btn small" data-sk="${s}">${SKILLS[s].name}(${SKILLS[s].mp}内)</button>`).join("")}</div>
+h+=`<div class="rowbtns"><button class="btn" id="a_atk">攻击</button><button class="btn" id="a_med">吃药</button></div>
 <div class="rowbtns">${f.catchPet?`<button class="btn small" id="a_cap">捕捉</button>`:""}<button class="btn small danger" id="a_flee">逃跑</button></div></div>`;
 }
 m.innerHTML=h;
 const bl=$("battlelog");bl.scrollTop=bl.scrollHeight;
 if(B.over){$("bback").onclick=()=>{B=null;TAB="home";render();};return;}
-$("a_atk").onclick=()=>doAtk(null);
-m.querySelectorAll("[data-sk]").forEach(b=>b.onclick=()=>doAtk(b.dataset.sk));
+$("a_atk").onclick=()=>doAutoAtk();
 $("a_med").onclick=()=>{
 const med=S.bag.find(x=>x.use);
 if(!med){toast("背包里没有药品，去商店买");return;}
@@ -926,6 +927,17 @@ $("a_flee").onclick=()=>{
 if(Math.random()<0.7){log(`<span class="sys">你成功逃脱了。</span>`);B.over=true;p.hp=Math.max(1,p.hp);save();rBattle();}
 else{log(`<span class="foe">逃跑失败！</span>`);foeTurn();save();rBattle();}
 };
+}
+function bestSkill(){
+ const p=S.player;let best=null,bm=0;
+ for(const id of(p.skills||[])){const sk=SKILLS[id];if(!sk)continue;
+  if(p.mp>=sk.mp&&sk.mult>bm){best=id;bm=sk.mult;}}
+ return best;
+}
+function doAutoAtk(){
+ const sk=bestSkill();
+ doAtk(sk);
+ if(sk)toast("施展「"+SKILLS[sk].name+"」！");
 }
 function doAtk(skId){
 const p=S.player,f=B.foe;
@@ -1425,14 +1437,20 @@ function rArena(){
  ARENA_OPPS={};
  for(const r of rs){const f=arenaOpp(r);ARENA_OPPS[r]=f;
  const pw=Math.floor(f.atk*3+f.def*2+f.hp*0.5+f.spd*2);
- h+=`<div class="tier"><div><div class="gold">${f.name} <span class="dim">第${r}名</span></div><div class="m">Lv.${f.lv} · 战力约${pw}</div></div>
+ h+=`<div class="tier"><div><div class="gold"><span class="vplink" data-opp="${r}">${f.name}</span> <span class="dim">第${r}名</span></div><div class="m">Lv.${f.lv} · 战力约${pw}</div></div>
  <button class="btn small" style="width:auto;margin:0" data-ch="${r}"${left<=0?" disabled":""}>挑战</button></div>`;}
  h+=`</div>`;
  const bl=[...A.top.map(n=>({...n})),{name:p.name+"（我）",rank:A.rank,me:true}].sort((a,b)=>a.rank-b.rank).slice(0,10);
  h+=`<div class="card"><h3>竞技场排行榜</h3>`;
- h+=bl.map(r=>`<div class="rankrow${r.me?" me":""}"><span>第${r.rank}名 · ${r.name}</span></div>`).join("")+`</div>`;
+ h+=bl.map((r,i)=>`<div class="rankrow${r.me?" me":""}"><span>第${r.rank}名 · <span class="vplink" data-top="${i}">${vipName(r.name,r.me?vipLevel():(hashStr(r.name)%9))}</span></span></div>`).join("")+`</div>`;
+ window._atop=bl;
  m.innerHTML=h;
  m.querySelectorAll("[data-ch]").forEach(b=>b.onclick=()=>startArenaBattle(+b.dataset.ch));
+ m.querySelectorAll("[data-opp]").forEach(el=>el.onclick=()=>{
+  const f=ARENA_OPPS[+el.dataset.opp];
+  viewProfile({_prof:{name:f.name,vip:Math.min(12,Math.floor(f.lv/8)),lv:f.lv,sect:Object.keys(SECTS)[hashStr(f.name)%4],zl:Math.floor(f.atk*3+f.def*2+f.hp*0.5+f.spd*2),atk:f.atk,def:f.def,maxhp:f.hp,spd:f.spd,pet:"?",wingT:1,title:"竞技高手"}});
+ });
+ m.querySelectorAll("[data-top]").forEach(el=>el.onclick=()=>{const r=window._atop[+el.dataset.top];viewProfile(r.me?{me:1}:{name:r.name.replace(/（我）$/,""),vip:0,lv:Math.max(1,105-r.rank)});});
  const ar=$("arenaReward");
  if(ar)ar.onclick=()=>{
  if(A.rank>3||A.reward===nowStr().slice(0,10))return;
@@ -1463,31 +1481,71 @@ function rTitle(){
  S.wornTitle={k:k,id:id};calcStats();save();render();
  const wt=wornTitleInfo();toast(`已佩戴称号「${wt?wt.name:""}」！`);});
 }
+/* ============ 玩家档案查看 ============ */
+function hashStr(s){let h=0;s=String(s);for(let i=0;i<s.length;i++){h=(h*31+s.charCodeAt(i))>>>0;}return h;}
+const NPC_PETS=["啸天虎","碧鳞蛇","金翅雕","金蚕蛊","苍原狼","月影兔","灵羽鸡","泰坦巨猿","天青牛蟒","九幽冥雀"];
+const NPC_TITLES=["武林新秀","一方豪杰","江湖名宿","绝世高手","武林神话","独步天下","剑啸江湖","笑傲群雄"];
+function npcProfile(name,ref){
+ ref=ref||{};const h=hashStr(name);
+ const power=ref.zl||(ref.pay||0)*1.2||(ref.score||0)*10||((ref.tier||1)*9000)||(ref.lv||20)*900||8000;
+ const f=0.9+(h%20)/100,sects=Object.keys(SECTS);
+ return {name,vip:ref.vip||(h%6),lv:ref.lv||(20+h%70),sect:sects[h%4],
+  zl:Math.round(ref.zl||power),
+  atk:Math.round(power*0.016*f),def:Math.round(power*0.011*f),
+  maxhp:Math.round(power*0.85*f),spd:Math.round(power*0.007*f),
+  pet:NPC_PETS[h%NPC_PETS.length],wingT:1+h%12,title:NPC_TITLES[h%NPC_TITLES.length]};
+}
+function myBestPetName(){let s=0,n="暂无宠物";for(const pet of(S.pets||[])){const sc=petScore(pet);if(sc>s){s=sc;n=pet.name;}}return n;}
+function cmpRow(label,nv,pv){
+ const hc=nv>pv?"good":nv<pv?"bad":"",pc=pv>nv?"good":pv<nv?"bad":"",d=nv-pv;
+ return `<div class="tier"><div><div class="m">${label}</div><div class="gold"><span class="${hc}">${nv}</span> <span class="dim">vs</span> <span class="${pc}">${pv}</span></div><div class="m dim">${d===0?"双方持平":d>0?"对方高 "+d:"你高 "+(-d)}</div></div></div>`;
+}
+function viewProfile(r){
+ const p=S.player,me=!!r.me;
+ const np=r._prof||(me?null:npcProfile(r.name,r));
+ const myVip=vipLevel(),myZl=zhanli();
+ let h=`<div class="card"><h3>${me?"我的档案":"玩家档案"}</h3>`;
+ if(me){
+  h+=`<p>名字：${vipName(p.name,myVip)} <span class="dim">VIP${myVip}</span></p><p class="dim">${SECTS[p.sect].name} · Lv.${p.level}</p>`;
+  h+=cmpRow("战力",myZl,myZl)+cmpRow("攻击",p.atk,p.atk)+cmpRow("防御",p.def,p.def)+cmpRow("气血",p.maxhp,p.maxhp)+cmpRow("速度",p.spd,p.spd);
+ }else{
+  const ratio=np.zl/Math.max(1,myZl);
+  h+=`<p>名字：${vipName(np.name,np.vip)} <span class="dim">VIP${np.vip}</span></p><p class="dim">${SECTS[np.sect].name} · Lv.${np.lv} · 称号${escHtml(np.title)}</p>`;
+  h+=`<p>${ratio>=1?`对方战力约为你的 <b class="bad">${ratio.toFixed(1)}</b> 倍，再接再厉！`:`你的战力已是对方的 <b class="good">${(1/ratio).toFixed(1)}</b> 倍！`}</p>`;
+  h+=cmpRow("战力",np.zl,myZl)+cmpRow("等级",np.lv,p.level)+cmpRow("攻击",np.atk,p.atk)+cmpRow("防御",np.def,p.def)+cmpRow("气血",np.maxhp,p.maxhp)+cmpRow("速度",np.spd,p.spd);
+  h+=`<div class="tier"><div><div class="m">宠物 / 翅膀</div><div class="gold">${escHtml(np.pet)} <span class="dim">vs</span> ${escHtml(myBestPetName())}</div><div class="m dim">${WING_NAMES[np.wingT]} <span class="dim">vs</span> ${(S.wing&&S.wing.tier)?WING_NAMES[S.wing.tier]:"未激活"}</div></div></div>`;
+ }
+ h+=`<button class="btn" id="vpClose" style="margin-top:8px">关闭</button></div>`;
+ modal(h);
+ $("vpClose").onclick=closeModal;
+}
 function rRank(){
  const m=$("main"),zl=zhanli(),p=S.player;
  const pay=S.orders.reduce((a,o)=>a+o.money,0);
  const zlist=[...RANKS.map(r=>({...r})),{name:p.name+"（我）",zl,me:true}].sort((a,b)=>b.zl-a.zl);
  const plist=[...RANK_PAY.map(r=>({...r})),{name:p.name+"（我）",pay,me:true}].sort((a,b)=>b.pay-a.pay);
  let h=`<div class="card"><h3>武林战力榜</h3><p class="dim">我的战力：<b class="gold">${zl}</b>· 第 ${zlist.findIndex(r=>r.me)+1} 名</p>`;
- h+=zlist.map((r,i)=>`<div class="rankrow${r.me?" me":""}"><span>${i+1}. ${vipName(r.name,r.me?vipLevel():(r.vip||0))}${i<3?` ${titleBadge(RANK_TITLES.zl[i].name,RANK_TITLES.zl[i].cls)}`:""}</span><span>${r.zl}</span></div>`).join("")+`</div>`;
+ h+=zlist.map((r,i)=>`<div class="rankrow${r.me?" me":""}"><span>${i+1}. <span class="vplink" data-b="zl" data-i="${i}">${vipName(r.name,r.me?vipLevel():(r.vip||0))}</span>${i<3?` ${titleBadge(RANK_TITLES.zl[i].name,RANK_TITLES.zl[i].cls)}`:""}</span><span>${r.zl}</span></div>`).join("")+`</div>`;
  h+=`<div class="card"><h3>充值风云榜</h3><p class="dim">我的累计充值：<b class="gold">￥${pay}</b>· 第 ${plist.findIndex(r=>r.me)+1} 名</p>`;
- h+=plist.map((r,i)=>`<div class="rankrow${r.me?" me":""}"><span>${i+1}. ${vipName(r.name,r.me?vipLevel():(r.vip||0))}${i<3?` ${titleBadge(RANK_TITLES.pay[i].name,RANK_TITLES.pay[i].cls)}`:""}</span><span>￥${r.pay}</span></div>`).join("")+`</div>`;
+ h+=plist.map((r,i)=>`<div class="rankrow${r.me?" me":""}"><span>${i+1}. <span class="vplink" data-b="pay" data-i="${i}">${vipName(r.name,r.me?vipLevel():(r.vip||0))}</span>${i<3?` ${titleBadge(RANK_TITLES.pay[i].name,RANK_TITLES.pay[i].cls)}`:""}</span><span>￥${r.pay}</span></div>`).join("")+`</div>`;
  // 宠物榜
  let myPetScore=0,myPetName="暂无宠物";
  for(const pet of(S.pets||[])){const sc=petScore(pet);if(sc>myPetScore){myPetScore=sc;myPetName=pet.name;}}
  const petlist=[...RANK_PET.map(r=>({...r})),{name:p.name+"（我）",pet:myPetName,score:myPetScore,me:true}].sort((a,b)=>b.score-a.score);
  h+=`<div class="card"><h3>宠物排行榜</h3><p class="dim">我的最强宠物：<b class="gold">${myPetName}</b>（评分${myPetScore}）· 第 ${petlist.findIndex(r=>r.me)+1} 名</p>`;
- h+=petlist.map((r,i)=>`<div class="rankrow${r.me?" me":""}"><span>${i+1}. ${vipName(r.name,r.me?vipLevel():(r.vip||0))} <span class="dim">${r.pet}</span>${i<3?` ${titleBadge(RANK_TITLES.pet[i].name,RANK_TITLES.pet[i].cls)}`:""}</span><span>${r.score}</span></div>`).join("")+`</div>`;
+ h+=petlist.map((r,i)=>`<div class="rankrow${r.me?" me":""}"><span>${i+1}. <span class="vplink" data-b="pet" data-i="${i}">${vipName(r.name,r.me?vipLevel():(r.vip||0))}</span> <span class="dim">${r.pet}</span>${i<3?` ${titleBadge(RANK_TITLES.pet[i].name,RANK_TITLES.pet[i].cls)}`:""}</span><span>${r.score}</span></div>`).join("")+`</div>`;
  // 翅膀榜
  const myWing=(S.wing&&S.wing.tier)||0;
  const winglist=[...RANK_WING.map(r=>({...r})),{name:p.name+"（我）",wing:myWing?WING_NAMES[myWing]:"未激活",tier:myWing,me:true}].sort((a,b)=>b.tier-a.tier);
  h+=`<div class="card"><h3>翅膀排行榜</h3><p class="dim">我的翅膀：<b class="gold">${myWing?WING_NAMES[myWing]+`（${myWing}阶）`:"未激活"}</b>· 第 ${winglist.findIndex(r=>r.me)+1} 名</p>`;
- h+=winglist.map((r,i)=>`<div class="rankrow${r.me?" me":""}"><span>${i+1}. ${vipName(r.name,r.me?vipLevel():(r.vip||0))} <span class="dim">${r.wing}${r.tier?`·${r.tier}阶`:""}</span>${i<3?` ${titleBadge(RANK_TITLES.wing[i].name,RANK_TITLES.wing[i].cls)}`:""}</span><span>${r.tier}阶</span></div>`).join("")+`</div>`;
+ h+=winglist.map((r,i)=>`<div class="rankrow${r.me?" me":""}"><span>${i+1}. <span class="vplink" data-b="wing" data-i="${i}">${vipName(r.name,r.me?vipLevel():(r.vip||0))}</span> <span class="dim">${r.wing}${r.tier?`·${r.tier}阶`:""}</span>${i<3?` ${titleBadge(RANK_TITLES.wing[i].name,RANK_TITLES.wing[i].cls)}`:""}</span><span>${r.tier}阶</span></div>`).join("")+`</div>`;
  // 等级榜
  const lvlist=[...RANK_LV.map(r=>({...r})),{name:p.name+"（我）",lv:p.level,me:true}].sort((a,b)=>b.lv-a.lv);
  h+=`<div class="card"><h3>等级排行榜</h3><p class="dim">我的等级：<b class="gold">Lv.${p.level}</b>· 第 ${lvlist.findIndex(r=>r.me)+1} 名</p>`;
- h+=lvlist.map((r,i)=>`<div class="rankrow${r.me?" me":""}"><span>${i+1}. ${vipName(r.name,r.me?vipLevel():(r.vip||0))}${i<3?` ${titleBadge(RANK_TITLES.lv[i].name,RANK_TITLES.lv[i].cls)}`:""}</span><span>Lv.${r.lv}</span></div>`).join("")+`</div>`;
+ h+=lvlist.map((r,i)=>`<div class="rankrow${r.me?" me":""}"><span>${i+1}. <span class="vplink" data-b="lv" data-i="${i}">${vipName(r.name,r.me?vipLevel():(r.vip||0))}</span>${i<3?` ${titleBadge(RANK_TITLES.lv[i].name,RANK_TITLES.lv[i].cls)}`:""}</span><span>Lv.${r.lv}</span></div>`).join("")+`</div>`;
  m.innerHTML=h;
+ window._vp={zl:zlist,pay:plist,pet:petlist,wing:winglist,lv:lvlist};
+ m.querySelectorAll("[data-b]").forEach(el=>el.onclick=()=>{const r=window._vp[el.dataset.b][+el.dataset.i];viewProfile(r);});
 }
 /* ============ 聊天系统 ============ */
 const CHAT_NPCS=[{n:"剑圣·西门飘雪",vip:10},{n:"总镖头·铁中堂",vip:7},{n:"云游僧·慧远",vip:5},{n:"猎户·石大壮",vip:2},{n:"苗疆翼女·阿幼",vip:2},{n:"采花大盗·田伯光",vip:2},{n:"江南大侠·江别鹤",vip:1},{n:"药农·老蔫",vip:1},{n:"顽童·小豆子",vip:0},{n:"送信小厮·阿毛",vip:0}];
@@ -1512,7 +1570,7 @@ function chatLine(m){
  const t=new Date(m.t||Date.now());
  const ts=String(t.getHours()).padStart(2,"0")+":"+String(t.getMinutes()).padStart(2,"0");
  if(m.sys)return `<p class="chatline"><span class="sys">[系统 ${ts}] ${escHtml(m.txt)}</span></p>`;
- return `<p class="chatline"><span class="dim">[${ts}]</span> ${vipName(m.n,m.vip)}${m.me?' <span class="dim">(我)</span>':""}：${escHtml(m.txt)}</p>`;
+ return `<p class="chatline"><span class="dim">[${ts}]</span> <span class="vplink" data-cn="${escHtml(m.n)}" data-cv="${m.vip||0}" data-me="${m.me?1:0}">${vipName(m.n,m.vip)}</span>：${escHtml(m.txt)}</p>`;
 }
 function sendChat(){
  const p=S.player,c=S.chat,inp=$("chatIn"),txt=(inp.value||"").trim();
@@ -1528,11 +1586,12 @@ function rChat(){
  const m=$("main"),p=S.player,c=S.chat;
  if(Math.random()<0.45)npcChat(c.ch||"world");
  const ch=c.ch||"world",msgs=c[ch]||[];
- let h=`<div class="card"><h3>江湖聊天</h3><div class="rowbtns"><button class="btn small ${ch==="world"?"primary":""}" id="chW">世界</button><button class="btn small ${ch==="sect"?"primary":""}" id="chS">门派·${SECTS[p.sect].name}</button></div><div class="chatbox" id="chatbox">${msgs.map(chatLine).join("")||'<p class="dim">暂无消息，来说第一句吧</p>'}</div><div class="chatinput"><input id="chatIn" maxlength="60" placeholder="说点什么…（5秒一条）"><button class="btn primary" id="chatSend" style="width:auto">发送</button></div><p class="dim">世界频道畅所欲言，门派频道只和同门交流。VIP名字会显示专属颜色。</p></div>`;
+ let h=`<div class="card"><h3>江湖聊天</h3><div class="rowbtns"><button class="btn small ${ch==="world"?"primary":""}" id="chW">世界</button><button class="btn small ${ch==="sect"?"primary":""}" id="chS">门派·${SECTS[p.sect].name}</button></div><div class="chatbox" id="chatbox">${msgs.map(chatLine).join("")||'<p class="dim">暂无消息，来说第一句吧</p>'}</div><div class="chatinput"><input id="chatIn" maxlength="60" placeholder="说点什么…（5秒一条）"><button class="btn primary" id="chatSend" style="width:auto">发送</button></div><p class="dim">世界频道畅所欲言，门派频道只和同门交流。VIP名字会显示专属颜色；点击排行榜/聊天/竞技场中的玩家名字可查看档案，直观对比差距；</p></div>`;
  m.innerHTML=h;
  const box=$("chatbox");box.scrollTop=box.scrollHeight;
  $("chW").onclick=()=>{c.ch="world";save();render();};
  $("chS").onclick=()=>{c.ch="sect";save();render();};
+ m.querySelectorAll("[data-cn]").forEach(el=>el.onclick=()=>viewProfile({name:el.dataset.cn,vip:+el.dataset.cv||0,me:el.dataset.me==="1"}));
  $("chatSend").onclick=sendChat;
  $("chatIn").onkeydown=e=>{if(e.key==="Enter")sendChat();};
 }
