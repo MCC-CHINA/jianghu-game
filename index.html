@@ -12,6 +12,7 @@ body{background:#141009;color:#e8dcc0;font-family:"Songti SC","STSong","SimSun",
 #topbar .pname{font-size:16px;font-weight:bold;color:#f5d67b;letter-spacing:1px}
 #topbar .pname .lv{background:#8a6d2f;color:#141009;font-size:12px;padding:1px 8px;border-radius:10px;margin-left:6px;vertical-align:2px}
 #topbar .pname .vip{background:linear-gradient(180deg,#f5d67b,#c8903c);color:#3a2a08;font-size:12px;font-weight:bold;padding:1px 8px;border-radius:10px;margin-left:6px;vertical-align:2px}
+#topbar .pname .title{color:#ffe9a8;font-size:13px;margin-right:4px;text-shadow:0 0 6px rgba(245,214,123,.6)}
 .bars{margin-top:6px;display:flex;flex-direction:column;gap:4px}
 .bar{height:14px;background:#0d0a06;border:1px solid #5a4a26;border-radius:7px;overflow:hidden;position:relative;font-size:10px}
 .bar>i{display:block;height:100%;border-radius:6px;transition:width .3s}
@@ -111,7 +112,8 @@ const SKILLS={
  jinding:{name:"金顶绵掌",mp:20,mult:2.5,desc:"峨眉绝学，掌风如绵似针",sect:"emei",cost:500,lv:8},
  xianglong:{name:"降龙十八掌",mp:25,mult:2.9,desc:"天下第一刚猛掌法，见龙在田",sect:"gaibang",cost:800,lv:10}
 };
-const ITEMS={ // iid: {name,slot,atk,def,hp,spd,tier}
+const ITEMS={ // iid: {name,slot,atk,def,hp,spd,luck,tier}
+ w0:{name:"小红剑·开荒神兵",slot:"weapon",atk:26,luck:9,tier:1,gift:1},
  w1:{name:"桃木剑",slot:"weapon",atk:5,tier:1},w2:{name:"精钢长剑",slot:"weapon",atk:12,tier:2},
  w3:{name:"寒铁宝刀",slot:"weapon",atk:22,tier:3},w4:{name:"龙泉宝剑",slot:"weapon",atk:36,tier:4},
  a1:{name:"粗布衣",slot:"armor",def:4,hp:20,tier:1},a2:{name:"镖师劲装",slot:"armor",def:9,hp:50,tier:2},
@@ -158,6 +160,9 @@ const VIP_NEED=[0,6,30,98,198,498,998]; // 索引即VIP等级：升到该级所�
 function vipTotal(){return S.orders.reduce((a,o)=>a+o.money,0);}
 function vipLevel(){const t=vipTotal();let v=0;for(let i=1;i<VIP_NEED.length;i++)if(t>=VIP_NEED[i])v=i;return v;}
 function vipGift(){const v=vipLevel();return{coins:v*300,stam:10+v*5,gold:v*8};}
+const VIP_TITLES=[null, // 索引=VIP等级：称号名+属性
+ {name:"初露锋芒",atk:8,hp:80},{name:"江湖新秀",atk:16,hp:160},{name:"一方豪杰",atk:28,hp:280},
+ {name:"武林名宿",atk:45,hp:450},{name:"绝世高手",atk:70,hp:700},{name:"武林神话",atk:110,hp:1100}];
 </script>
 <script>
 "use strict";
@@ -172,13 +177,16 @@ function calcStats(){
  const p=S.player;
  p.maxhp=p.base.maxhp+(p.level-1)*18; p.maxmp=p.base.maxmp+(p.level-1)*8;
  p.atk=p.base.atk+(p.level-1)*3; p.def=p.base.def+(p.level-1)*2; p.spd=p.base.spd+(p.level-1)*1;
+ p.luck=0;
  for(const slot of["weapon","armor","boots","charm"]){
   const it=S.equip[slot]; if(!it)continue; const d=ITEMS[it.iid],e=it.enh||0;
-  p.atk+=d.atk||0; p.def+=d.def||0; p.hp0=(p.hp0||0); p.spd+=d.spd||0;
+  p.atk+=d.atk||0; p.def+=d.def||0; p.hp0=(p.hp0||0); p.spd+=d.spd||0; p.luck+=d.luck||0;
   if(d.hp)p.maxhp+=d.hp;
   if(slot==="weapon")p.atk+=e*2; if(slot==="armor")p.def+=e*2;
   if(slot==="boots")p.spd+=e*1; if(slot==="charm"){p.maxhp+=e*15;}
  }
+ const worn=VIP_TITLES[S.title||0]; // 佩戴称号加成
+ if(worn){p.atk+=worn.atk;p.maxhp+=worn.hp;}
  const vb=1+vipLevel()*0.02; // VIP加成：每级攻击/气血+2%
  p.atk=Math.floor(p.atk*vb); p.maxhp=Math.floor(p.maxhp*vb);
  p.hp=Math.min(p.hp,p.maxhp); p.mp=Math.min(p.mp,p.maxmp);
@@ -201,13 +209,14 @@ function newGame(name,sectKey){
 function renderTop(){
  const p=S.player,t=$("topbar");t.style.display="block";
  const v=vipLevel();
- t.innerHTML=`<div class="pname">${p.name}<span class="lv">Lv.${p.level} ${SECTS[p.sect].name}</span>${v?`<span class="vip">👑VIP${v}</span>`:""}</div>
+ const T=VIP_TITLES[S.title||0];
+ t.innerHTML=`<div class="pname">${T?`<span class="title">「${T.name}」</span>`:""}${p.name}<span class="lv">Lv.${p.level} ${SECTS[p.sect].name}</span>${v?`<span class="vip">👑VIP${v}</span>`:""}</div>
  <div class="bars">
   <div class="bar hp"><i style="width:${p.hp/p.maxhp*100}%"></i><span>气血 ${p.hp}/${p.maxhp}</span></div>
   <div class="bar mp"><i style="width:${p.mp/p.maxmp*100}%"></i><span>内力 ${p.mp}/${p.maxmp}</span></div>
   <div class="bar exp"><i style="width:${p.exp/expNeed(p.level)*100}%"></i><span>修为 ${p.exp}/${expNeed(p.level)}</span></div>
  </div>
- <div class="wallet"><span>🪙铜币 <b>${p.coins}</b></span><span>💰元宝 <b>${p.gold}</b></span><span>⚡体力 <b>${p.stamina}/${p.maxStamina}</b></span><span>⚔️战力 <b>${zhanli()}</b></span></div>`;
+ <div class="wallet"><span>🪙铜币 <b>${p.coins}</b></span><span>💰元宝 <b>${p.gold}</b></span><span>⚡体力 <b>${p.stamina}/${p.maxStamina}</b></span><span>🍀幸运 <b>${p.luck||0}</b></span><span>⚔️战力 <b>${zhanli()}</b></span></div>`;
 }
 const TABS=[["home","🏠<br>江湖"],["bag","🎒<br>背包"],["pet","🦊<br>宠物"],["sect","🥋<br>门派"],["shop","🏪<br>商店"],["gold","💎<br>商城"],["pay","💰<br>充值"],["rank","🏆<br>排行"],["more","⚙️<br>更多"]];
 function renderTabs(){
@@ -282,9 +291,9 @@ log(`<span class="sys">你在${ZONES[zi].name}遭遇了！</span>`);
 save();rBattle();
 }
 function log(t){B.log.push(t);}
-function dmgCalc(atk,def,mult){
+function dmgCalc(atk,def,mult,luck){
 let d=Math.max(1,(atk*(mult||1.6)-def*0.8))* (0.9+Math.random()*0.2);
-const crit=Math.random()<0.15; if(crit)d*=1.6;
+const crit=Math.random()<Math.min(0.5,0.15+(luck||0)*0.01); if(crit)d*=1.6;
 return{h:Math.floor(d),crit};
 }
 function foeTurn(){
@@ -375,11 +384,11 @@ if(skId){
 const sk=SKILLS[skId];
 if(p.mp<sk.mp){toast("内力不足");return;}
 p.mp-=sk.mp;
-const d=dmgCalc(p.atk,f.def,sk.mult);
+const d=dmgCalc(p.atk,f.def,sk.mult,p.luck);
 f.hp=Math.max(0,f.hp-d.h);
 log(`<span class="me">你使出，造成 ${d.h} 点伤害${d.crit?"（暴击！）":""}</span>`);
 }else{
-const d=dmgCalc(p.atk,f.def,1.6);
+const d=dmgCalc(p.atk,f.def,1.6,p.luck);
 f.hp=Math.max(0,f.hp-d.h);
 log(`<span class="me">你挥剑斩去，造成 ${d.h} 点伤害${d.crit?"（暴击！）":""}</span>`);
 }
@@ -416,7 +425,7 @@ if(it.use){const s=SHOP.find(x=>x.id===it.use)||{name:it.name};
 h+=`<div class="mob"><div><div class="mn">${it.name}</div><div class="md">药品</div></div><button class="btn" data-use="${i}">使用</button></div>`;return;}
 const d=ITEMS[it.iid];
 h+=`<div class="mob"><div><div class="mn">${d.name}${it.enh?` <span class="gold">+${it.enh}</span>`:""}</div>
-<div class="md">${SLOTNAME[d.slot]} · ${[d.atk&&"攻"+d.atk,d.def&&"防"+d.def,d.hp&&"血"+d.hp,d.spd&&"速"+d.spd].filter(Boolean).join(" ")}</div></div>
+<div class="md">${SLOTNAME[d.slot]} · ${[d.atk&&"攻"+d.atk,d.def&&"防"+d.def,d.hp&&"血"+d.hp,d.spd&&"速"+d.spd,d.luck&&"🍀幸运+"+d.luck].filter(Boolean).join(" ")}</div></div>
 <button class="btn" data-eq="${i}">装备</button></div>`;
 });
 h+=`</div>`;m.innerHTML=h;
@@ -527,17 +536,23 @@ function rPay(){
  const m=$("main"),p=S.player;
  const v=vipLevel(),total=vipTotal(),next=v<VIP_NEED.length-1?VIP_NEED[v+1]:null;
  const today=nowStr().slice(0,10),claimed=S.vipClaim===today,g=vipGift();
+ const T=VIP_TITLES[S.title||0];
+ let titleBtns="";
+ for(let i=1;i<=v;i++){const tt=VIP_TITLES[i];titleBtns+=`<button class="btn small${(S.title||0)===i?" primary":""}" style="flex:1;margin:2px;white-space:nowrap" data-title="${i}">「${tt.name}」</button>`;}
+ if(!titleBtns)titleBtns=`<span class="dim">充值到 VIP1 解锁称号</span>`;
  let h=`<div class="card"><h3>👑 VIP特权</h3>
  <p>当前等级：<b class="gold">VIP${v}</b> · 累计充值 <b class="gold">￥${total}</b></p>
  <p class="dim">${next?`再充 ￥${next-total} 晋升 VIP${v+1}`:`已达最高 VIP${v}，威震江湖！`}</p>
  <div class="statgrid"><div>攻击/气血加成<b>+${v*2}%</b></div><div>每日VIP礼包<b>${v?(claimed?"已领取":"可领取"):"VIP1开启"}</b></div></div>
+ <p style="margin:8px 0 4px">我的称号：<b class="gold">${T?`「${T.name}」`:"暂无"}</b>${T?`<span class="dim"> 攻击+${T.atk} 气血+${T.hp}</span>`:""}</p>
+ <div class="rowbtns" style="flex-wrap:wrap">${titleBtns}</div>
  <p class="dim" style="margin:6px 0">今日礼包：铜币${g.coins} · 体力${g.stam} · 元宝${g.gold}</p>
  <button class="btn small primary" id="vipclaim" ${(!v||claimed)?"disabled":""}>${claimed?"今日已领取":(v?"领取今日VIP礼包":"充值任意金额开启VIP")}</button></div>
  <div class="card"><h3>💰 充值元宝</h3>
  <p class="dim">⚠️ 原型演示：模拟支付流程，不产生真实扣款。正式版将接入微信/支付宝。</p>
  <p>当前元宝：<b class="gold">${p.gold}</b></p>`;
  TIERS.forEach((t,i)=>{
-  h+=`<div class="tier"><div><div class="gold">${t.gold} 元宝 ${t.bonus?`<span class="dim">${t.bonus}</span>`:""}</div><div class="m">￥${t.money}</div></div>
+  h+=`<div class="tier"><div><div class="gold">${t.gold} 元宝 ${t.bonus?`<span class="dim">${t.bonus}</span>`:""}${i===0&&!S.orders.length?` <span class="dim">🎁首充赠小红剑</span>`:""}</div><div class="m">￥${t.money}</div></div>
   <button class="btn small primary" style="width:auto;margin:0" data-tier="${i}">充值</button></div>`;
  });
  h+=`</div><div class="card"><h3>🧾 我的充值记录</h3>`;
@@ -555,6 +570,7 @@ function rPay(){
   p.stamina=Math.min(p.maxStamina,p.stamina+gg.stam);
   save();render();toast(`🎁 VIP${vv}每日礼包到账！`);
  };
+ m.querySelectorAll("[data-title]").forEach(b=>b.onclick=()=>{S.title=+b.dataset.title;calcStats();save();render();toast(`已佩戴称号「${VIP_TITLES[S.title].name}」！`);});
  m.querySelectorAll("[data-tier]").forEach(b=>b.onclick=()=>payModal(+b.dataset.tier));
 }
 function payModal(i){
@@ -568,13 +584,20 @@ function payModal(i){
  $("payok").onclick=()=>{
   $("payok").disabled=true;$("payok").textContent="支付处理中…";
   setTimeout(()=>{
-   const oldV=vipLevel();
+   const oldV=vipLevel(),isFirst=!S.orders.length;
    S.player.gold+=t.gold;
    S.orders.push({id:oid,money:t.money,gold:t.gold,time:nowStr(),status:"已到账"});
    const newV=vipLevel();
+   let msg=`🎉 充值成功！元宝+${t.gold}`;
+   if(newV>oldV){msg=`🎉 充值成功！晋升 👑VIP${newV}！`;S.title=newV;}
+   if(isFirst){ // 首充赠开荒神兵小红剑
+    const sword={iid:"w0",enh:0},cur=S.equip.weapon?ITEMS[S.equip.weapon.iid]:null;
+    if(!cur||(cur.atk||0)<26){if(S.equip.weapon)S.bag.push(S.equip.weapon);S.equip.weapon=sword;msg+=` 小红剑已穿戴！`;}
+    else{S.bag.push(sword);msg+=` 获赠小红剑！`;}
+   }
    calcStats();
    save();closeModal();render();
-   toast(newV>oldV?`🎉 充值成功！晋升 👑VIP${newV}！`:`🎉 充值成功！元宝+${t.gold}`);
+   toast(msg);
   },1200);
  };
  $("paycancel").onclick=closeModal;
@@ -600,7 +623,8 @@ function rMore(){
  · 野怪打到30%血可捕捉为宠物，宠物会帮你打架<br>
  · 「门派」学高级武功、做师门任务<br>
  · 体力不够就打坐，或去商城买体力丹<br>
- · 「充值」是模拟的，不花真钱，随便点！累计充值提升VIP等级，加攻击气血、每日领礼包</p></div>
+ · 「充值」是模拟的，不花真钱，随便点！累计充值提升VIP等级，加攻击气血、每日领礼包<br>
+ · 首充送小红剑（攻击26、🍀幸运+9，暴击率更高）；VIP称号可佩戴，加攻击气血</p></div>
  <div class="card"><h3>💾 存档</h3>
  <button class="btn small" id="resave">手动保存</button>
  <button class="btn small danger" id="reset">删号重来（清空存档）</button></div>`;
