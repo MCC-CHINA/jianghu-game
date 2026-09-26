@@ -461,14 +461,14 @@ function renderTop(){
  </div>
  <div class="wallet"><span>🪙铜币 <b>${p.coins}</b></span><span>💰元宝 <b>${p.gold}</b></span><span>⚡体力 <b>${p.stamina}/${p.maxStamina}</b></span><span>🍀幸运 <b>${p.luck||0}</b></span><span>⚔️战力 <b>${zhanli()}</b></span></div>`;
 }
-const TABS=[["home","🏠<br>江湖"],["bag","🎒<br>背包"],["pet","🦊<br>宠物"],["wing","🪽<br>翅膀"],["partner","🤝<br>伙伴"],["sect","🥋<br>门派"],["gongfa","📖<br>功法"],["shop","🏪<br>商店"],["gold","💎<br>商城"],["pay","💰<br>充值"],["rank","🏆<br>排行"],["arena","⚔️<br>竞技"],["event","🎉<br>活动"],["more","⚙️<br>更多"]];
+const TABS=[["home","🏠<br>江湖"],["bag","🎒<br>背包"],["pet","🦊<br>宠物"],["wing","🪽<br>翅膀"],["partner","🤝<br>伙伴"],["sect","🥋<br>门派"],["gongfa","📖<br>功法"],["shop","🏪<br>商店"],["gold","💎<br>商城"],["pay","💰<br>充值"],["rank","🏆<br>排行"],["title","🏅<br>称号"],["arena","⚔️<br>竞技"],["event","🎉<br>活动"],["more","⚙️<br>更多"]];
 function renderTabs(){
  const t=$("tabbar");t.style.display="flex";
  t.innerHTML=TABS.map(([k,n])=>`<button class="${TAB===k?'on':''}" data-t="${k}">${n}</button>`).join("");
  t.querySelectorAll("button").forEach(b=>b.onclick=()=>{TAB=b.dataset.t;B=null;render();});
 }
 function render(){if(S&&S.player&&sweepExpired())setTimeout(()=>toast("⏳ 小红剑已到期，已自动卸下"),50);renderTop();renderTabs();
- ({home:rHome,bag:rBag,pet:rPet,sect:rSect,gongfa:rGongfa,shop:rShop,gold:rGold,pay:rPay,rank:rRank,arena:rArena,wing:rWing,partner:rPartner,event:rEvent,more:rMore}[TAB])();}
+ ({home:rHome,bag:rBag,pet:rPet,sect:rSect,gongfa:rGongfa,shop:rShop,gold:rGold,pay:rPay,rank:rRank,title:rTitle,arena:rArena,wing:rWing,partner:rPartner,event:rEvent,more:rMore}[TAB])();}
 /* ============ 创建角色 ============ */
 let selSect="shaolin";
 function rCreate(){
@@ -954,16 +954,10 @@ function rPay(){
  const v=vipLevel(),total=vipTotal(),next=v<VIP_NEED.length-1?VIP_NEED[v+1]:null;
  const today=nowStr().slice(0,10),claimed=S.vipClaim===today,g=vipGift();
  const T=VIP_TITLES[S.title||0];
- const vtCls=vipTitleCls(S.title||0);
- let titleBtns="";
- for(let i=1;i<=v;i++){const tt=VIP_TITLES[i];titleBtns+=`<button class="btn small${(S.title||0)===i?" primary":""}" style="flex:1;margin:2px;white-space:nowrap" data-title="${i}">${titleBadge(tt.name,vipTitleCls(i))}</button>`;}
- if(!titleBtns)titleBtns=`<span class="dim">充值到 VIP1 解锁称号</span>`;
  let h=`<div class="card"><h3>👑 VIP特权</h3>
  <p>当前等级：<b class="gold">VIP${v}</b> · 累计充值 <b class="gold">￥${total}</b></p>
  <p class="dim">${next?`再充 ￥${next-total} 晋升 VIP${v+1}`:`已达最高 VIP${v}，威震江湖！`}</p>
  <div class="statgrid"><div>攻击/气血加成<b>+${v*2}%</b></div><div>稀有爆率<b>+${T?T.drop:0}%</b></div><div>每日VIP礼包<b>${v?(claimed?"已领取":"可领取"):"VIP1开启"}</b></div></div>
- <p style="margin:8px 0 4px">我的称号：${T?titleBadge(T.name,vtCls):"暂无"}${T?`<span class="dim"> 攻击+${T.atk} 气血+${T.hp} 爆率+${T.drop}%</span>`:""}</p>
- <div class="rowbtns" style="flex-wrap:wrap">${titleBtns}</div>
  <p class="dim" style="margin:6px 0">今日礼包：铜币${g.coins} · 体力${g.stam} · 元宝${g.gold} · 🪶灵羽${g.feather}</p>
  <button class="btn small primary" id="vipclaim" ${(!v||claimed)?"disabled":""}>${claimed?"今日已领取":(v?"领取今日VIP礼包":"充值任意金额开启VIP")}</button></div>
  <div class="card"><h3>🎁 首充礼包</h3>
@@ -1011,7 +1005,6 @@ function rPay(){
   save();render();
   toast(`🎁 首充礼包到账：元宝+288，铜币+20000，体力+90，灵兽蛋开出「${PETS[pid].name}」！`);
  };
- m.querySelectorAll("[data-title]").forEach(b=>b.onclick=()=>{S.title=+b.dataset.title;calcStats();save();render();toast(`已佩戴称号「${VIP_TITLES[S.title].name}」！`);});
  m.querySelectorAll("[data-tier]").forEach(b=>b.onclick=()=>payModal(+b.dataset.tier));
  m.querySelectorAll("[data-gift]").forEach(b=>b.onclick=()=>{
   const gf=GIFTS.find(x=>x.id===b.dataset.gift);
@@ -1099,6 +1092,26 @@ function rArena(){
   save();render();toast("🏆 竞技场每日奖励到账！");
  };
 }
+/* ============ 称号 ============ */
+function rTitle(){
+ const m=$("main"),p=S.player;
+ const v=vipLevel(),T=VIP_TITLES[S.title||0];
+ let h=`<div class="card"><h3>🏅 我的称号</h3><p class="dim">称号带来强力属性加成：VIP称号佩戴生效，排行榜与限定称号自动生效、多个可叠加。</p></div>`;
+ let titleBtns="";
+ for(let i=1;i<=v;i++){const tt=VIP_TITLES[i];titleBtns+=`<button class="btn small${(S.title||0)===i?" primary":""}" style="flex:1;margin:2px;white-space:nowrap" data-title="${i}">${titleBadge(tt.name,vipTitleCls(i))}</button>`;}
+ if(!titleBtns)titleBtns=`<span class="dim">充值到 VIP1 解锁称号</span>`;
+ h+=`<div class="card"><h3>👑 VIP称号</h3><p>当前佩戴：${T?titleBadge(T.name,vipTitleCls(S.title||0)):"暂无"}${T?`<span class="dim"> 攻击+${T.atk} 气血+${T.hp} 爆率+${T.drop}%</span>`:""}</p><div class="rowbtns" style="flex-wrap:wrap">${titleBtns}</div></div>`;
+ const myT=myRankTitles();
+ h+=`<div class="card"><h3>🎖️ 排行榜荣誉称号</h3><p class="dim">任一榜单前三名自动获得称号，多个称号属性可叠加。</p>`;
+ h+=myT.length?myT.map(t=>`<div class="tier"><div>${titleBadge(t.name,t.cls)}<span class="dim"> ${t.board}第${t.rank}名</span><div class="m">${bonusStr(t.bonus)}</div></div></div>`).join(""):`<p class="dim">暂未上榜，继续努力！</p>`;
+ h+=`</div>`;
+ const evts=(S.eventTitles||[]).map(eid=>EVENT_TITLES[eid]).filter(Boolean);
+ h+=`<div class="card"><h3>🎉 限定称号</h3><p class="dim">通过节日活动与特殊机缘获得，自动生效、可叠加。</p>`;
+ h+=evts.length?evts.map(e=>`<div class="tier"><div>${titleBadge(e.name,e.cls)}<span class="dim"> ${e.desc}</span><div class="m">${bonusStr(e.bonus)}</div></div></div>`).join(""):`<p class="dim">暂无限 定称号，去活动中心看看吧！</p>`;
+ h+=`</div>`;
+ m.innerHTML=h;
+ m.querySelectorAll("[data-title]").forEach(b=>b.onclick=()=>{S.title=+b.dataset.title;calcStats();save();render();toast(`已佩戴称号「${VIP_TITLES[S.title].name}」！`);});
+}
 function rRank(){
  const m=$("main"),zl=zhanli(),p=S.player;
  const pay=S.orders.reduce((a,o)=>a+o.money,0);
@@ -1123,12 +1136,7 @@ function rRank(){
  const lvlist=[...RANK_LV.map(r=>({...r})),{name:p.name+"（我）",lv:p.level,me:true}].sort((a,b)=>b.lv-a.lv);
  h+=`<div class="card"><h3>⬆️ 等级排行榜</h3><p class="dim">我的等级：<b class="gold">Lv.${p.level}</b> · 第 ${lvlist.findIndex(r=>r.me)+1} 名</p>`;
  h+=lvlist.map((r,i)=>`<div class="rankrow${r.me?" me":""}"><span>${i+1}. ${r.name}${i<3?` ${titleBadge(RANK_TITLES.lv[i].name,RANK_TITLES.lv[i].cls)}`:""}</span><span>Lv.${r.lv}</span></div>`).join("")+`</div>`;
- const myT=myRankTitles();
- h+=`<div class="card"><h3>🎖️ 我的荣誉称号</h3><p class="dim">任一榜单前三名自动获得称号，多个称号属性可叠加。</p>`;
- h+=myT.length?myT.map(t=>`<div class="tier"><div>${titleBadge(t.name,t.cls)}<span class="dim"> ${t.board}第${t.rank}名</span><div class="m">${bonusStr(t.bonus)}</div></div></div>`).join(""):`<p class="dim">暂未上榜，继续努力！</p>`;
- const evts=(S.eventTitles||[]).map(eid=>EVENT_TITLES[eid]).filter(Boolean);
- if(evts.length)h+=evts.map(e=>`<div class="tier"><div>${titleBadge(e.name,e.cls)}<span class="dim"> ${e.desc}</span><div class="m">${bonusStr(e.bonus)}</div></div></div>`).join("");
- h+=`</div>`;m.innerHTML=h;
+ m.innerHTML=h;
 }
 /* ============ 更多：GM后台/帮助/存档 ============ */
 function rEvent(){
