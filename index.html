@@ -338,6 +338,33 @@ const GIFTS=[
  {id:"pet_xuenv",need:498,kind:"pet",pid:"xuenv",name:"神级宠物「冰天雪女」",desc:"神级魂兽，极北天王"},
  {id:"title_shenzhi",need:998,kind:"title",eid:"shenzhi",name:"稀有称号「神之眷顾」",desc:"攻击+50 气血+500 幸运+3，可叠加"}
 ];
+/* 累计充值奖励：10档，真实充值+红包共同累积进度（红包不计VIP等级） */
+const RECHARGE_REWARDS=[
+ {need:6,desc:"元宝×200 · 铜币×10万 · 体力+90",give:[["gold",200],["coins",100000],["stamina",90]]},
+ {need:30,desc:"元宝×600 · 高级灵兽蛋×3（黄~地级）· 铜币×50万",give:[["gold",600],["egg3",3],["coins",500000]]},
+ {need:98,desc:"元宝×1200 · 神兵宝箱×2 · 限定称号「笑傲江湖」",give:[["gold",1200],["box",2],["title","xajh"]]},
+ {need:198,desc:"元宝×2500 · 神级宠物「三眼金猊·王秋儿」",give:[["gold",2500],["pet","sanyan"]]},
+ {need:498,desc:"元宝×5000 · 神级功法随机×1 · 限定称号「一剑西来」",give:[["gold",5000],["gongfa_rand_god",1],["title","yijian"]]},
+ {need:998,desc:"元宝×10000 · 神级宠物「冰天雪女」· 限定称号「威震八方」",give:[["gold",10000],["pet","xuenv"],["title","weizhen"]]},
+ {need:1998,desc:"元宝×20000 · 神话伙伴×1 · 限定称号「一代宗师」",give:[["gold",20000],["partner",4],["title","zongshi"]]},
+ {need:2998,desc:"元宝×30000 · 神级功法《大日焚天诀》· 限定称号「开宗立派」",give:[["gold",30000],["gongfa","darin"],["title","kaizong"]]},
+ {need:5998,desc:"元宝×60000 · 神级双宠（金猊+雪女）· 限定称号「纵横四海」",give:[["gold",60000],["pet","sanyan"],["pet","xuenv"],["title","zongheng"]]},
+ {need:9999,desc:"元宝×100000 · 神话伙伴×2 · 限定称号「名扬四海」· 铜币×1000万",give:[["gold",100000],["partner",4],["partner",4],["title","mingyang"],["coins",10000000]]}
+];
+function rechargeProgress(){return vipTotal()+(S.rechargeBonus||0);} // 累计充值奖励进度：真实充值+红包
+function grantReward(g){
+ const p=S.player,k=g[0],v=g[1];
+ if(k==="gold")p.gold+=v;
+ else if(k==="coins")p.coins+=v;
+ else if(k==="stamina")p.stamina=Math.min(p.maxStamina,p.stamina+v);
+ else if(k==="egg3"){for(let i=0;i<v;i++){const pool=Object.keys(PETS).filter(x=>PETS[x].tier<=3);const pid=pick(pool);S.pets.push({pid,name:PETS[pid].name,level:p.level,exp:0});}if(S.activePet===-1)S.activePet=0;}
+ else if(k==="box"){const tier=Math.min(5,Math.floor(p.level/6)+1);for(let i=0;i<v;i++){const pool=Object.keys(ITEMS).filter(x=>ITEMS[x].slot==="weapon"&&ITEMS[x].tier===tier&&!ITEMS[x].gift);S.bag.push({iid:pick(pool),enh:0});}}
+ else if(k==="pet"){if(S.pets.some(x=>x.pid===v)){p.gold+=3000;}else{const pb=PETS[v];S.pets.push({pid:v,name:pb.name,level:p.level,exp:0});if(S.activePet===-1)S.activePet=0;}}
+ else if(k==="gongfa"){S.gongfaLearned=S.gongfaLearned||{};if(gfLearned(v))p.gold+=2000;else S.gongfaLearned[v]=1;}
+ else if(k==="gongfa_rand_god"){const cand=Object.keys(GONGFA).filter(x=>GONGFA[x].tier==="神"&&!GONGFA[x].vip6&&!gfLearned(x));S.gongfaLearned=S.gongfaLearned||{};if(cand.length)S.gongfaLearned[pick(cand)]=1;else p.gold+=2000;}
+ else if(k==="title"){S.eventTitles=S.eventTitles||[];if(!S.eventTitles.includes(v))S.eventTitles.push(v);}
+ else if(k==="partner"){if(!Array.isArray(S.partners))S.partners=[];const used=S.partners.map(x=>x.name);const name=pick(PARTNER_NAMES.filter(n=>!used.includes(n)))||pick(PARTNER_NAMES);S.partners.push({name,quality:v,level:p.level,exp:0,equip:{weapon:null,armor:null,boots:null,charm:null}});if(S.activePartner===-1||S.activePartner===undefined)S.activePartner=0;}
+}
 /* 称号牌渲染：皇冠+翼饰+缎带 */
 function titleBadge(name,cls){return `<span class="rtx ${cls}"><b>${name}</b></span>`;}
 function vipTitleCls(t){return "rvip";} // VIP称号统一渐变金
@@ -733,6 +760,9 @@ S.bag.push({iid,enh:0});
 log(`<span class="sys">获得了！</span>`);
 }
 }
+// 充值红包掉落：散人打怪也能攒累计充值奖励进度
+const rpRate=B.wb?0.5:(B.arena?0.2:0.06);
+if(Math.random()<rpRate){S.redpackets=(S.redpackets||0)+1;log(`<span class="sys">获得充值红包×1！去充值页开启，可计入累计充值奖励</span>`);}
 if(p.task&&!p.taskDone){p.task.done++;if(p.task.done>=p.task.need){p.taskDone=true;log(`<span class="sys">师门任务完成，可回门派领奖！</span>`);}}
 }else{
 log(`<span class="sys">你败下阵来，被好心人救回，气血恢复…</span>`);
@@ -1094,6 +1124,7 @@ function rVip(){
 function rPay(){
  const m=$("main"),p=S.player;
  const v=vipLevel(),total=vipTotal(),next=v<VIP_NEED.length-1?VIP_NEED[v+1]:null;
+ const bonus=S.rechargeBonus||0,prog=total+bonus;
  const today=nowStr().slice(0,10),claimed=S.vipClaim===today,g=vipGift();
  const wtPay=wornTitleInfo();
  let h=`<div class="card"><h3>VIP特权</h3>
@@ -1118,6 +1149,16 @@ function rPay(){
  const ok=total>=gf.need,got=(S.claimedGifts||{})[gf.id];
  h+=`<div class="tier"><div><div class="gold">${(gf.kind==="pet"||gf.kind==="title")?godName(gf.name):gf.name}</div><div class="m">${gf.desc} · 累计充值满￥${gf.need}（${total}/${gf.need}）</div></div>
  <button class="btn small primary" style="width:auto;margin:0" data-gift="${gf.id}"${(ok&&!got)?"":" disabled"}>${got?"已领取":(ok?"领取":"未达成")}</button></div>`;
+ });
+ h+=`</div><div class="card"><h3>累计充值奖励</h3>
+ <p class="dim">真实充值与红包共同累积进度，10档壕礼拉开差距！散人打怪掉落充值红包，开启后计入下方奖励进度（不计入VIP等级）。</p>
+ <p>奖励进度：<b class="gold">￥${prog}</b> <span class="dim">（真实充值￥${total} + 红包￥${bonus}）</span></p>
+ <div class="tier"><div><div class="gold">充值红包×${S.redpackets||0}</div><div class="m">开启随机获得1~3元奖励进度</div></div>
+ <button class="btn small primary" style="width:auto;margin:0" id="openrp"${(S.redpackets||0)?"":" disabled"}>${(S.redpackets||0)?"开启红包":"暂无红包"}</button></div>`;
+ RECHARGE_REWARDS.forEach((rw,i)=>{
+ const ok=prog>=rw.need,got=(S.claimedRecharge||[]).includes(rw.need);
+ h+=`<div class="tier"><div><div class="gold">累计满￥${rw.need}</div><div class="m">${rw.desc}</div><div class="m dim">进度 ${Math.min(prog,rw.need)}/${rw.need}</div></div>
+ <button class="btn small primary" style="width:auto;margin:0" data-rw="${i}"${(ok&&!got)?"":" disabled"}>${got?"已领取":(ok?"领取":"未达成")}</button></div>`;
  });
  h+=`</div><div class="card"><h3>我的充值记录</h3>`;
  if(!S.orders.length)h+=`<p class="dim">暂无充值记录</p>`;
@@ -1157,6 +1198,20 @@ function rPay(){
  else{S.eventTitles=S.eventTitles||[];if(!S.eventTitles.includes(gf.eid))S.eventTitles.push(gf.eid);}
  calcStats();save();render();toast(`获得${gf.name}！`);
  });
+ m.querySelectorAll("[data-rw]").forEach(b=>b.onclick=()=>{
+ const rw=RECHARGE_REWARDS[+b.dataset.rw],pg=rechargeProgress();
+ if(!rw||pg<rw.need||(S.claimedRecharge||[]).includes(rw.need))return;
+ S.claimedRecharge=S.claimedRecharge||[];S.claimedRecharge.push(rw.need);
+ rw.give.forEach(grantReward);
+ calcStats();save();render();toast(`累计充值奖励到账！`);
+ });
+ const orp=$("openrp");
+ if(orp)orp.onclick=()=>{
+ const n=S.redpackets||0;if(!n)return;
+ let add=0;for(let i=0;i<n;i++)add+=1+Math.floor(Math.random()*3);
+ S.redpackets=0;S.rechargeBonus=(S.rechargeBonus||0)+add;
+ save();render();toast(`开启${n}个红包，累计充值奖励进度+￥${add}！`);
+ };
 }
 function payModal(i){
  const t=TIERS[i],oid="T"+Date.now().toString().slice(-8);
@@ -1366,7 +1421,7 @@ function rMore(){
  · 「充值」是模拟的，不花真钱，随便点！首充自动赠小红剑（限时3天），另有首充礼包可领（288元宝+2万铜币+体力+4阶灵兽蛋）；累计充值提升VIP等级，加攻击气血、每日领礼包<br>
  · 宠物可捕捉斗罗魂兽：柔骨兔·小舞、蓝银皇·阿银、鬼虎、人面魔蛛、泰坦巨猿·二明、暗魔邪神虎、天青牛蟒·大明、冰碧帝皇蝎<br>
  · 「排行」有战力榜和充值榜，前三名自动获得炫酷称号（属性可叠加）：战力之巅/武林传奇/江湖豪杰，神豪无双/富甲天下/一掷千金<br>
- · 宠物分黄/玄/地/天/神五级，品级越高助战越强；神级宠物、神级功法、稀有称号只能通过充值豪礼或限时活动获得<br>
+ · 宠物分黄/玄/地/天/神五级，品级越高助战越强；新增累计充值奖励（10档，神级宠物/功法/神话伙伴等壕礼）；打怪掉落充值红包，散人也能攒进度领奖励（红包不计VIP等级）<br>
  · 活动中心：限时活动（中秋称号、神功现世）、每日活动（世界BOSS、师门任务）、福利领取（VIP礼包/首充礼包/充值豪礼）都在这里<br>· 神话伙伴：VIP8免费领 / 限时活动「神将降临」（累计充值￥1288）/ 千金募名将低概率出<br></p></div>
  <div class="card"><h3>存档</h3>
  <button class="btn small" id="resave">手动保存</button>
