@@ -14,6 +14,7 @@ body{background:#141009;color:#e8dcc0;font-family:"Songti SC","STSong","SimSun",
 #topPay{position:absolute;right:10px;top:8px;z-index:11;width:auto;margin:0;padding:6px 14px;font-size:13px}
 #topbar .pname .lv{background:#8a6d2f;color:#141009;font-size:12px;padding:1px 8px;border-radius:10px;margin-left:6px;vertical-align:2px}
 #topbar .pname .vip{background:linear-gradient(180deg,#f5d67b,#c8903c);color:#3a2a08;font-size:12px;font-weight:bold;padding:1px 8px;border-radius:10px;margin-left:6px;vertical-align:2px}
+#topVip{cursor:pointer}
 /* VIP6+名字变色，VIP12彩虹流动 */
 .vipn6{color:#ffd700;font-weight:bold;text-shadow:0 0 8px rgba(255,215,0,.7)}
 .vipn7{color:#ff9f43;font-weight:bold;text-shadow:0 0 8px rgba(255,159,67,.7)}
@@ -238,6 +239,13 @@ const GIFTS=[
 /* 称号牌渲染：皇冠+翼饰+缎带 */
 function titleBadge(name,cls){return `<span class="rtx ${cls}"><b>${name}</b></span>`;}
 function vipTitleCls(t){return t>=9?"rt0":(t>=5?"rt1":(t>=3?"rt2":"rt3"));} // VIP称号传奇风样式
+// 统一佩戴称号：{k:"vip",id:等级} | {k:"ev",id:称号eid} | {k:"rank",id:"榜:名次"}
+function migrateTitle(){if(S&&S.player&&S.wornTitle===undefined){const t=S.title||0;S.wornTitle=t?{k:"vip",id:t}:null;}}
+function wornTitleInfo(){const w=S.wornTitle;if(!w)return null;
+ if(w.k==="vip"){const t=VIP_TITLES[w.id];return t?{name:t.name,cls:vipTitleCls(w.id),bonus:t}:null;}
+ if(w.k==="ev"){const e=EVENT_TITLES[w.id];return e?{name:e.name,cls:e.cls,bonus:e.bonus}:null;}
+ if(w.k==="rank"){const bi=String(w.id).split(":"),t=(RANK_TITLES[bi[0]]||[])[+bi[1]];return t?{name:t.name,cls:t.cls,bonus:t.bonus}:null;}
+ return null;}
 function godName(n){return `<span class="godflow">${n}</span>`;} // 神级名：七彩流光
 function itemNameHTML(it){const d=ITEMS[it.iid];return d.tier>=5?godName(d.name):d.name;} // 装备名（5阶神级流光）
 function myRankTitles(){
@@ -391,7 +399,8 @@ const VIP_TITLES=[null, // 索引=VIP等级：称号名+属性+爆率
  {name:"武林名宿",atk:45,hp:450,drop:16},{name:"绝世高手",atk:70,hp:700,drop:20},{name:"武林神话",atk:110,hp:1100,drop:30},
  {name:"独步天下",atk:160,hp:1600,drop:35},{name:"盖世无双",atk:230,hp:2300,drop:40},{name:"君临天下",atk:320,hp:3200,drop:45},
  {name:"天人合一",atk:450,hp:4500,drop:50},{name:"破碎虚空",atk:620,hp:6200,drop:60},{name:"武道至尊",atk:850,hp:8500,drop:70}];
-function vipDrop(){const t=VIP_TITLES[S.title||0];return t?(t.drop||0):0;} // 当前佩戴VIP称号的爆率加成%
+function isWorn(k,id){const w=S.wornTitle;return !!(w&&w.k===k&&w.id===id);}
+function vipDrop(){const w=S.wornTitle;return(w&&w.k==="vip"&&VIP_TITLES[w.id])?VIP_TITLES[w.id].drop||0:0;} // 当前佩戴VIP称号的爆率加成%
 </script>
 <script>
 "use strict";
@@ -414,8 +423,8 @@ function calcStats(){
  if(slot==="weapon")p.atk+=e*2; if(slot==="armor")p.def+=e*2;
  if(slot==="boots")p.spd+=e*1; if(slot==="charm"){p.maxhp+=e*15;}
  }
- const worn=VIP_TITLES[S.title||0]; // 佩戴称号加成
- if(worn){p.atk+=worn.atk;p.maxhp+=worn.hp;}
+ const wt0=wornTitleInfo(),wb=wt0?(wt0.bonus||{}):null; // 佩戴称号加成
+ if(wb){p.atk+=wb.atk||0;p.maxhp+=wb.hp||0;p.luck+=wb.luck||0;p.spd+=wb.spd||0;}
  for(const[gid,lv]of Object.entries(S.gongfa||{})){const g=GONGFA[gid];if(!g||!lv)continue; // 功法加成
  for(const[k,v]of Object.entries(g.bonus)){
  if(k==="hp")p.maxhp+=v*lv;else if(k==="mp")p.maxmp+=v*lv;else p[k]=(p[k]||0)+v*lv;}}
@@ -449,15 +458,15 @@ function newGame(name,sectKey){
  base:{maxhp:sc.hp,maxmp:sc.mp,atk:sc.atk,def:sc.def,spd:sc.spd}},
  equip:{weapon:null,armor:null,boots:null,charm:null},bag:[],pets:[],activePet:-1,wing:{tier:0},
  partners:[],activePartner:-1,arena:{rank:1000,date:"",left:5,reward:"",top:ARENA_TOP.map((n,i)=>({name:n,rank:i+1}))},
- orders:[],zone:0,created:nowStr(),gongfa:{},gongfaLearned:{},claimedGifts:{},douqi:0,yihuo:[],fenjue:{lv:0},eventTitles:[]};
+ orders:[],zone:0,created:nowStr(),wornTitle:null,gongfa:{},gongfaLearned:{},claimedGifts:{},douqi:0,yihuo:[],fenjue:{lv:0},eventTitles:[]};
  calcStats();S.player.hp=S.player.maxhp;S.player.mp=S.player.maxmp;save();
 }
 /* ============ 顶栏/导航 ============ */
 function renderTop(){
  const p=S.player,t=$("topbar");t.style.display="block";
  const v=vipLevel();
- const T=VIP_TITLES[S.title||0];
- t.innerHTML=`<div class="pname">${T?titleBadge(T.name,vipTitleCls(S.title||0)):""}<span class="${v>=6?"vipn"+Math.min(v,12):""}">${p.name}</span><span class="lv">Lv.${p.level} ${SECTS[p.sect].name}</span>${v?`<span class="vip">VIP${v}</span>`:""}</div>
+ const wt=wornTitleInfo();
+ t.innerHTML=`<div class="pname">${wt?titleBadge(wt.name,wt.cls):""}<span class="${v>=6?"vipn"+Math.min(v,12):""}">${p.name}</span><span class="lv">Lv.${p.level} ${SECTS[p.sect].name}</span>${v?`<span class="vip" id="topVip" title="查看VIP详情">VIP${v}</span>`:""}</div>
  <div class="bars">
  <div class="bar hp"><i style="width:${p.hp/p.maxhp*100}%"></i><span>气血 ${p.hp}/${p.maxhp}</span></div>
  <div class="bar mp"><i style="width:${p.mp/p.maxmp*100}%"></i><span>内力 ${p.mp}/${p.maxmp}</span></div>
@@ -466,6 +475,7 @@ function renderTop(){
  <div class="wallet"><span>铜币 <b>${p.coins}</b></span><span>元宝 <b>${p.gold}</b></span><span>体力 <b>${p.stamina}/${p.maxStamina}</b></span><span>幸运 <b>${p.luck||0}</b></span><span>战力 <b>${zhanli()}</b></span></div>`;
  t.innerHTML+=`<button class="btn small primary" id="topPay">充值</button>`;
  $("topPay").onclick=()=>{TAB="pay";B=null;render();window.scrollTo(0,0);};
+ const tv=$("topVip");if(tv)tv.onclick=()=>{TAB="vipinfo";B=null;render();window.scrollTo(0,0);};
 }
 const TABS=[["home","江湖"],["bag","背包"],["pet","宠物"],["wing","翅膀"],["partner","伙伴"],["sect","门派"],["gongfa","功法"],["shop","商店"],["gold","商城"],["rank","排行"],["title","称号"],["arena","竞技"],["event","活动"],["more","更多"]];
 function renderTabs(){
@@ -474,7 +484,7 @@ function renderTabs(){
  t.querySelectorAll("button").forEach(b=>b.onclick=()=>{TAB=b.dataset.t;B=null;render();});
 }
 function render(){if(S&&S.player&&sweepExpired())setTimeout(()=>toast(" 小红剑已到期，已自动卸下"),50);renderTop();renderTabs();
- ({home:rHome,bag:rBag,pet:rPet,sect:rSect,gongfa:rGongfa,shop:rShop,gold:rGold,pay:rPay,rank:rRank,title:rTitle,arena:rArena,wing:rWing,partner:rPartner,event:rEvent,more:rMore}[TAB])();}
+ ({home:rHome,bag:rBag,pet:rPet,sect:rSect,gongfa:rGongfa,shop:rShop,gold:rGold,pay:rPay,rank:rRank,title:rTitle,arena:rArena,wing:rWing,partner:rPartner,event:rEvent,more:rMore,vipinfo:rVip}[TAB])();}
 /* ============ 创建角色 ============ */
 let selSect="shaolin";
 function rCreate(){
@@ -960,15 +970,32 @@ save();render();
 <script>
 "use strict";
 /* ============ 模拟充值 ============ */
+/* ============ VIP详情 ============ */
+function rVip(){
+ const m=$("main"),v=vipLevel(),total=vipTotal(),next=v<12?VIP_NEED[v+1]:null;
+ let h='<div class="card"><h3>VIP详情</h3>'
+ +'<p>当前等级：<b class="gold">VIP'+v+'</b> · 累计充值 <b class="gold">￥'+total+'</b></p>'
+ +'<p class="dim">'+(next?('再充值 ￥'+(next-total)+' 即可晋升 VIP'+(v+1)):'已达最高 VIP12，威震江湖！')+'</p></div>';
+ h+='<div class="card"><h3>VIP等级一览</h3>';
+ for(let i=1;i<=12;i++){const t=VIP_TITLES[i];
+ const sp=i===6?'<br><span class="gold">特殊福利：神级功法《大日焚天诀》</span>':(i===8?'<br><span class="gold">特殊福利：神话伙伴免费领取</span>':'');
+ h+='<div class="tier"'+(i===v?' style="border-color:#f5d67b"':'')+'><div>'
+ +'<div class="mn">VIP'+i+' <span class="dim">累计￥'+VIP_NEED[i]+'</span>'+(i===v?' <span class="gold">当前</span>':'')+(i<=v?' <span class="dim">已达成</span>':'')+'</div>'
+ +'<div class="md">攻击/气血 +'+(i*2)+'% · 称号「'+t.name+'」（攻击+'+t.atk+' 气血+'+t.hp+' 爆率+'+t.drop+'%）'
+ +'<br>每日礼包：铜币'+(i*300)+' · 体力'+(10+i*5)+' · 元宝'+(i*8)+' · 灵羽'+(i*2)+sp+'</div>'
+ +'</div></div>';}
+ h+='</div>';
+ m.innerHTML=h;
+}
 function rPay(){
  const m=$("main"),p=S.player;
  const v=vipLevel(),total=vipTotal(),next=v<VIP_NEED.length-1?VIP_NEED[v+1]:null;
  const today=nowStr().slice(0,10),claimed=S.vipClaim===today,g=vipGift();
- const T=VIP_TITLES[S.title||0];
+ const wtPay=wornTitleInfo();
  let h=`<div class="card"><h3>VIP特权</h3>
  <p>当前等级：<b class="gold">VIP${v}</b>· 累计充值 <b class="gold">￥${total}</b></p>
  <p class="dim">${next?`再充 ￥${next-total} 晋升 VIP${v+1}`:`已达最高 VIP${v}，威震江湖！`}</p>
- <div class="statgrid"><div>攻击/气血加成<b>+${v*2}%</b></div><div>稀有爆率<b>+${T?T.drop:0}%</b></div><div>每日VIP礼包<b>${v?(claimed?"已领取":"可领取"):"VIP1开启"}</b></div></div>
+ <div class="statgrid"><div>攻击/气血加成<b>+${v*2}%</b></div><div>稀有爆率<b>+${(wtPay&&wtPay.bonus.drop)||0}%</b></div><div>每日VIP礼包<b>${v?(claimed?"已领取":"可领取"):"VIP1开启"}</b></div></div>
  <p class="dim" style="margin:6px 0">今日礼包：铜币${g.coins} · 体力${g.stam} · 元宝${g.gold} · 灵羽${g.feather}</p>
  <button class="btn small primary" id="vipclaim" ${(!v||claimed)?"disabled":""}>${claimed?"今日已领取":(v?"领取今日VIP礼包":"充值任意金额开启VIP")}</button></div>
  <div class="card"><h3>首充礼包</h3>
@@ -1043,7 +1070,7 @@ function payModal(i){
  S.orders.push({id:oid,money:t.money,gold:t.gold,time:nowStr(),status:"已到账"});
  const newV=vipLevel();
  let msg=` 充值成功！元宝+${t.gold}`;
- if(newV>oldV){msg=` 充值成功！晋升 VIP${newV}！`;S.title=newV;}
+ if(newV>oldV){msg=` 充值成功！晋升 VIP${newV}！`;S.wornTitle={k:"vip",id:newV};}
  if(newV>=6&&!((S.gongfaLearned||{}).darin)){S.gongfaLearned=S.gongfaLearned||{};S.gongfaLearned.darin=1;msg+=` 获赠神级功法《大日焚天诀》！`;}
  if(isFirst){ // 首充赠开荒神兵小红剑（限时3天）
  const sword={iid:"w0",enh:0,expire:Date.now()+3*864e5},cur=S.equip.weapon?ITEMS[S.equip.weapon.iid]:null;
@@ -1105,21 +1132,24 @@ function rArena(){
 }
 /* ============ 称号 ============ */
 function rTitle(){
- const m=$("main"),v=vipLevel(),worn=S.title||0;
+ const m=$("main"),v=vipLevel(),w=S.wornTitle;
  const myT=myRankTitles().map(t=>t.name),evGot=S.eventTitles||[];
  let vipHtml="";
  for(let i=1;i<=12;i++){const tt=VIP_TITLES[i],got=i<=v;
- vipHtml+=`<span class="tt${got?"":" locked"}${worn===i?" worn":""}"${got?` data-title="${i}"`:""}>${titleBadge(tt.name,vipTitleCls(i))}</span>`;}
+ vipHtml+=`<span class="tt${got?"":" locked"}${isWorn("vip",i)?" worn":""}"${got?` data-wk="vip" data-wid="${i}"`:""}>${titleBadge(tt.name,vipTitleCls(i))}</span>`;}
  let rkHtml="";
- for(const bk of Object.keys(RANK_TITLES))for(let i=0;i<3;i++){const t=RANK_TITLES[bk][i],got=myT.includes(t.name);
- rkHtml+=`<span class="tt${got?"":" locked"}">${titleBadge(t.name,t.cls)}</span>`;}
+ for(const bk of Object.keys(RANK_TITLES))for(let i=0;i<3;i++){const t=RANK_TITLES[bk][i],got=myT.includes(t.name),wid=bk+":"+i;
+ rkHtml+=`<span class="tt${got?"":" locked"}${isWorn("rank",wid)?" worn":""}"${got?` data-wk="rank" data-wid="${wid}"`:""}>${titleBadge(t.name,t.cls)}</span>`;}
  let evHtml="";
  for(const eid of Object.keys(EVENT_TITLES)){const e=EVENT_TITLES[eid],got=evGot.includes(eid);
- evHtml+=`<span class="tt${got?"":" locked"}">${titleBadge(e.name,e.cls)}</span>`;}
- m.innerHTML=`<div class="card"><h3>VIP称号</h3><div class="tgrid">${vipHtml}</div></div>`
+ evHtml+=`<span class="tt${got?"":" locked"}${isWorn("ev",eid)?" worn":""}"${got?` data-wk="ev" data-wid="${eid}"`:""}>${titleBadge(e.name,e.cls)}</span>`;}
+ m.innerHTML=`<div class="card"><h3>VIP称号</h3><p class="dim">点击已获得的称号进行佩戴/切换</p><div class="tgrid">${vipHtml}</div></div>`
  +`<div class="card"><h3>排行榜荣誉称号</h3><div class="tgrid">${rkHtml}</div></div>`
  +`<div class="card"><h3>限定称号</h3><div class="tgrid">${evHtml}</div></div>`;
- m.querySelectorAll("[data-title]").forEach(s=>s.onclick=()=>{S.title=+s.dataset.title;calcStats();save();render();toast(`已佩戴称号「${VIP_TITLES[S.title].name}」！`);});
+ m.querySelectorAll("[data-wk]").forEach(s=>s.onclick=()=>{
+ const k=s.dataset.wk;let id=s.dataset.wid;if(k==="vip")id=+id;
+ S.wornTitle={k:k,id:id};calcStats();save();render();
+ const wt=wornTitleInfo();toast(`已佩戴称号「${wt?wt.name:""}」！`);});
 }
 function rRank(){
  const m=$("main"),zl=zhanli(),p=S.player;
@@ -1236,7 +1266,7 @@ function rMore(){
 /* ============ 启动 ============ */
 (function init(){
  S=load();
- if(S&&S.player){calcStats();TAB="home";render();}
+ if(S&&S.player){migrateTitle();calcStats();TAB="home";render();}
  else{rCreate();}
  setInterval(()=>{ // 每60秒回1点体力
  if(S&&S.player&&S.player.stamina<S.player.maxStamina){S.player.stamina++;save();if(TAB==="home"&&!B)renderTop();}
