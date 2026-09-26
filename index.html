@@ -18,14 +18,19 @@ body{background:#141009;color:#e8dcc0;font-family:"Songti SC","STSong","SimSun",
 .ptier.地{background:#2a4a2a;color:#9ae09a}
 .ptier.天{background:#5a2a2a;color:#f0a8a8}
 .ptier.神{background:#6a4a00;color:#ffe97b;font-weight:bold}
-/* 排行榜炫酷称号：半透明流光 */
-.rt{position:relative;display:inline-block;font-weight:bold;padding:2px 10px;border-radius:12px;margin:1px 2px;font-size:12px;white-space:nowrap;overflow:hidden;border:1px solid;backdrop-filter:blur(2px)}
-.rt::after{content:"";position:absolute;top:0;left:-70%;width:45%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.6),transparent);transform:skewX(-20deg);animation:sweep 2.6s ease-in-out infinite}
+/* 称号牌：中间金属牌匾 + 两侧对称翼饰 */
+.rtx{display:inline-flex;align-items:center;vertical-align:middle;margin:2px 1px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.45))}
+.rtx .wing{flex:none;width:42px;height:30px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 36'%3E%3Cdefs%3E%3ClinearGradient id='m' x1='0' y1='0' x2='1' y2='0'%3E%3Cstop offset='0' stop-color='%23fff3b0'/%3E%3Cstop offset='.55' stop-color='%23ffdf6b'/%3E%3Cstop offset='1' stop-color='%23c8862a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M58 18 C44 8 26 6 6 12 C20 13 26 15 28 18 C26 21 20 23 6 24 C26 30 44 28 58 18 Z' fill='url(%23m)'/%3E%3Cpath d='M58 18 C48 12 36 10 24 13 C34 14 40 16 42 18 C40 20 34 22 24 23 C36 26 48 24 58 18 Z' fill='%23fffbe8' opacity='.45'/%3E%3Ccircle cx='7' cy='18' r='2.6' fill='%23fff3b0'/%3E%3Ccircle cx='7' cy='18' r='1.2' fill='%23a86a1a'/%3E%3C/svg%3E") no-repeat center/contain}
+.rtx .wing.r{transform:scaleX(-1)}
+.rtx b{position:relative;overflow:hidden;flex:none;font-size:13px;font-weight:bold;white-space:nowrap;padding:5px 14px;margin:0 -8px;border-radius:7px;background:linear-gradient(180deg,#fff6c0 0%,#ffdf6b 45%,#e09a3a 100%);border:1px solid #fff8d0;outline:1px solid #a86a1a;outline-offset:-4px;color:#4a2a00;text-shadow:0 1px 0 rgba(255,255,255,.65),0 0 6px rgba(255,210,90,.6)}
+.rtx b::after{content:"";position:absolute;top:0;left:-70%;width:45%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.65),transparent);transform:skewX(-20deg);animation:sweep 2.8s ease-in-out infinite}
 @keyframes sweep{to{left:140%}}
-.rt1{background:linear-gradient(90deg,rgba(255,223,107,.28),rgba(255,157,60,.5),rgba(255,223,107,.28));border-color:rgba(255,215,100,.9);color:#ffe97b;text-shadow:0 0 8px rgba(255,190,60,.95);box-shadow:0 0 12px rgba(255,200,80,.55)}
-.rt2{background:linear-gradient(90deg,rgba(200,200,255,.22),rgba(150,150,230,.45),rgba(200,200,255,.22));border-color:rgba(180,180,255,.85);color:#d8d8ff;text-shadow:0 0 8px rgba(150,150,255,.9);box-shadow:0 0 10px rgba(150,150,255,.5)}
-.rt3{background:linear-gradient(90deg,rgba(255,200,150,.22),rgba(220,130,90,.45),rgba(255,200,150,.22));border-color:rgba(255,180,120,.85);color:#ffd9b0;text-shadow:0 0 8px rgba(230,140,80,.9);box-shadow:0 0 8px rgba(230,150,90,.45)}
-.rt-moon{background:linear-gradient(90deg,rgba(255,182,213,.25),rgba(255,255,255,.4),rgba(255,182,213,.25));border-color:rgba(255,182,213,.9);color:#ffd6e8;text-shadow:0 0 10px rgba(255,150,200,.95);box-shadow:0 0 14px rgba(255,170,210,.55)}
+.rtx.rt2 b{background:linear-gradient(180deg,#f2f2ff 0%,#b9b9f0 45%,#7676b8 100%);border-color:#f6f6ff;outline-color:#43437e;color:#1b1b4d;text-shadow:0 1px 0 rgba(255,255,255,.7),0 0 6px rgba(150,150,255,.6)}
+.rtx.rt2 .wing{filter:hue-rotate(205deg) saturate(.55)}
+.rtx.rt3 b{background:linear-gradient(180deg,#ffe6c8 0%,#f0a870 45%,#a8642f 100%);border-color:#ffedda;outline-color:#6f3f1c;color:#3a1e00;text-shadow:0 1px 0 rgba(255,255,255,.6),0 0 6px rgba(240,170,110,.6)}
+.rtx.rt3 .wing{filter:hue-rotate(-22deg) saturate(1.1)}
+.rtx.rt-moon b{background:linear-gradient(180deg,#ffe4f1 0%,#ff9ec7 45%,#c65a92 100%);border-color:#ffecf6;outline-color:#7e2454;color:#560f34;text-shadow:0 1px 0 rgba(255,255,255,.7),0 0 8px rgba(255,150,200,.7)}
+.rtx.rt-moon .wing{filter:hue-rotate(295deg) saturate(1.35)}
 #topbar .pname .title{color:#ffe9a8;font-size:13px;margin-right:4px;text-shadow:0 0 6px rgba(245,214,123,.6)}
 .bars{margin-top:6px;display:flex;flex-direction:column;gap:4px}
 .bar{height:14px;background:#0d0a06;border:1px solid #5a4a26;border-radius:7px;overflow:hidden;position:relative;font-size:10px}
@@ -204,6 +209,8 @@ const GIFTS=[
  {id:"pet_xuenv",need:498,kind:"pet",pid:"xuenv",name:"神级宠物「冰天雪女」",desc:"神级魂兽，极北天王"},
  {id:"title_shenzhi",need:998,kind:"title",eid:"shenzhi",name:"稀有称号「🌟神之眷顾」",desc:"攻击+50 气血+500 幸运+3，可叠加"}
 ];
+/* 称号牌渲染：牌匾+两侧翼饰 */
+function titleBadge(name,cls){return `<span class="rtx ${cls}"><i class="wing"></i><b>${name}</b><i class="wing r"></i></span>`;}
 function myRankTitles(){
  const t=[],zl=zhanli();
  const zr=[...RANKS.map(r=>({...r})),{zl,me:true}].sort((a,b)=>b.zl-a.zl).findIndex(r=>r.me);
@@ -778,6 +785,7 @@ function rPay(){
  const v=vipLevel(),total=vipTotal(),next=v<VIP_NEED.length-1?VIP_NEED[v+1]:null;
  const today=nowStr().slice(0,10),claimed=S.vipClaim===today,g=vipGift();
  const T=VIP_TITLES[S.title||0];
+ const vtCls=(S.title||0)>=5?"rt1":((S.title||0)>=3?"rt2":"rt3");
  let titleBtns="";
  for(let i=1;i<=v;i++){const tt=VIP_TITLES[i];titleBtns+=`<button class="btn small${(S.title||0)===i?" primary":""}" style="flex:1;margin:2px;white-space:nowrap" data-title="${i}">「${tt.name}」</button>`;}
  if(!titleBtns)titleBtns=`<span class="dim">充值到 VIP1 解锁称号</span>`;
@@ -785,7 +793,7 @@ function rPay(){
  <p>当前等级：<b class="gold">VIP${v}</b> · 累计充值 <b class="gold">￥${total}</b></p>
  <p class="dim">${next?`再充 ￥${next-total} 晋升 VIP${v+1}`:`已达最高 VIP${v}，威震江湖！`}</p>
  <div class="statgrid"><div>攻击/气血加成<b>+${v*2}%</b></div><div>稀有爆率<b>+${T?T.drop:0}%</b></div><div>每日VIP礼包<b>${v?(claimed?"已领取":"可领取"):"VIP1开启"}</b></div></div>
- <p style="margin:8px 0 4px">我的称号：<b class="gold">${T?`「${T.name}」`:"暂无"}</b>${T?`<span class="dim"> 攻击+${T.atk} 气血+${T.hp} 爆率+${T.drop}%</span>`:""}</p>
+ <p style="margin:8px 0 4px">我的称号：${T?titleBadge(T.name,vtCls):"暂无"}${T?`<span class="dim"> 攻击+${T.atk} 气血+${T.hp} 爆率+${T.drop}%</span>`:""}</p>
  <div class="rowbtns" style="flex-wrap:wrap">${titleBtns}</div>
  <p class="dim" style="margin:6px 0">今日礼包：铜币${g.coins} · 体力${g.stam} · 元宝${g.gold}</p>
  <button class="btn small primary" id="vipclaim" ${(!v||claimed)?"disabled":""}>${claimed?"今日已领取":(v?"领取今日VIP礼包":"充值任意金额开启VIP")}</button></div>
@@ -866,14 +874,14 @@ function rRank(){
  const zlist=[...RANKS.map(r=>({...r})),{name:p.name+"（我）",zl,me:true}].sort((a,b)=>b.zl-a.zl);
  const plist=[...RANK_PAY.map(r=>({...r})),{name:p.name+"（我）",pay,me:true}].sort((a,b)=>b.pay-a.pay);
  let h=`<div class="card"><h3>🏆 武林战力榜</h3><p class="dim">我的战力：<b class="gold">${zl}</b> · 第 ${zlist.findIndex(r=>r.me)+1} 名</p>`;
- h+=zlist.map((r,i)=>`<div class="rankrow${r.me?" me":""}"><span>${i+1}. ${r.name}${i<3?` <span class="rt ${RANK_TITLES.zl[i].cls}">${RANK_TITLES.zl[i].name}</span>`:""}</span><span>${r.zl}</span></div>`).join("")+`</div>`;
+ h+=zlist.map((r,i)=>`<div class="rankrow${r.me?" me":""}"><span>${i+1}. ${r.name}${i<3?` ${titleBadge(RANK_TITLES.zl[i].name,RANK_TITLES.zl[i].cls)}`:""}</span><span>${r.zl}</span></div>`).join("")+`</div>`;
  h+=`<div class="card"><h3>💰 充值风云榜</h3><p class="dim">我的累计充值：<b class="gold">￥${pay}</b> · 第 ${plist.findIndex(r=>r.me)+1} 名</p>`;
- h+=plist.map((r,i)=>`<div class="rankrow${r.me?" me":""}"><span>${i+1}. ${r.name}${i<3?` <span class="rt ${RANK_TITLES.pay[i].cls}">${RANK_TITLES.pay[i].name}</span>`:""}</span><span>￥${r.pay}</span></div>`).join("")+`</div>`;
+ h+=plist.map((r,i)=>`<div class="rankrow${r.me?" me":""}"><span>${i+1}. ${r.name}${i<3?` ${titleBadge(RANK_TITLES.pay[i].name,RANK_TITLES.pay[i].cls)}`:""}</span><span>￥${r.pay}</span></div>`).join("")+`</div>`;
  const myT=myRankTitles();
  h+=`<div class="card"><h3>🎖️ 我的荣誉称号</h3><p class="dim">任一榜单前三名自动获得称号，多个称号属性可叠加。</p>`;
- h+=myT.length?myT.map(t=>`<div class="tier"><div><span class="rt ${t.cls}">${t.name}</span><span class="dim"> ${t.board}第${t.rank}名</span><div class="m">${bonusStr(t.bonus)}</div></div></div>`).join(""):`<p class="dim">暂未上榜，继续努力！</p>`;
+ h+=myT.length?myT.map(t=>`<div class="tier"><div>${titleBadge(t.name,t.cls)}<span class="dim"> ${t.board}第${t.rank}名</span><div class="m">${bonusStr(t.bonus)}</div></div></div>`).join(""):`<p class="dim">暂未上榜，继续努力！</p>`;
  const evts=(S.eventTitles||[]).map(eid=>EVENT_TITLES[eid]).filter(Boolean);
- if(evts.length)h+=evts.map(e=>`<div class="tier"><div><span class="rt ${e.cls}">${e.name}</span><span class="dim"> ${e.desc}</span><div class="m">${bonusStr(e.bonus)}</div></div></div>`).join("");
+ if(evts.length)h+=evts.map(e=>`<div class="tier"><div>${titleBadge(e.name,e.cls)}<span class="dim"> ${e.desc}</span><div class="m">${bonusStr(e.bonus)}</div></div></div>`).join("");
  h+=`</div>`;m.innerHTML=h;
 }
 /* ============ 更多：GM后台/帮助/存档 ============ */
@@ -897,7 +905,7 @@ function rMore(){
  · 🦊宠物分黄/玄/地/天/神五级，品级越高助战越强；神级宠物、神级功法、稀有称号只能通过💎充值豪礼或⚡限时活动获得<br>
  · 📖神级以下功法：元宝购买或打🌍世界BOSS掉落；「更多」→「节日活动」有中秋称号和神功现世限时活动</p></div>
  <div class="card"><h3>🎑 节日活动</h3>
- <div class="tier"><div><div class="gold">中秋赏月 · 限时</div><div class="m">领取限定称号 <span class="rt rt-moon">🐰中秋快乐</span><br>攻击+15 气血+150，与其他称号叠加</div></div>
+ <div class="tier"><div><div class="gold">中秋赏月 · 限时</div><div class="m">领取限定称号 ${titleBadge("🐰中秋快乐","rt-moon")}<br>攻击+15 气血+150，与其他称号叠加</div></div>
  <button class="btn small primary" style="width:auto;margin:0" id="evtMid"${(S.eventTitles||[]).includes("midautumn")?" disabled":""}>${(S.eventTitles||[]).includes("midautumn")?"已领取":"领取"}</button></div>
  <div class="tier"><div><div class="gold">⚡神功现世 · 限时</div><div class="m">活动期间累计充值满￥498，领取神级《大日焚天诀》<br><span class="dim">（原需👑VIP6，限时直得）</span></div></div>
  <button class="btn small primary" style="width:auto;margin:0" id="evtDarin">领取</button></div></div>
