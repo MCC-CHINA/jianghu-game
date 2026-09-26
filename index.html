@@ -701,11 +701,14 @@ if(old)S.bag.push(old);
 calcStats();save();render();toast("装备了");
 });
 m.querySelectorAll("[data-use]").forEach(b=>b.onclick=()=>{
-const it=S.bag[+b.dataset.use];S.bag.splice(+b.dataset.use,1);
+const it=S.bag[+b.dataset.use];
+if((it.use==="hp150"||it.use==="hp450")&&p.hp>=p.maxhp){toast("气血已满，无需用药");return;}
+if(it.use==="mpfull"&&p.mp>=p.maxmp){toast("内力已满，无需用药");return;}
+S.bag.splice(+b.dataset.use,1);
 if(it.use==="hp150")p.hp=Math.min(p.maxhp,p.hp+150);
 if(it.use==="hp450")p.hp=Math.min(p.maxhp,p.hp+450);
 if(it.use==="mpfull")p.mp=p.maxmp;
-calcStats();save();render();toast("使用了");
+calcStats();save();render();toast("用药了，效果拔群！");
 });
 $("enhance").onclick=()=>{
 const slots=Object.entries(S.equip).filter(([s,it])=>it&&it.enh<5);
@@ -904,7 +907,7 @@ h+=`</div>`;m.innerHTML=h;
 m.querySelectorAll("[data-buy]").forEach(b=>b.onclick=()=>{
 const s=SHOP.find(x=>x.id===b.dataset.buy);
 if(p.coins<s.price){toast("铜币不足");return;}
-p.coins-=s.price;S.bag.push({name:s.name,use:s.id});save();render();toast("购买了");
+p.coins-=s.price;S.bag.push({name:s.name,use:s.use});save();render();toast("购买了");
 });
 }
 /* ============ 元宝商城 ============ */
