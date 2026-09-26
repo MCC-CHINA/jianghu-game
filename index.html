@@ -202,10 +202,16 @@ const TIERS=[
 ];
 const RANKS=[{name:"武林神话·叶孤鸿",zl:99999},{name:"剑圣·西门飘雪",zl:52000},{name:"魔教教主·任逍遥",zl:38000},{name:"丐帮帮主·洪七",zl:26000},{name:"武当掌门·张真人",zl:18000},{name:"峨眉掌门·灭绝师太",zl:12000},{name:"少林方丈·玄慈",zl:9000},{name:"黑风寨主·黑风虎",zl:5000},{name:"采花大盗·田伯光",zl:2800},{name:"江南大侠·江别鹤",zl:1500}];
 const RANK_PAY=[{name:"神豪·王多鱼",pay:99999},{name:"江南首富·沈万三",pay:52000},{name:"西域土豪·金轮法王",pay:26000},{name:"盐帮帮主·方中信",pay:12000},{name:"总镖头·铁中堂",pay:6000},{name:"富商·陶朱公",pay:2600},{name:"钱庄掌柜·金算盘",pay:1200},{name:"小地主·黄世仁",pay:500},{name:"暴发户·苟富贵",pay:150}];
+const RANK_PET=[{name:"兽王·蛮吉",pet:"🐯啸天虎",score:8800},{name:"毒仙·何仙姑",pet:"🐍碧鳞蛇",score:7200},{name:"驭兽斋主·公孙瓒",pet:"🦅金翅雕",score:6100},{name:"南疆蛊女·蓝凤凰",pet:"🐛金蚕蛊",score:4800},{name:"猎户·石大壮",pet:"🐺苍原狼",score:3500},{name:"药农·老蔫",pet:"🐰月影兔",score:2200},{name:"顽童·小豆子",pet:"🐥灵羽鸡",score:1200}];
+const RANK_WING=[{name:"翼皇·陆九天",wing:"九天神翼",tier:12},{name:"风神·聂风行",wing:"混沌天翼",tier:10},{name:"火凤传人·祝融焱",wing:"天罡神翼",tier:9},{name:"夜枭·影无痕",wing:"暗影之翼",tier:7},{name:"云游僧·慧远",wing:"圣光之翼",tier:6},{name:"苗疆翼女·阿幼",wing:"烈焰之翼",tier:3},{name:"送信小厮·阿毛",wing:"翠羽之翼",tier:1}];
+const RANK_LV=[{name:"武林神话·叶孤鸿",lv:99},{name:"剑圣·西门飘雪",lv:88},{name:"魔教教主·任逍遥",lv:80},{name:"丐帮帮主·洪七",lv:72},{name:"武当掌门·张真人",lv:65},{name:"峨眉掌门·灭绝师太",lv:58},{name:"少林方丈·玄慈",lv:52},{name:"黑风寨主·黑风虎",lv:40},{name:"采花大盗·田伯光",lv:30},{name:"江南大侠·江别鹤",lv:20}];
 /* 排行榜称号：前三名自动获得，属性可叠加 */
 const RANK_TITLES={
  zl:[{name:"👑战力之巅",cls:"rt1",bonus:{atk:30,hp:300}},{name:"⚔️武林传奇",cls:"rt2",bonus:{atk:20,hp:200}},{name:"🛡️江湖豪杰",cls:"rt3",bonus:{atk:10,hp:100}}],
- pay:[{name:"💎神豪无双",cls:"rt1",bonus:{atk:25,hp:250,luck:2}},{name:"💰富甲天下",cls:"rt2",bonus:{atk:15,hp:150,luck:1}},{name:"🪙一掷千金",cls:"rt3",bonus:{atk:8,hp:80}}]
+ pay:[{name:"💎神豪无双",cls:"rt1",bonus:{atk:25,hp:250,luck:2}},{name:"💰富甲天下",cls:"rt2",bonus:{atk:15,hp:150,luck:1}},{name:"🪙一掷千金",cls:"rt3",bonus:{atk:8,hp:80}}],
+ pet:[{name:"🦊灵兽之主",cls:"rt1",bonus:{atk:20,hp:200}},{name:"🐾兽语者",cls:"rt2",bonus:{atk:12,hp:120}},{name:"🐣驯兽师",cls:"rt3",bonus:{atk:6,hp:60}}],
+ wing:[{name:"🪽九天神皇",cls:"rt0",bonus:{atk:25,hp:250,spd:3}},{name:"🕊️凌云之志",cls:"rt2",bonus:{atk:15,hp:150,spd:2}},{name:"🪶风行者",cls:"rt3",bonus:{atk:8,hp:80,spd:1}}],
+ lv:[{name:"⬆️登峰造极",cls:"rt1",bonus:{atk:20,hp:200}},{name:"📈后来居上",cls:"rt2",bonus:{atk:12,hp:120}},{name:"🌱初露头角",cls:"rt3",bonus:{atk:6,hp:60}}]
 };
 /* 节日限定称号 */
 const EVENT_TITLES={
@@ -227,6 +233,18 @@ function myRankTitles(){
  const pay=S.orders.reduce((a,o)=>a+o.money,0);
  const pr=[...RANK_PAY.map(r=>({...r})),{pay,me:true}].sort((a,b)=>b.pay-a.pay).findIndex(r=>r.me);
  if(pr<3)t.push({board:"充值榜",rank:pr+1,...RANK_TITLES.pay[pr]});
+ // 宠物榜：取评分最高的宠物
+ let myPetScore=0,myPetName="暂无宠物";
+ for(const pet of(S.pets||[])){const sc=petScore(pet);if(sc>myPetScore){myPetScore=sc;myPetName=pet.name;}}
+ const per=[...RANK_PET.map(r=>({...r})),{name:S.player.name+"（我）",pet:myPetName,score:myPetScore,me:true}].sort((a,b)=>b.score-a.score).findIndex(r=>r.me);
+ if(per<3)t.push({board:"宠物榜",rank:per+1,...RANK_TITLES.pet[per]});
+ // 翅膀榜
+ const myWing=(S.wing&&S.wing.tier)||0;
+ const wr=[...RANK_WING.map(r=>({...r})),{name:S.player.name+"（我）",wing:myWing?WING_NAMES[myWing]:"未激活",tier:myWing,me:true}].sort((a,b)=>b.tier-a.tier).findIndex(r=>r.me);
+ if(wr<3)t.push({board:"翅膀榜",rank:wr+1,...RANK_TITLES.wing[wr]});
+ // 等级榜
+ const lr=[...RANK_LV.map(r=>({...r})),{name:S.player.name+"（我）",lv:S.player.level,me:true}].sort((a,b)=>b.lv-a.lv).findIndex(r=>r.me);
+ if(lr<3)t.push({board:"等级榜",rank:lr+1,...RANK_TITLES.lv[lr]});
  return t;
 }
 /* ============ 限时物品 ============ */
@@ -303,7 +321,12 @@ const GFNAME={atk:"攻击",def:"防御",hp:"气血",mp:"内力",spd:"速度",luc
 const VIP_NEED=[0,6,30,98,198,498,998,1998,2998,4998,7998,12998,19998]; // 索引即VIP等级：升到该级所需累计充值
 function vipTotal(){return S.orders.reduce((a,o)=>a+o.money,0);}
 function vipLevel(){const t=vipTotal();let v=0;for(let i=1;i<VIP_NEED.length;i++)if(t>=VIP_NEED[i])v=i;return v;}
-function vipGift(){const v=vipLevel();return{coins:v*300,stam:10+v*5,gold:v*8};}
+function vipGift(){const v=vipLevel();return{coins:v*300,stam:10+v*5,gold:v*8,feather:v*2};}
+/* ============ 翅膀系统 ============ */
+const WING_MAX=12;
+const WING_NAMES=[null,"翠羽之翼","疾风之翼","烈焰之翼","寒冰之翼","雷霆之翼","圣光之翼","暗影之翼","九幽冥翼","天罡神翼","混沌天翼","鸿蒙圣翼","九天神翼"];
+function wingCost(t){return{feather:10+t*10,coins:1000*(t+1)};} // t阶升t+1阶
+function petScore(pet){const b=PETS[pet.pid];return Math.floor((b.atk+b.hp/10)*(1+0.15*(pet.level-1))*(PET_TMULT[b.tier]||1));}
 const VIP_TITLES=[null, // 索引=VIP等级：称号名+属性+爆率
  {name:"初露锋芒",atk:8,hp:80,drop:5},{name:"江湖新秀",atk:16,hp:160,drop:8},{name:"一方豪杰",atk:28,hp:280,drop:12},
  {name:"武林名宿",atk:45,hp:450,drop:16},{name:"绝世高手",atk:70,hp:700,drop:20},{name:"武林神话",atk:110,hp:1100,drop:30},
@@ -343,6 +366,8 @@ function calcStats(){
   for(const[k,v]of Object.entries(f.bonus)){if(k==="hp")p.maxhp+=v;else if(k==="mp")p.maxmp+=v;else p[k]=(p[k]||0)+v;}}
  const fjlv=(S.fenjue&&S.fenjue.lv)||0,fm=fenjueTier()+1; // 焚诀加成（随异火进化）
  if(fjlv){p.atk+=4*fm*fjlv;p.maxhp+=50*fm*fjlv;p.maxmp+=10*fm*fjlv;}
+ const wt=(S.wing&&S.wing.tier)||0; // 翅膀加成：每阶攻击+12 气血+120 速度+3
+ if(wt){p.atk+=12*wt;p.maxhp+=120*wt;p.spd+=3*wt;}
  for(const t of myRankTitles()){const b=t.bonus; // 排行榜称号加成（可叠加）
   p.atk+=b.atk||0;p.def+=b.def||0;p.maxhp+=b.hp||0;p.maxmp+=b.mp||0;p.spd+=b.spd||0;p.luck+=b.luck||0;}
  for(const eid of(S.eventTitles||[])){const e=EVENT_TITLES[eid];if(!e)continue;const b=e.bonus; // 节日称号加成（可叠加）
@@ -359,9 +384,9 @@ function zhanli(){
 function newGame(name,sectKey){
  const sc=SECTS[sectKey];
  S={player:{name,sect:sectKey,level:1,exp:0,hp:sc.hp,mp:sc.mp,coins:100,gold:0,
-   stamina:50,maxStamina:50,skills:[sc.skill],task:null,taskDone:false,
+   stamina:50,maxStamina:50,skills:[sc.skill],task:null,taskDone:false,feather:0,
    base:{maxhp:sc.hp,maxmp:sc.mp,atk:sc.atk,def:sc.def,spd:sc.spd}},
-  equip:{weapon:null,armor:null,boots:null,charm:null},bag:[],pets:[],activePet:-1,
+  equip:{weapon:null,armor:null,boots:null,charm:null},bag:[],pets:[],activePet:-1,wing:{tier:0},
   orders:[],zone:0,created:nowStr(),gongfa:{},gongfaLearned:{},claimedGifts:{},douqi:0,yihuo:[],fenjue:{lv:0},eventTitles:[]};
  calcStats();S.player.hp=S.player.maxhp;S.player.mp=S.player.maxmp;save();
 }
@@ -510,6 +535,9 @@ if(B.wb){ // 世界BOSS：掉落功法（神级以下）
   const yf=pick(unownedYH);S.yihuo=S.yihuo||[];S.yihuo.push(yf.name);
   log(`<span class="sys">🔥 天降机缘！世界BOSS掉落${yf.name}，已自动炼化！</span>`);
  }
+ // 世界BOSS掉落灵羽（翅膀升阶材料）
+ const fn=2+Math.floor(Math.random()*4);p.feather=(p.feather||0)+fn;
+ log(`<span class="sys">🪶 世界BOSS掉落灵羽×${fn}！可在「宠物」页升级翅膀</span>`);
 }else{
 // 掉落（VIP称号提升爆率）
 const tier=ZONES[B.zi].tier;
@@ -639,8 +667,18 @@ S.player.coins-=cost;it.enh++;calcStats();save();closeModal();render();toast("�
 }
 /* ============ 宠物 ============ */
 function rPet(){
-const m=$("main");
-let h=`<div class="card"><h3>🦊 我的宠物</h3><p class="dim">宠物分黄/玄/地/天/神五级，品级越高助战越强。野外把怪物打到30%血以下可捕捉；神级宠物只能通过充值豪礼或限时活动获得。</p>`;
+const m=$("main"),p=S.player;
+// ---- 翅膀 ----
+const wt=(S.wing&&S.wing.tier)||0,wc=wingCost(wt);
+const canUp=wt<WING_MAX&&(p.feather||0)>=wc.feather&&p.coins>=wc.coins;
+let wh=`<div class="card"><h3>🪽 我的翅膀</h3>`;
+if(!wt)wh+=`<p class="dim">尚未激活翅膀。集齐 <b class="gold">🪶灵羽×${wc.feather}</b> + 铜币${wc.coins} 即可激活「${WING_NAMES[1]}」！<br>灵羽来源：🌍世界BOSS掉落、💎商城购买、👑每日VIP礼包。</p>`;
+else wh+=`<p>当前：<b class="gold">🪽${WING_NAMES[wt]}（${wt}阶）</b> <span class="dim">攻击+${12*wt} 气血+${120*wt} 速度+${3*wt}</span></p>`;
+if(wt<WING_MAX)wh+=`<div class="tier"><div><div class="gold">${wt?"升至"+(wt+1)+"阶·"+WING_NAMES[wt+1]:"激活翅膀"}</div><div class="m">消耗 🪶灵羽×${wc.feather}（拥有${p.feather||0}）· 铜币${wc.coins}（拥有${p.coins}）</div></div>
+<button class="btn small primary" style="width:auto;margin:0" id="wingUp"${canUp?"":" disabled"}>${wt?"升阶":"激活"}</button></div>`;
+else wh+=`<p class="dim">已达最高 ${WING_MAX} 阶「${WING_NAMES[WING_MAX]}」，翱翔九天！</p>`;
+wh+=`</div>`;
+let h=wh+`<div class="card"><h3>🦊 我的宠物</h3><p class="dim">宠物分黄/玄/地/天/神五级，品级越高助战越强。野外把怪物打到30%血以下可捕捉；神级宠物只能通过充值豪礼或限时活动获得。</p>`;
 if(!S.pets.length)h+=`<p class="dim">还没有宠物，去青竹林捕捉小灵猴吧！</p>`;
 S.pets.forEach((pet,i)=>{
 const b=PETS[pet.pid];
@@ -650,6 +688,13 @@ h+=`<div class="mob"><div><div class="mn">${pet.name} <span class="ptier ${PTN[b
 ${i===S.activePet?"":`<button class="btn" data-pet="${i}">出战</button>`}</div>`;
 });
 h+=`</div>`;m.innerHTML=h;
+const wu=$("wingUp");
+if(wu)wu.onclick=()=>{
+ const t=(S.wing&&S.wing.tier)||0,c=wingCost(t);
+ if(t>=WING_MAX||(p.feather||0)<c.feather||p.coins<c.coins)return;
+ p.feather-=c.feather;p.coins-=c.coins;S.wing={tier:t+1};
+ calcStats();save();render();toast(`🪽 翅膀${t?"升至":"激活"}「${WING_NAMES[t+1]}」！`);
+};
 m.querySelectorAll("[data-pet]").forEach(b=>b.onclick=()=>{S.activePet=+b.dataset.pet;save();render();toast("宠物出战！");});
 }
 /* ============ 门派 ============ */
@@ -775,6 +820,7 @@ let h=`<div class="card"><h3>💎 元宝商城</h3><p class="dim">你有元宝 <
 <div class="tier"><div><div class="gold">体力丹</div><div class="m">+30体力 · 10元宝</div></div><button class="btn small" style="width:auto;margin:0" data-g="tili">购买</button></div>
 <div class="tier"><div><div class="gold">灵兽蛋</div><div class="m">随机开出黄~天级宠物 · 88元宝</div></div><button class="btn small" style="width:auto;margin:0" data-g="egg">购买</button></div>
 <div class="tier"><div><div class="gold">神兵宝箱</div><div class="m">随机开出${tier}阶武器 · 68元宝</div></div><button class="btn small" style="width:auto;margin:0" data-g="box">购买</button></div>
+<div class="tier"><div><div class="gold">🪶 灵羽</div><div class="m">翅膀升阶材料 · 10元宝/个</div></div><button class="btn small" style="width:auto;margin:0" data-g="feather">购买</button></div>
 </div>`;m.innerHTML=h;
 m.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>{
 const k=b.dataset.g;
@@ -783,6 +829,7 @@ else if(k==="egg"&&p.gold>=88){p.gold-=88;const pool=Object.keys(PETS).filter(k=
 S.pets.push({pid,name:PETS[pid].name,level:p.level,exp:0});if(S.activePet===-1)S.activePet=0;toast("开出了！");}
 else if(k==="box"&&p.gold>=68){p.gold-=68;const pool=Object.keys(ITEMS).filter(x=>ITEMS[x].slot==="weapon"&&ITEMS[x].tier===tier&&!ITEMS[x].gift);
 const iid=pick(pool);S.bag.push({iid,enh:0});toast("开出了！");}
+else if(k==="feather"&&p.gold>=10){p.gold-=10;p.feather=(p.feather||0)+1;toast("🪶 灵羽+1！");}
 else{toast("元宝不足，请充值");return;}
 save();render();
 });
@@ -806,7 +853,7 @@ function rPay(){
  <div class="statgrid"><div>攻击/气血加成<b>+${v*2}%</b></div><div>稀有爆率<b>+${T?T.drop:0}%</b></div><div>每日VIP礼包<b>${v?(claimed?"已领取":"可领取"):"VIP1开启"}</b></div></div>
  <p style="margin:8px 0 4px">我的称号：${T?titleBadge(T.name,vtCls):"暂无"}${T?`<span class="dim"> 攻击+${T.atk} 气血+${T.hp} 爆率+${T.drop}%</span>`:""}</p>
  <div class="rowbtns" style="flex-wrap:wrap">${titleBtns}</div>
- <p class="dim" style="margin:6px 0">今日礼包：铜币${g.coins} · 体力${g.stam} · 元宝${g.gold}</p>
+ <p class="dim" style="margin:6px 0">今日礼包：铜币${g.coins} · 体力${g.stam} · 元宝${g.gold} · 🪶灵羽${g.feather}</p>
  <button class="btn small primary" id="vipclaim" ${(!v||claimed)?"disabled":""}>${claimed?"今日已领取":(v?"领取今日VIP礼包":"充值任意金额开启VIP")}</button></div>
  <div class="card"><h3>🎁 首充礼包</h3>
  <p class="dim">首次充值任意金额后可领取，每位少侠限领一次（含小红剑自动赠送之外的额外壕礼）。</p>
@@ -836,7 +883,7 @@ function rPay(){
   const vv=vipLevel(),tt=nowStr().slice(0,10);
   if(!vv||S.vipClaim===tt)return;
   const gg=vipGift();
-  S.vipClaim=tt;p.coins+=gg.coins;p.gold+=gg.gold;
+  S.vipClaim=tt;p.coins+=gg.coins;p.gold+=gg.gold;p.feather=(p.feather||0)+gg.feather;
   p.stamina=Math.min(p.maxStamina,p.stamina+gg.stam);
   save();render();toast(`🎁 VIP${vv}每日礼包到账！`);
  };
@@ -905,6 +952,21 @@ function rRank(){
  h+=zlist.map((r,i)=>`<div class="rankrow${r.me?" me":""}"><span>${i+1}. ${r.name}${i<3?` ${titleBadge(RANK_TITLES.zl[i].name,RANK_TITLES.zl[i].cls)}`:""}</span><span>${r.zl}</span></div>`).join("")+`</div>`;
  h+=`<div class="card"><h3>💰 充值风云榜</h3><p class="dim">我的累计充值：<b class="gold">￥${pay}</b> · 第 ${plist.findIndex(r=>r.me)+1} 名</p>`;
  h+=plist.map((r,i)=>`<div class="rankrow${r.me?" me":""}"><span>${i+1}. ${r.name}${i<3?` ${titleBadge(RANK_TITLES.pay[i].name,RANK_TITLES.pay[i].cls)}`:""}</span><span>￥${r.pay}</span></div>`).join("")+`</div>`;
+ // 宠物榜
+ let myPetScore=0,myPetName="暂无宠物";
+ for(const pet of(S.pets||[])){const sc=petScore(pet);if(sc>myPetScore){myPetScore=sc;myPetName=pet.name;}}
+ const petlist=[...RANK_PET.map(r=>({...r})),{name:p.name+"（我）",pet:myPetName,score:myPetScore,me:true}].sort((a,b)=>b.score-a.score);
+ h+=`<div class="card"><h3>🦊 宠物排行榜</h3><p class="dim">我的最强宠物：<b class="gold">${myPetName}</b>（评分${myPetScore}）· 第 ${petlist.findIndex(r=>r.me)+1} 名</p>`;
+ h+=petlist.map((r,i)=>`<div class="rankrow${r.me?" me":""}"><span>${i+1}. ${r.name} <span class="dim">${r.pet}</span>${i<3?` ${titleBadge(RANK_TITLES.pet[i].name,RANK_TITLES.pet[i].cls)}`:""}</span><span>${r.score}</span></div>`).join("")+`</div>`;
+ // 翅膀榜
+ const myWing=(S.wing&&S.wing.tier)||0;
+ const winglist=[...RANK_WING.map(r=>({...r})),{name:p.name+"（我）",wing:myWing?WING_NAMES[myWing]:"未激活",tier:myWing,me:true}].sort((a,b)=>b.tier-a.tier);
+ h+=`<div class="card"><h3>🪽 翅膀排行榜</h3><p class="dim">我的翅膀：<b class="gold">${myWing?WING_NAMES[myWing]+`（${myWing}阶）`:"未激活"}</b> · 第 ${winglist.findIndex(r=>r.me)+1} 名</p>`;
+ h+=winglist.map((r,i)=>`<div class="rankrow${r.me?" me":""}"><span>${i+1}. ${r.name} <span class="dim">${r.wing}${r.tier?`·${r.tier}阶`:""}</span>${i<3?` ${titleBadge(RANK_TITLES.wing[i].name,RANK_TITLES.wing[i].cls)}`:""}</span><span>${r.tier}阶</span></div>`).join("")+`</div>`;
+ // 等级榜
+ const lvlist=[...RANK_LV.map(r=>({...r})),{name:p.name+"（我）",lv:p.level,me:true}].sort((a,b)=>b.lv-a.lv);
+ h+=`<div class="card"><h3>⬆️ 等级排行榜</h3><p class="dim">我的等级：<b class="gold">Lv.${p.level}</b> · 第 ${lvlist.findIndex(r=>r.me)+1} 名</p>`;
+ h+=lvlist.map((r,i)=>`<div class="rankrow${r.me?" me":""}"><span>${i+1}. ${r.name}${i<3?` ${titleBadge(RANK_TITLES.lv[i].name,RANK_TITLES.lv[i].cls)}`:""}</span><span>Lv.${r.lv}</span></div>`).join("")+`</div>`;
  const myT=myRankTitles();
  h+=`<div class="card"><h3>🎖️ 我的荣誉称号</h3><p class="dim">任一榜单前三名自动获得称号，多个称号属性可叠加。</p>`;
  h+=myT.length?myT.map(t=>`<div class="tier"><div>${titleBadge(t.name,t.cls)}<span class="dim"> ${t.board}第${t.rank}名</span><div class="m">${bonusStr(t.bonus)}</div></div></div>`).join(""):`<p class="dim">暂未上榜，继续努力！</p>`;
@@ -970,7 +1032,8 @@ function rMore(){
  · 去「江湖」挑战敌人，升级变强<br>· 怪物掉装备，去「背包」穿戴、铁匠铺强化<br>
  · 野怪打到30%血可捕捉为宠物，宠物会帮你打架<br>
  · 🥋技能全是斗破斗技：八极崩、焰分噬浪尺、佛怒火莲、三千雷动、帝印诀等，去「门派」学习<br>
- · 🔥异火极难掉落：世界BOSS有极低概率掉落异火；佩戴👑VIP称号提升稀有爆率（VIP12+70%），野外装备掉率也受加成<br>
+ · 🪽翅膀：在「宠物」页用🪶灵羽+铜币激活/升阶（最高12阶九天神翼），每阶攻击+12/气血+120/速度+3；灵羽来自🌍世界BOSS掉落、💎商城购买、👑每日VIP礼包<br>
+ · 🏆排行新增🦊宠物榜、🪽翅膀榜、⬆️等级榜，前三名同样获得可叠加荣誉称号<br>
  · 体力不够就打坐，或去商城买体力丹<br>
  · 「充值」是模拟的，不花真钱，随便点！首充自动赠小红剑（限时3天），另有🎁首充礼包可领（288元宝+2万铜币+体力+4阶灵兽蛋）；累计充值提升VIP等级，加攻击气血、每日领礼包<br>
  · 宠物可捕捉斗罗魂兽：柔骨兔·小舞、蓝银皇·阿银、鬼虎、人面魔蛛、泰坦巨猿·二明、暗魔邪神虎、天青牛蟒·大明、冰碧帝皇蝎<br>
