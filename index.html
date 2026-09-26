@@ -14,7 +14,7 @@ body{background:#141009;color:#e8dcc0;font-family:"Songti SC","STSong","SimSun",
 #topPay{position:absolute;right:10px;top:8px;z-index:11;width:auto;margin:0;padding:6px 14px;font-size:13px}
 #topbar .pname .lv{background:#8a6d2f;color:#141009;font-size:12px;padding:1px 8px;border-radius:10px;margin-left:6px;vertical-align:2px}
 #topbar .pname .vip{background:linear-gradient(180deg,#f5d67b,#c8903c);color:#3a2a08;font-size:12px;font-weight:bold;padding:1px 8px;border-radius:10px;margin-left:6px;vertical-align:2px}
-#topVip{cursor:pointer}
+#topVip{cursor:pointer;background:rgba(20,12,4,.55);color:#f5d67b;border:1px solid #c8903c;text-shadow:0 0 8px rgba(245,214,123,.7);box-shadow:0 0 8px rgba(200,144,60,.35)}
 /* VIP6+名字变色，VIP12彩虹流动 */
 .vipn6{color:#ffd700;font-weight:bold;text-shadow:0 0 8px rgba(255,215,0,.7)}
 .vipn7{color:#ff9f43;font-weight:bold;text-shadow:0 0 8px rgba(255,159,67,.7)}
@@ -388,7 +388,9 @@ function gainPartnerExp(n){
  while(pt.exp>=40*pt.level){pt.exp-=40*pt.level;pt.level++;}
 }
 function recruitPartner(q){
- const used=(S.partners||[]).map(x=>x.name);
+ if(!Array.isArray(S.partners))S.partners=[];
+ if(S.activePartner===undefined)S.activePartner=-1;
+ const used=S.partners.map(x=>x.name);
  const name=pick(PARTNER_NAMES.filter(n=>!used.includes(n)))||pick(PARTNER_NAMES);
  S.partners.push({name,quality:q,level:S.player.level,exp:0,equip:{weapon:null,armor:null,boots:null,charm:null}});
  if(S.activePartner===-1||S.activePartner===undefined)S.activePartner=0;
@@ -796,7 +798,7 @@ const rg=$("recG");
 if(rg)rg.onclick=()=>{if(p.gold<88){toast("元宝不足（需88）");return;}p.gold-=88;
  const r=Math.random();recruitPartner(r<0.4?2:(r<0.8?3:4));};
 const mv=$("mythicVip");
-if(mv)mv.onclick=()=>{if(vipLevel()<8||S.claimedMythicVip)return;S.claimedMythicVip=true;recruitPartner(4);};
+if(mv)mv.onclick=()=>{if(vipLevel()<8||S.claimedMythicVip)return;recruitPartner(4);S.claimedMythicVip=true;save();render();};
 m.querySelectorAll("[data-pfight]").forEach(b=>b.onclick=()=>{S.activePartner=+b.dataset.pfight;calcStats();save();render();toast(" 伙伴出战！");});
 m.querySelectorAll("[data-pun]").forEach(b=>b.onclick=()=>{
  const[pi,slot]=b.dataset.pun.split("_"),pt=S.partners[+pi],it=pt.equip[slot];
@@ -868,8 +870,8 @@ for(const[gid,g]of Object.entries(GONGFA)){
  const per=Object.entries(g.bonus).map(([k,v])=>`${GFNAME[k]}+${v}`).join(" ");
  let btn,sub="";
  if(g.vip6){
- if(vipLevel()>=6){
- btn=`<button class="btn small primary" style="width:auto;margin:0" data-gf="${gid}"${maxed?" disabled":""}>${maxed?"已满重":`修炼·${gfCost(lv)}铜币`}</button>`;
+ if(gfLearned(gid)){
+ btn=`<button class="btn small primary" style="width:auto;margin:0" data-gf="${gid}"${(maxed||locked)?" disabled":""}>${maxed?"已满重":`修炼·${gfCost(lv)}铜币`}</button>`;
  }else{
  btn=`<button class="btn small" style="width:auto;margin:0" disabled>VIP6专属</button>`;
  sub=`<div class="m" style="color:#e08a8a">VIP6 或 限时活动「神功现世」可获得</div>`;
@@ -1266,7 +1268,7 @@ function rMore(){
 /* ============ 启动 ============ */
 (function init(){
  S=load();
- if(S&&S.player){migrateTitle();calcStats();TAB="home";render();}
+ if(S&&S.player){if(!Array.isArray(S.partners))S.partners=[];if(S.activePartner===undefined)S.activePartner=-1;if(!Array.isArray(S.pets))S.pets=[];if(!Array.isArray(S.eventTitles))S.eventTitles=[];migrateTitle();calcStats();TAB="home";render();}
  else{rCreate();}
  setInterval(()=>{ // 每60秒回1点体力
  if(S&&S.player&&S.player.stamina<S.player.maxStamina){S.player.stamina++;save();if(TAB==="home"&&!B)renderTop();}
