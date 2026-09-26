@@ -797,6 +797,10 @@ function rPay(){
  <div class="rowbtns" style="flex-wrap:wrap">${titleBtns}</div>
  <p class="dim" style="margin:6px 0">今日礼包：铜币${g.coins} · 体力${g.stam} · 元宝${g.gold}</p>
  <button class="btn small primary" id="vipclaim" ${(!v||claimed)?"disabled":""}>${claimed?"今日已领取":(v?"领取今日VIP礼包":"充值任意金额开启VIP")}</button></div>
+ <div class="card"><h3>🎁 首充礼包</h3>
+ <p class="dim">首次充值任意金额后可领取，每位少侠限领一次（含小红剑自动赠送之外的额外壕礼）。</p>
+ <div class="tier"><div><div class="gold">首充大礼包</div><div class="m">288元宝 · 20000铜币 · 体力+90 · 4阶灵兽蛋×1（开出黄~天级宠物）</div></div>
+ <button class="btn small primary" id="firstgift" style="width:auto;margin:0" ${(S.orders.length&&!S.firstGift)?"":"disabled"}>${S.firstGift?"已领取":(S.orders.length?"领取":"首充后可领")}</button></div></div>
  <div class="card"><h3>💰 充值元宝</h3>
  <p class="dim">⚠️ 原型演示：模拟支付流程，不产生真实扣款。正式版将接入微信/支付宝。</p>
  <p>当前元宝：<b class="gold">${p.gold}</b></p>`;
@@ -824,6 +828,19 @@ function rPay(){
   S.vipClaim=tt;p.coins+=gg.coins;p.gold+=gg.gold;
   p.stamina=Math.min(p.maxStamina,p.stamina+gg.stam);
   save();render();toast(`🎁 VIP${vv}每日礼包到账！`);
+ };
+ const fgb=$("firstgift");
+ if(fgb)fgb.onclick=()=>{
+  if(!S.orders.length||S.firstGift)return;
+  S.firstGift=1;
+  p.gold+=288;p.coins+=20000;
+  p.stamina=Math.min(p.maxStamina,p.stamina+90);
+  const pool=Object.keys(PETS).filter(k=>PETS[k].tier<=4);
+  const pid=pick(pool);
+  S.pets.push({pid,name:PETS[pid].name,level:p.level,exp:0});
+  if(S.activePet===-1)S.activePet=0;
+  save();render();
+  toast(`🎁 首充礼包到账：元宝+288，铜币+20000，体力+90，灵兽蛋开出「${PETS[pid].name}」！`);
  };
  m.querySelectorAll("[data-title]").forEach(b=>b.onclick=()=>{S.title=+b.dataset.title;calcStats();save();render();toast(`已佩戴称号「${VIP_TITLES[S.title].name}」！`);});
  m.querySelectorAll("[data-tier]").forEach(b=>b.onclick=()=>payModal(+b.dataset.tier));
@@ -899,7 +916,7 @@ function rMore(){
  · 🥋技能全是斗破斗技：八极崩、焰分噬浪尺、佛怒火莲、三千雷动、帝印诀等，去「门派」学习<br>
  · 🔥异火极难掉落：世界BOSS有极低概率掉落异火；佩戴👑VIP称号提升稀有爆率（VIP6+30%），野外装备掉率也受加成<br>
  · 体力不够就打坐，或去商城买体力丹<br>
- · 「充值」是模拟的，不花真钱，随便点！累计充值提升VIP等级，加攻击气血、每日领礼包<br>
+ · 「充值」是模拟的，不花真钱，随便点！首充自动赠小红剑（限时3天），另有🎁首充礼包可领（288元宝+2万铜币+体力+4阶灵兽蛋）；累计充值提升VIP等级，加攻击气血、每日领礼包<br>
  · 宠物可捕捉斗罗魂兽：柔骨兔·小舞、蓝银皇·阿银、鬼虎、人面魔蛛、泰坦巨猿·二明、暗魔邪神虎、天青牛蟒·大明、冰碧帝皇蝎<br>
  · 「排行」有战力榜和充值榜，前三名自动获得炫酷称号（属性可叠加）：👑战力之巅/⚔️武林传奇/🛡️江湖豪杰，💎神豪无双/💰富甲天下/🪙一掷千金<br>
  · 🦊宠物分黄/玄/地/天/神五级，品级越高助战越强；神级宠物、神级功法、稀有称号只能通过💎充值豪礼或⚡限时活动获得<br>
