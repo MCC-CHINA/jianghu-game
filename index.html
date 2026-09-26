@@ -21,6 +21,9 @@ body{background:#141009;color:#e8dcc0;font-family:"Songti SC","STSong","SimSun",
 .vipn11{color:#1dd1a1;font-weight:bold;text-shadow:0 0 8px rgba(29,209,161,.7)}
 .vipn12{font-weight:bold;background:linear-gradient(90deg,#ff2d2d,#ff7f00,#ffe600,#2dff2d,#00e5ff,#2d7fff,#a52dff,#ffd700,#ff2d2d);background-size:300% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:rainbow 4s linear infinite}
 @keyframes rainbow{to{background-position:300% center}}
+/* 神级物品：七彩流光 */
+.godflow{font-weight:bold;background:linear-gradient(90deg,#ff2d2d,#ff7f00,#ffe600,#2dff2d,#00e5ff,#2d7fff,#a52dff,#ffd700,#ff2d2d);background-size:300% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:rainbow 3s linear infinite}
+.ptier.神{background:linear-gradient(90deg,#ff2d2d,#ff7f00,#ffe600,#2dff2d,#00e5ff,#a52dff,#ffd700);background-size:300% auto;animation:rainbow 3s linear infinite;color:#fff;font-weight:bold;text-shadow:0 1px 2px rgba(0,0,0,.5)}
 .ptier{font-size:11px;padding:1px 6px;border-radius:8px;margin-left:4px;white-space:nowrap}
 .ptier.黄{background:#5a4a1a;color:#f5d67b}
 .ptier.玄{background:#3a3a6a;color:#b8b0f0}
@@ -240,6 +243,8 @@ const GIFTS=[
 /* 称号牌渲染：皇冠+翼饰+缎带 */
 function titleBadge(name,cls){return `<span class="rtx ${cls}"><i class="crown"></i><i class="wing"></i><b>${name}</b><i class="wing r"></i></span>`;}
 function vipTitleCls(t){return t>=9?"rt0":(t>=5?"rt1":(t>=3?"rt2":"rt3"));} // VIP称号传奇风样式
+function godName(n){return `<span class="godflow">${n}</span>`;} // 神级名：七彩流光
+function itemNameHTML(it){const d=ITEMS[it.iid];return d.tier>=5?godName(d.name):d.name;} // 装备名（5阶神级流光）
 function myRankTitles(){
  const t=[],zl=zhanli();
  const zr=[...RANKS.map(r=>({...r})),{zl,me:true}].sort((a,b)=>b.zl-a.zl).findIndex(r=>r.me);
@@ -694,7 +699,7 @@ const m=$("main"),p=S.player;
 let h=`<div class="card"><h3>🎒 背包</h3><p class="dim">已装备：</p><div class="statgrid">`;
 for(const slot of["weapon","armor","boots","charm"]){
 const it=S.equip[slot];
-h+=`<div>${SLOTNAME[slot]}：<b>${it?ITEMS[it.iid].name+(it.enh?` +${it.enh}`:"")+(it.expire?` <span class="dim">${expireText(it)}</span>`:""):"空"}</b></div>`;
+h+=`<div>${SLOTNAME[slot]}：<b>${it?itemNameHTML(it)+(it.enh?` +${it.enh}`:"")+(it.expire?` <span class="dim">${expireText(it)}</span>`:""):"空"}</b></div>`;
 }
 h+=`</div><button class="btn small" id="enhance">🔨 铁匠铺·强化装备</button></div><div class="card"><h3>物品</h3>`;
 if(!S.bag.length)h+=`<p class="dim">空空如也，去闯荡江湖打怪掉落吧。</p>`;
@@ -702,7 +707,7 @@ S.bag.forEach((it,i)=>{
 if(it.use){const s=SHOP.find(x=>x.id===it.use)||{name:it.name};
 h+=`<div class="mob"><div><div class="mn">${it.name}</div><div class="md">药品</div></div><button class="btn" data-use="${i}">使用</button></div>`;return;}
 const d=ITEMS[it.iid];
-h+=`<div class="mob"><div><div class="mn">${d.name}${it.enh?` <span class="gold">+${it.enh}</span>`:""}${it.expire?` <span class="dim">${expireText(it)}</span>`:""}</div>
+h+=`<div class="mob"><div><div class="mn">${d.tier>=5?godName(d.name):d.name}${it.enh?` <span class="gold">+${it.enh}</span>`:""}${it.expire?` <span class="dim">${expireText(it)}</span>`:""}</div>
 <div class="md">${SLOTNAME[d.slot]} · ${[d.atk&&"攻"+d.atk,d.def&&"防"+d.def,d.hp&&"血"+d.hp,d.spd&&"速"+d.spd,d.luck&&"🍀幸运+"+d.luck].filter(Boolean).join(" ")}</div></div>
 <button class="btn" data-eq="${i}">装备</button></div>`;
 });
@@ -728,7 +733,7 @@ $("enhance").onclick=()=>{
 const slots=Object.entries(S.equip).filter(([s,it])=>it&&it.enh<5);
 if(!slots.length){toast("没有可强化的装备（已满级或未装备）");return;}
 modal(`<h3>🔨 铁匠铺</h3>${slots.map(([s,it],i)=>{const d=ITEMS[it.iid],cost=50*(it.enh+1)*d.tier;
-return`<div class="tier"><div><div class="gold">${d.name} +${it.enh}→+${it.enh+1}</div><div class="m">花费 ${cost} 铜币</div></div><button class="btn small" style="width:auto;margin:0" data-en="${i}">强化</button></div>`;}).join("")}
+return`<div class="tier"><div><div class="gold">${d.tier>=5?godName(d.name):d.name} +${it.enh}→+${it.enh+1}</div><div class="m">花费 ${cost} 铜币</div></div><button class="btn small" style="width:auto;margin:0" data-en="${i}">强化</button></div>`;}).join("")}
 <button class="btn small" onclick="closeModal()">关闭</button>`);
 $("modalbox").querySelectorAll("[data-en]").forEach(b=>b.onclick=()=>{
 const[slot,it]=slots[+b.dataset.en],d=ITEMS[it.iid],cost=50*(it.enh+1)*d.tier;
@@ -767,12 +772,12 @@ h+=`<div class="rowbtns"><button class="btn small" id="recC">📜 广发英雄�
 if(!(S.partners||[]).length)h+=`<p class="dim">还没有伙伴，去招募一位与你并肩闯荡吧！</p>`;
 (S.partners||[]).forEach((pt,i)=>{
  const st=partnerStats(pt);
- h+=`<div class="tier"><div><div class="mn">${pt.name} <span style="color:${PARTNER_QC[pt.quality]}">${PARTNER_Q[pt.quality]}</span> <span class="dim">Lv.${pt.level}</span>${i===S.activePartner?' <span class="gold">出战中</span>':""}</div>
+ h+=`<div class="tier"><div><div class="mn">${pt.quality===4?godName(pt.name):pt.name} <span style="color:${PARTNER_QC[pt.quality]}">${PARTNER_Q[pt.quality]}</span> <span class="dim">Lv.${pt.level}</span>${i===S.activePartner?' <span class="gold">出战中</span>':""}</div>
  <div class="md">攻击${st.atk} 防御${st.def} 气血${st.hp} 速度${st.spd}${st.luck?` 幸运${st.luck}`:""} · 经验${pt.exp||0}/${40*pt.level}</div>
  <div class="md">`;
  for(const slot of["weapon","armor","boots","charm"]){
   const it=pt.equip[slot];
-  h+=`${SLOTNAME[slot]}:${it?ITEMS[it.iid].name+(it.enh?`+${it.enh}`:""):"空"}${it?`<button class="btn small" style="padding:2px 6px;font-size:11px;margin:2px" data-pun="${i}_${slot}">卸下</button>`:`<button class="btn small" style="padding:2px 6px;font-size:11px;margin:2px" data-peq="${i}_${slot}">穿戴</button>`} `;
+  h+=`${SLOTNAME[slot]}:${it?itemNameHTML(it)+(it.enh?`+${it.enh}`:""):"空"}${it?`<button class="btn small" style="padding:2px 6px;font-size:11px;margin:2px" data-pun="${i}_${slot}">卸下</button>`:`<button class="btn small" style="padding:2px 6px;font-size:11px;margin:2px" data-peq="${i}_${slot}">穿戴</button>`} `;
  }
  h+=`</div></div>${i===S.activePartner?"":`<button class="btn small" style="width:auto;margin:0" data-pfight="${i}">出战</button>`}</div>`;
 });
@@ -794,7 +799,7 @@ m.querySelectorAll("[data-peq]").forEach(b=>b.onclick=()=>{
  const items=S.bag.map((it,i)=>({it,i})).filter(x=>x.it.iid&&ITEMS[x.it.iid]&&ITEMS[x.it.iid].slot===slot&&!itemExpired(x.it));
  if(!items.length){toast("背包没有可穿戴的"+SLOTNAME[slot]);return;}
  modal(`<h3>给「${pt.name}」穿戴${SLOTNAME[slot]}</h3>`+items.map(x=>{const d=ITEMS[x.it.iid];
-  return`<div class="tier"><div><div class="gold">${d.name}${x.it.enh?` +${x.it.enh}`:""}</div><div class="md">${SLOTNAME[d.slot]} · ${[d.atk&&"攻"+d.atk,d.def&&"防"+d.def,d.hp&&"血"+d.hp,d.spd&&"速"+d.spd,d.luck&&"幸运+"+d.luck].filter(Boolean).join(" ")}</div></div><button class="btn small" style="width:auto;margin:0" data-pick="${x.i}">穿戴</button></div>`;}).join("")+`<button class="btn small" onclick="closeModal()">关闭</button>`);
+  return`<div class="tier"><div><div class="gold">${d.tier>=5?godName(d.name):d.name}${x.it.enh?` +${x.it.enh}`:""}</div><div class="md">${SLOTNAME[d.slot]} · ${[d.atk&&"攻"+d.atk,d.def&&"防"+d.def,d.hp&&"血"+d.hp,d.spd&&"速"+d.spd,d.luck&&"幸运+"+d.luck].filter(Boolean).join(" ")}</div></div><button class="btn small" style="width:auto;margin:0" data-pick="${x.i}">穿戴</button></div>`;}).join("")+`<button class="btn small" onclick="closeModal()">关闭</button>`);
  $("modalbox").querySelectorAll("[data-pick]").forEach(pb=>pb.onclick=()=>{
   const it=S.bag[+pb.dataset.pick],old=pt.equip[slot];
   pt.equip[slot]=it;S.bag.splice(+pb.dataset.pick,1);
@@ -810,7 +815,7 @@ if(!S.pets.length)h+=`<p class="dim">还没有宠物，去青竹林捕捉小灵�
 S.pets.forEach((pet,i)=>{
 const b=PETS[pet.pid];
 const atk=Math.floor(b.atk*(1+0.15*(pet.level-1))),hp=Math.floor(b.hp*(1+0.15*(pet.level-1)));
-h+=`<div class="mob"><div><div class="mn">${pet.name} <span class="ptier ${PTN[b.tier]}">${PTN[b.tier]}级</span> <span class="dim">Lv.${pet.level}</span> ${i===S.activePet?'<span class="gold">出战中</span>':""}</div>
+h+=`<div class="mob"><div><div class="mn">${b.tier===5?godName(pet.name):pet.name} <span class="ptier ${PTN[b.tier]}">${PTN[b.tier]}级</span> <span class="dim">Lv.${pet.level}</span> ${i===S.activePet?'<span class="gold">出战中</span>':""}</div>
 <div class="md">${b.desc}</div><div class="md">气血${hp} 攻击${atk} · 经验${pet.exp}/${petExpNeed(pet.level)}</div></div>
 ${i===S.activePet?"":`<button class="btn" data-pet="${i}">出战</button>`}</div>`;
 });
@@ -868,7 +873,7 @@ for(const[gid,g]of Object.entries(GONGFA)){
  }else{
   btn=`<button class="btn small primary" style="width:auto;margin:0" data-gf="${gid}"${(maxed||locked)?" disabled":""}>${maxed?"已满重":`修炼·${gfCost(lv)}铜币`}</button>`;
  }
- h+=`<div class="tier"><div><div class="gold">《${g.name}》 <span class="ptier ${g.tier}">${g.tier}级</span> <span class="dim">${lv}/${g.max}重</span></div>
+ h+=`<div class="tier"><div><div class="gold">《${g.tier==="神"?godName(g.name):g.name}》 <span class="ptier ${g.tier}">${g.tier}级</span> <span class="dim">${lv}/${g.max}重</span></div>
  <div class="m">${g.desc}</div><div class="m">每重：${per}</div>${sub}
  ${learned&&locked?`<div class="m" style="color:#e08a8a">需要 ${g.req} 级修炼</div>`:""}
  </div>${btn}</div>`;
@@ -983,7 +988,7 @@ function rPay(){
  h+=`</div><div class="card"><h3>💎 充值豪礼</h3><p class="dim">神级宠物与稀有称号只能通过充值豪礼或限时活动获得。</p>`;
  GIFTS.forEach(gf=>{
   const ok=total>=gf.need,got=(S.claimedGifts||{})[gf.id];
-  h+=`<div class="tier"><div><div class="gold">${gf.name}</div><div class="m">${gf.desc} · 累计充值满￥${gf.need}（${total}/${gf.need}）</div></div>
+  h+=`<div class="tier"><div><div class="gold">${(gf.kind==="pet"||gf.kind==="title")?godName(gf.name):gf.name}</div><div class="m">${gf.desc} · 累计充值满￥${gf.need}（${total}/${gf.need}）</div></div>
   <button class="btn small primary" style="width:auto;margin:0" data-gift="${gf.id}"${(ok&&!got)?"":" disabled"}>${got?"已领取":(ok?"领取":"未达成")}</button></div>`;
  });
  h+=`</div><div class="card"><h3>🧾 我的充值记录</h3>`;
@@ -1159,7 +1164,7 @@ function rEvent(){
  h+=`<div class="card"><h3>⏳ 限时活动</h3>
  <div class="tier"><div><div class="gold">🎑 中秋赏月</div><div class="m">限定称号 ${titleBadge("🐰中秋快乐","rt-moon")}<br>攻击+15 气血+150，可叠加</div></div>
  <button class="btn small primary" style="width:auto;margin:0" id="evtMid"${midGot?" disabled":""}>${midGot?"已领取":"领取"}</button></div>
- <div class="tier"><div><div class="gold">⚡ 神功现世</div><div class="m">累计充值满￥498 领取神级《大日焚天诀》（${total}/498）<br><span class="dim">原需👑VIP6，限时直得</span></div></div>
+ <div class="tier"><div><div class="gold">⚡ 神功现世</div><div class="m">累计充值满￥498 领取神级《<span class="godflow">大日焚天诀</span>》（${total}/498）<br><span class="dim">原需👑VIP6，限时直得</span></div></div>
  <button class="btn small primary" style="width:auto;margin:0" id="evtDarin"${canDarin?"":" disabled"}>${darinGot?"已领取":(total>=498?"领取":`差￥${498-total}`)}</button></div>
  <div class="tier"><div><div class="gold">🌟 神将降临</div><div class="m">累计充值满￥1288 领取神话伙伴×1（${total}/1288）<br><span class="dim">神话伙伴：顶级资质，助战无双</span></div></div>
  <button class="btn small primary" style="width:auto;margin:0" id="evtMythic"${canMythic?"":" disabled"}>${mythicGot?"已领取":(total>=1288?"领取":`差￥${1288-total}`)}</button></div></div>`;
