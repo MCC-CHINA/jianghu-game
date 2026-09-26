@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>江湖行 · 文字武侠</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:#141009;color:#e8dcc0;font-family:"Songti SC","STSong","SimSun",serif;font-size:15px;line-height:1.6;min-height:100vh}
+#app{max-width:520px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;background:#1a140d;box-shadow:0 0 30px rgba(0,0,0,.6)}
+#topbar{position:sticky;top:0;z-index:10;background:#241b0f;border-bottom:2px solid #8a6d2f;padding:8px 12px}
+#topbar .pname{font-size:16px;font-weight:bold;color:#f5d67b;letter-spacing:1px}
+#topbar .pname .lv{background:#8a6d2f;color:#141009;font-size:12px;padding:1px 8px;border-radius:10px;margin-left:6px;vertical-align:2px}
+.bars{margin-top:6px;display:flex;flex-direction:column;gap:4px}
+.bar{height:14px;background:#0d0a06;border:1px solid #5a4a26;border-radius:7px;overflow:hidden;position:relative;font-size:10px}
+.bar>i{display:block;height:100%;border-radius:6px;transition:width .3s}
+.bar.hp>i{background:linear-gradient(90deg,#a83232,#e05a5a)}
+.bar.mp>i{background:linear-gradient(90deg,#2f6da3,#5aa3e0)}
+.bar.exp>i{background:linear-gradient(90deg,#7a8a2f,#c3d65a)}
+.bar>span{position:absolute;left:0;right:0;top:0;text-align:center;line-height:14px;color:#fff;text-shadow:0 1px 2px #000}
+.wallet{display:flex;gap:12px;margin-top:6px;font-size:13px;color:#d8c690}
+.wallet b{color:#f5d67b}
+#main{flex:1;padding:12px 12px 76px;overflow-x:hidden}
+#tabbar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;background:#241b0f;border-top:2px solid #8a6d2f;display:flex;overflow-x:auto;z-index:10}
+#tabbar button{flex:1 0 auto;min-width:60px;background:none;border:none;color:#b09a5e;font-size:13px;padding:10px 4px;font-family:inherit;cursor:pointer;white-space:nowrap}
+#tabbar button.on{color:#f5d67b;background:#31250f;border-top:2px solid #f5d67b;margin-top:-2px}
+.card{background:#241b0f;border:1px solid #5a4a26;border-radius:8px;padding:12px;margin-bottom:12px}
+.card h3{color:#f5d67b;font-size:16px;margin-bottom:8px;letter-spacing:2px;border-bottom:1px solid #5a4a26;padding-bottom:6px}
+.btn{display:block;width:100%;background:#3a2c12;border:1px solid #8a6d2f;color:#f5d67b;font-size:15px;padding:12px;border-radius:8px;margin:8px 0;font-family:inherit;cursor:pointer;letter-spacing:2px}
+.btn:active{background:#54401a}
+.btn.primary{background:linear-gradient(180deg,#8a6d2f,#6b521f);color:#fff8e0;font-weight:bold}
+.btn.danger{border-color:#a83232;color:#e08a8a}
+.btn.small{padding:8px;font-size:13px;margin:4px 0}
+.btn:disabled{opacity:.4}
+.rowbtns{display:flex;gap:8px}
+.rowbtns .btn{flex:1}
+.mob{display:flex;justify-content:space-between;align-items:center;background:#2c2110;border:1px solid #5a4a26;border-radius:8px;padding:10px;margin:8px 0}
+.mob .mn{font-weight:bold;color:#ffe9a8}
+.mob .md{font-size:12px;color:#b09a5e}
+.mob .btn{width:auto;margin:0;padding:8px 16px;font-size:13px}
+#battlelog{background:#0d0a06;border:1px solid #5a4a26;border-radius:8px;padding:10px;height:260px;overflow-y:auto;font-size:14px;margin-bottom:10px}
+#battlelog p{margin:4px 0}
+#battlelog .me{color:#8fd694}
+#battlelog .foe{color:#e08a8a}
+#battlelog .sys{color:#f5d67b}
+#battlelog .pet{color:#8fc3e0}
+.statgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:14px}
+.statgrid div{background:#2c2110;padding:6px 10px;border-radius:6px}
+.statgrid b{color:#f5d67b;float:right}
+input[type=text]{width:100%;background:#0d0a06;border:1px solid #8a6d2f;color:#f5d67b;font-size:16px;padding:12px;border-radius:8px;font-family:inherit;margin:8px 0}
+.sect{border:1px solid #5a4a26;border-radius:8px;padding:12px;margin:8px 0;cursor:pointer;background:#2c2110}
+.sect.sel{border-color:#f5d67b;background:#3a2c12}
+.sect h4{color:#f5d67b;font-size:16px}
+.sect p{font-size:13px;color:#b09a5e}
+#modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:50;padding:20px}
+#modal.show{display:flex}
+#modal .box{background:#241b0f;border:2px solid #8a6d2f;border-radius:12px;padding:20px;max-width:400px;width:100%;max-height:80vh;overflow-y:auto}
+#modal .box h3{color:#f5d67b;text-align:center;margin-bottom:12px;letter-spacing:3px}
+.tier{border:1px solid #8a6d2f;border-radius:8px;padding:12px;margin:8px 0;display:flex;justify-content:space-between;align-items:center;background:#2c2110}
+.tier .g{color:#f5d67b;font-weight:bold;font-size:17px}
+.tier .m{color:#b09a5e;font-size:13px}
+.order{font-size:13px;border-bottom:1px dashed #5a4a26;padding:8px 0}
+.order .ok{color:#8fd694}
+.rankrow{display:flex;justify-content:space-between;padding:8px;border-bottom:1px dashed #5a4a26;font-size:14px}
+.rankrow.me{color:#f5d67b;font-weight:bold}
+.toast{position:fixed;top:40%;left:50%;transform:translate(-50%,-50%);background:rgba(20,14,8,.95);border:1px solid #f5d67b;color:#f5d67b;padding:14px 26px;border-radius:10px;font-size:16px;z-index:99;display:none;letter-spacing:2px}
+.qrcode{width:150px;height:150px;margin:12px auto;background:repeating-linear-gradient(45deg,#e8dcc0,#e8dcc0 6px,#141009 6px,#141009 12px);border:8px solid #e8dcc0;border-radius:8px}
+.paynote{text-align:center;color:#b09a5e;font-size:13px}
+.center{text-align:center}
+.gold{color:#f5d67b}
+.dim{color:#b09a5e;font-size:13px}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="topbar" style="display:none"></div>
+  <div id="main"></div>
+  <div id="tabbar" style="display:none"></div>
+</div>
+<div id="modal"><div class="box" id="modalbox"></div></div>
+<div class="toast" id="toast"></div>
+<script>
+"use strict";
+/* ============ 工具 ============ */
+const $=id=>document.getElementById(id);
+const rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+function toast(t){const e=$("toast");e.textContent=t;e.style.display="block";setTimeout(()=>e.style.display="none",1800);}
+function modal(html){$("modalbox").innerHTML=html;$("modal").classList.add("show");}
+function closeModal(){$("modal").classList.remove("show");}
+$("modal").addEventListener("click",e=>{if(e.target.id==="modal")closeModal();});
+function nowStr(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")+" "+String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")+":"+String(d.getSeconds()).padStart(2,"0");}
+</script>
+<script>
+"use strict";
+/* ============ 数值表 ============ */
+const SECTS={
+ shaolin:{name:"少林派",desc:"刚猛无俦，铜皮铁骨。擅长：防御、气血",hp:130,mp:40,atk:12,def:11,spd:6,skill:"luohan"},
+ wudang:{name:"武当派",desc:"以柔克刚，绵里藏针。擅长：内力、均衡",hp:105,mp:65,atk:13,def:8,spd:8,skill:"mianzhang"},
+ emei:{name:"峨眉派",desc:"身法灵动，出手如电。擅长：速度、暴击",hp:95,mp:55,atk:14,def:7,spd:12,skill:"emeici"},
+ gaibang:{name:"丐帮",desc:"豪气干云，掌力雄浑。擅长：攻击、爆发",hp:110,mp:45,atk:16,def:7,spd:9,skill:"dagoubang"}
+};
+const SKILLS={
+ luohan:{name:"罗汉拳",mp:8,mult:1.5,desc:"少林入门拳法，稳扎稳打"},
+ mianzhang:{name:"绵掌",mp:10,mult:1.6,desc:"看似轻柔，内劲绵长"},
+ emeici:{name:"峨眉刺法",mp:9,mult:1.6,desc:"快如闪电，连刺三下"},
+ dagoubang:{name:"打狗棒法",mp:10,mult:1.7,desc:"丐帮绝技，专打恶犬"},
+ jingang:{name:"大力金刚掌",mp:22,mult:2.6,desc:"少林七十二绝技之一，开碑裂石",sect:"shaolin",cost:500,lv:8},
+ taiji:{name:"太极剑法",mp:20,mult:2.5,desc:"以静制动，后发先至",sect:"wudang",cost:500,lv:8},
+ jinding:{name:"金顶绵掌",mp:20,mult:2.5,desc:"峨眉绝学，掌风如绵似针",sect:"emei",cost:500,lv:8},
+ xianglong:{name:"降龙十八掌",mp:25,mult:2.9,desc:"天下第一刚猛掌法，见龙在田",sect:"gaibang",cost:800,lv:10}
+};
+const ITEMS={ // iid: {name,slot,atk,def,hp,spd,tier}
+ w1:{name:"桃木剑",slot:"weapon",atk:5,tier:1},w2:{name:"精钢长剑",slot:"weapon",atk:12,tier:2},
+ w3:{name:"寒铁宝刀",slot:"weapon",atk:22,tier:3},w4:{name:"龙泉宝剑",slot:"weapon",atk:36,tier:4},
+ a1:{name:"粗布衣",slot:"armor",def:4,hp:20,tier:1},a2:{name:"镖师劲装",slot:"armor",def:9,hp:50,tier:2},
+ a3:{name:"软猬甲",slot:"armor",def:16,hp:100,tier:3},a4:{name:"金丝宝甲",slot:"armor",def:26,hp:180,tier:4},
+ b1:{name:"草鞋",slot:"boots",spd:2,def:1,tier:1},b2:{name:"快靴",slot:"boots",spd:4,def:2,tier:2},
+ b3:{name:"踏云靴",slot:"boots",spd:7,def:4,tier:3},b4:{name:"追风履",slot:"boots",spd:11,def:6,tier:4},
+ c1:{name:"铜戒指",slot:"charm",atk:2,hp:15,tier:1},c2:{name:"玉佩",slot:"charm",atk:4,def:2,hp:40,tier:2},
+ c3:{name:"灵珠",slot:"charm",atk:7,def:4,hp:80,tier:3},c4:{name:"龙纹佩",slot:"charm",atk:12,def:7,hp:140,tier:4}
+};
+const SLOTNAME={weapon:"武器",armor:"护甲",boots:"鞋子",charm:"饰品"};
+const PETS={ // pid: {name,hp,atk,def,spd,desc}
+ linghou:{name:"小灵猴",hp:60,atk:10,def:5,spd:12,desc:"青竹林的机灵小猴，动作敏捷"},
+ tiedog:{name:"铁背犬",hp:110,atk:16,def:10,spd:8,desc:"黑风寨驯养的獒犬，忠心护主"},
+ youmingzhu:{name:"幽冥蛛",hp:150,atk:24,def:14,spd:10,desc:"幽冥谷的毒蛛，獠牙淬毒"},
+ xuediao:{name:"雪雕",hp:200,atk:34,def:18,spd:16,desc:"华山之巅的雪雕，翱翔九天"}
+};
+function mkMonster(name,lv,catchPet,boss){return{name,lv,catchPet:catchPet||null,boss:!!boss,
+ hp:Math.floor(45+lv*24),atk:Math.floor(8+lv*2.3),def:Math.floor(4+lv*1.3),spd:Math.floor(5+lv*0.9),
+ exp:Math.floor(22+lv*13),coins:rnd(10+lv*5,16+lv*8)};}
+const ZONES=[
+ {name:"青竹林",req:1,desc:"新手历练之地，竹影婆娑",tier:1,
+  mobs:[()=>mkMonster("野猴",1,"linghou"),()=>mkMonster("青竹蛇",2,"linghou"),()=>mkMonster("山贼喽啰",3),()=>mkMonster("小头目·赵虎",5,null,true)]},
+ {name:"黑风寨",req:6,desc:"贼寇盘踞的山寨，危机四伏",tier:2,
+  mobs:[()=>mkMonster("寨丁",6,"tiedog"),()=>mkMonster("巡山刀客",7,"tiedog"),()=>mkMonster("黑风双煞",9),()=>mkMonster("寨主·黑风虎",11,null,true)]},
+ {name:"幽冥谷",req:12,desc:"瘴气弥漫的险谷，毒物横行",tier:3,
+  mobs:[()=>mkMonster("毒蛛",12,"youmingzhu"),()=>mkMonster("尸煞",13,"youmingzhu"),()=>mkMonster("谷主亲卫",15),()=>mkMonster("谷主·幽冥老怪",17,null,true)]},
+ {name:"华山之巅",req:18,desc:"武林圣地，高手如云",tier:4,
+  mobs:[()=>mkMonster("各派弟子",18,"xuediao"),()=>mkMonster("武林长老",20,"xuediao"),()=>mkMonster("退隐高手",21),()=>mkMonster("武林盟主",23,null,true)]}
+];
+const SHOP=[
+ {id:"jinchuang",name:"金疮药",price:50,desc:"恢复150点气血",use:"hp150"},
+ {id:"dahuan",name:"大还丹",price:150,desc:"恢复450点气血",use:"hp450"},
+ {id:"neili",name:"内力丹",price:80,desc:"恢复全部内力",use:"mpfull"}
+];
+const TIERS=[
+ {money:6,gold:60,bonus:""},
+ {money:30,gold:330,bonus:"多送10%"},
+ {money:98,gold:1080,bonus:"多送15%"},
+ {money:198,gold:2280,bonus:"多送20%"}
+];
+const RANKS=[{name:"武林神话·叶孤鸿",zl:99999},{name:"剑圣·西门飘雪",zl:52000},{name:"魔教教主·任逍遥",zl:38000},{name:"丐帮帮主·洪七",zl:26000},{name:"武当掌门·张真人",zl:18000},{name:"峨眉掌门·灭绝师太",zl:12000},{name:"少林方丈·玄慈",zl:9000},{name:"黑风寨主·黑风虎",zl:5000},{name:"采花大盗·田伯光",zl:2800},{name:"江南大侠·江别鹤",zl:1500}];
+</script>
+<script>
+"use strict";
+/* ============ 存档 ============ */
+const SAVE_KEY="jhx_save_v1";
+let S=null, TAB="home", B=null;
+function save(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(S));}catch(e){}}
+function load(){try{const t=localStorage.getItem(SAVE_KEY);return t?JSON.parse(t):null;}catch(e){return null;}}
+function expNeed(lv){return Math.floor(80*Math.pow(lv,1.6));}
+function petExpNeed(lv){return 40*lv;}
+function calcStats(){
+ const p=S.player;
+ p.maxhp=p.base.maxhp+(p.level-1)*18; p.maxmp=p.base.maxmp+(p.level-1)*8;
+ p.atk=p.base.atk+(p.level-1)*3; p.def=p.base.def+(p.level-1)*2; p.spd=p.base.spd+(p.level-1)*1;
+ for(const slot of["weapon","armor","boots","charm"]){
+  const it=S.equip[slot]; if(!it)continue; const d=ITEMS[it.iid],e=it.enh||0;
+  p.atk+=d.atk||0; p.def+=d.def||0; p.hp0=(p.hp0||0); p.spd+=d.spd||0;
+  if(d.hp)p.maxhp+=d.hp;
+  if(slot==="weapon")p.atk+=e*2; if(slot==="armor")p.def+=e*2;
+  if(slot==="boots")p.spd+=e*1; if(slot==="charm"){p.maxhp+=e*15;}
+ }
+ p.hp=Math.min(p.hp,p.maxhp); p.mp=Math.min(p.mp,p.maxmp);
+}
+function zhanli(){
+ const p=S.player;let z=p.atk*3+p.def*2+p.maxhp*0.5+p.spd*2;
+ const pet=S.pets[S.activePet]; if(pet){const b=PETS[pet.pid];z+=(b.atk*(1+0.15*(pet.level-1)))*2;}
+ return Math.floor(z);
+}
+function newGame(name,sectKey){
+ const sc=SECTS[sectKey];
+ S={player:{name,sect:sectKey,level:1,exp:0,hp:sc.hp,mp:sc.mp,coins:100,gold:0,
+   stamina:50,maxStamina:50,skills:[sc.skill],task:null,taskDone:false,
+   base:{maxhp:sc.hp,maxmp:sc.mp,atk:sc.atk,def:sc.def,spd:sc.spd}},
+  equip:{weapon:null,armor:null,boots:null,charm:null},bag:[],pets:[],activePet:-1,
+  orders:[],zone:0,created:nowStr()};
+ calcStats();S.player.hp=S.player.maxhp;S.player.mp=S.player.maxmp;save();
+}
+/* ============ 顶栏/导航 ============ */
+function renderTop(){
+ const p=S.player,t=$("topbar");t.style.display="block";
+ t.innerHTML=`<div class="pname">${p.name}<span class="lv">Lv.${p.level} ${SECTS[p.sect].name}</span></div>
+ <div class="bars">
+  <div class="bar hp"><i style="width:${p.hp/p.maxhp*100}%"></i><span>气血 ${p.hp}/${p.maxhp}</span></div>
+  <div class="bar mp"><i style="width:${p.mp/p.maxmp*100}%"></i><span>内力 ${p.mp}/${p.maxmp}</span></div>
+  <div class="bar exp"><i style="width:${p.exp/expNeed(p.level)*100}%"></i><span>修为 ${p.exp}/${expNeed(p.level)}</span></div>
+ </div>
+ <div class="wallet"><span>🪙铜币 <b>${p.coins}</b></span><span>💰元宝 <b>${p.gold}</b></span><span>⚡体力 <b>${p.stamina}/${p.maxStamina}</b></span><span>⚔️战力 <b>${zhanli()}</b></span></div>`;
+}
+const TABS=[["home","🏠<br>江湖"],["bag","🎒<br>背包"],["pet","🦊<br>宠物"],["sect","🥋<br>门派"],["shop","🏪<br>商店"],["gold","💎<br>商城"],["pay","💰<br>充值"],["rank","🏆<br>排行"],["more","⚙️<br>更多"]];
+function renderTabs(){
+ const t=$("tabbar");t.style.display="flex";
+ t.innerHTML=TABS.map(([k,n])=>`<button class="${TAB===k?'on':''}" data-t="${k}">${n}</button>`).join("");
+ t.querySelectorAll("button").forEach(b=>b.onclick=()=>{TAB=b.dataset.t;B=null;render();});
+}
+function render(){renderTop();renderTabs();
+ ({home:rHome,bag:rBag,pet:rPet,sect:rSect,shop:rShop,gold:rGold,pay:rPay,rank:rRank,more:rMore}[TAB])();}
+/* ============ 创建角色 ============ */
+let selSect="shaolin";
+function rCreate(){
+ $("topbar").style.display="none";$("tabbar").style.display="none";
+ const m=$("main");
+ m.innerHTML=`<div class="card"><h3>🗡️ 初入江湖</h3>
+ <p class="dim">欢迎来到文字武侠世界。取一个响亮的名号，选择你的门派，开始闯荡江湖吧！</p>
+ <input type="text" id="cname" maxlength="8" placeholder="输入你的名字（最多8字）">
+ ${Object.entries(SECTS).map(([k,v])=>`<div class="sect ${k===selSect?'sel':''}" data-s="${k}"><h4>${v.name}</h4><p>${v.desc}</p><p class="dim">初始武功：${SKILLS[v.skill].name}</p></div>`).join("")}
+ <button class="btn primary" id="gobtn">踏 入 江 湖</button></div>`;
+ m.querySelectorAll(".sect").forEach(d=>d.onclick=()=>{selSect=d.dataset.s;rCreate();});
+ $("gobtn").onclick=()=>{
+  const n=$("cname").value.trim();
+  if(!n){toast("请先输入名字");return;}
+  newGame(n,selSect);TAB="home";render();toast("欢迎来到江湖，"+n+"！");
+ };
+}
+/* ============ 江湖（主界面/战斗）=========== */
+function rHome(){
+ const m=$("main"),p=S.player;
+ if(B){rBattle();return;}
+ let h=`<div class="card"><h3>🗺️ 闯荡江湖</h3><p class="dim">选择区域，挑战其中的江湖人物。每次挑战消耗5点体力。</p>`;
+ ZONES.forEach((z,i)=>{
+  const lock=p.level<z.req;
+  h+=`<div class="mob"><div><div class="mn">${z.name} ${lock?'🔒':''}</div><div class="md">${z.desc} · 建议${z.req}级+</div></div>
+  <button class="btn" ${lock?'disabled':''} data-z="${i}">${lock?z.req+'级':"前往"}</button></div>`;
+ });
+ h+=`<button class="btn small" id="dazuo">🧘 打坐调息（+10体力）</button>
+ <p class="dim">师门任务：${p.task?("已接取：击败"+p.task.need+"个敌人（"+p.task.done+"/"+p.task.need+"）"+(p.taskDone?" ✅可领奖":"")):"未接取，去门派接取"}</p></div>`;
+ m.innerHTML=h;
+ m.querySelectorAll("[data-z]").forEach(b=>b.onclick=()=>rZone(+b.dataset.z));
+ $("dazuo").onclick=()=>{
+  const now=Date.now();
+  if(S.dazuoCD&&now-S.dazuoCD<60000){toast("调息中…"+Math.ceil((60000-(now-S.dazuoCD))/1000)+"秒");return;}
+  S.dazuoCD=now;p.stamina=Math.min(p.maxStamina,p.stamina+10);save();render();toast("体力恢复了！");
+ };
+}
+function rZone(zi){
+ const m=$("main"),z=ZONES[zi],p=S.player;
+ let h=`<div class="card"><h3>${z.name}</h3><p class="dim">${z.desc}</p>`;
+ z.mobs.forEach((fn,i)=>{
+  const mo=fn();
+  h+=`<div class="mob"><div><div class="mn">${mo.boss?'👹':''}${mo.name} <span class="dim">Lv.${mo.lv}</span></div>
+  <div class="md">${mo.catchPet?("可捕捉："+PETS[mo.catchPet].name+" · "):""}气血${mo.hp} 攻击${mo.atk}</div></div>
+  <button class="btn" data-m="${i}">挑战</button></div>`;
+ });
+ h+=`<button class="btn small" id="back">← 返回</button></div>`;
+ m.innerHTML=h;
+ m.querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>startBattle(zi,+b.dataset.m));
+ $("back").onclick=()=>render();
+}
+</script>
+<script>
+"use strict";
+/* ============ 战斗 ============ */
+function startBattle(zi,mi){
+const p=S.player;
+if(p.stamina<5){toast("体力不足，去打坐或商城买体力丹");return;}
+p.stamina-=5;
+const mo=ZONES[zi].mobs[mi]();
+B={zi,mi,foe:{...mo,maxhp:mo.hp},log:[],over:false};
+log(`<span class="sys">你在${ZONES[zi].name}遭遇了！</span>`);
+save();rBattle();
+}
+function log(t){B.log.push(t);}
+function dmgCalc(atk,def,mult){
+let d=Math.max(1,(atk*(mult||1.6)-def*0.8))* (0.9+Math.random()*0.2);
+const crit=Math.random()<0.15; if(crit)d*=1.6;
+return{h:Math.floor(d),crit};
+}
+function foeTurn(){
+const f=B.foe,p=S.player;
+if(f.hp<=0||B.over)return;
+const d=dmgCalc(f.atk,p.def,1.5);
+p.hp=Math.max(0,p.hp-d.h);
+log(`<span class="foe">${f.name}攻来，造成 ${d.h} 点伤害${d.crit?"（暴击！）":""}</span>`);
+if(p.hp<=0){endBattle(false);return;}
+petTurn();
+}
+function petTurn(){
+const pet=S.pets[S.activePet];
+if(!pet||B.over)return;
+const b=PETS[pet.pid],f=B.foe;
+const pa=Math.floor(b.atk*(1+0.15*(pet.level-1)));
+const d=Math.max(1,Math.floor(pa*1.2-f.def*0.5));
+f.hp=Math.max(0,f.hp-d);
+log(`<span class="pet">协助攻击，造成 ${d} 点伤害</span>`);
+if(f.hp<=0)endBattle(true);
+}
+function gainExp(n){
+const p=S.player;p.exp+=n;
+let ups=0;
+while(p.exp>=expNeed(p.level)){p.exp-=expNeed(p.level);p.level++;ups++;}
+if(ups>0){calcStats();p.hp=p.maxhp;p.mp=p.maxmp;log(`<span class="sys">🎉 升级了！当前 ${p.level} 级，气血内力回满！</span>`);}
+}
+function gainPetExp(n){
+const pet=S.pets[S.activePet];if(!pet)return;
+pet.exp+=n;
+while(pet.exp>=petExpNeed(pet.level)){pet.exp-=petExpNeed(pet.level);pet.level++;}
+}
+function endBattle(win){
+B.over=true;const p=S.player,f=B.foe;
+if(win){
+log(`<span class="sys">⚔️ 战胜了！获得修为 ${f.exp}、铜币 ${f.coins}</span>`);
+gainExp(f.exp);p.coins+=f.coins;gainPetExp(Math.floor(f.exp/2));
+// 掉落
+const tier=ZONES[B.zi].tier;
+const pool=Object.keys(ITEMS).filter(k=>ITEMS[k].tier===tier);
+if(f.boss||Math.random()<0.3){
+const iid=pick(pool);
+S.bag.push({iid,enh:0});
+log(`<span class="sys">🎁 获得了！</span>`);
+}
+if(p.task&&!p.taskDone){p.task.done++;if(p.task.done>=p.task.need){p.taskDone=true;log(`<span class="sys">📜 师门任务完成，可回门派领奖！</span>`);}}
+}else{
+log(`<span class="sys">你败下阵来，被好心人救回，气血恢复…</span>`);
+p.hp=1;
+}
+calcStats();save();
+}
+function rBattle(){
+const m=$("main"),p=S.player,f=B.foe;
+let h=`<div class="card"><h3>⚔️ ${f.name} ${f.boss?"👹":""} <span class="dim">Lv.${f.lv}</span></h3>
+<div class="bar hp"><i style="width:${f.hp/f.maxhp*100}%"></i><span>${f.hp}/${f.maxhp}</span></div>
+<div id="battlelog">${B.log.map(t=>`<p>${t}</p>`).join("")}</div>`;
+if(B.over){
+h+=`<button class="btn primary" id="bback">继续闯荡</button></div>`;
+}else{
+h+=`<div class="rowbtns"><button class="btn" id="a_atk">普通攻击</button><button class="btn" id="a_med">吃药</button></div>
+<div class="rowbtns">${p.skills.map(s=>`<button class="btn small" data-sk="${s}">${SKILLS[s].name}(${SKILLS[s].mp}内)</button>`).join("")}</div>
+<div class="rowbtns">${f.catchPet?`<button class="btn small" id="a_cap">🪤 捕捉</button>`:""}<button class="btn small danger" id="a_flee">逃跑</button></div></div>`;
+}
+m.innerHTML=h;
+const bl=$("battlelog");bl.scrollTop=bl.scrollHeight;
+if(B.over){$("bback").onclick=()=>{B=null;TAB="home";render();};return;}
+$("a_atk").onclick=()=>doAtk(null);
+m.querySelectorAll("[data-sk]").forEach(b=>b.onclick=()=>doAtk(b.dataset.sk));
+$("a_med").onclick=()=>{
+const med=S.bag.find(x=>x.use);
+if(!med){toast("背包里没有药品，去商店买");return;}
+if(med.use==="hp150")p.hp=Math.min(p.maxhp,p.hp+150);
+if(med.use==="hp450")p.hp=Math.min(p.maxhp,p.hp+450);
+if(med.use==="mpfull")p.mp=p.maxmp;
+S.bag.splice(S.bag.indexOf(med),1);
+log(`<span class="me">你服下了</span>`);
+afterPlayer();};
+const cap=$("a_cap");if(cap)cap.onclick=doCapture;
+$("a_flee").onclick=()=>{
+if(Math.random()<0.7){log(`<span class="sys">你成功逃脱了。</span>`);B.over=true;p.hp=Math.max(1,p.hp);save();rBattle();}
+else{log(`<span class="foe">逃跑失败！</span>`);foeTurn();save();rBattle();}
+};
+}
+function doAtk(skId){
+const p=S.player,f=B.foe;
+if(skId){
+const sk=SKILLS[skId];
+if(p.mp<sk.mp){toast("内力不足");return;}
+p.mp-=sk.mp;
+const d=dmgCalc(p.atk,f.def,sk.mult);
+f.hp=Math.max(0,f.hp-d.h);
+log(`<span class="me">你使出，造成 ${d.h} 点伤害${d.crit?"（暴击！）":""}</span>`);
+}else{
+const d=dmgCalc(p.atk,f.def,1.6);
+f.hp=Math.max(0,f.hp-d.h);
+log(`<span class="me">你挥剑斩去，造成 ${d.h} 点伤害${d.crit?"（暴击！）":""}</span>`);
+}
+if(f.hp<=0){endBattle(true);}else{foeTurn();}
+save();rBattle();
+}
+function afterPlayer(){const f=B.foe;if(f.hp<=0){endBattle(true);}else{foeTurn();}save();rBattle();}
+function doCapture(){
+const f=B.foe;
+if(f.hp>f.maxhp*0.3){toast("先把它打到30%以下血量再捕捉");return;}
+if(Math.random()<0.6){
+const pid=f.catchPet,b=PETS[pid];
+S.pets.push({pid,name:b.name,level:f.lv,exp:0});
+if(S.activePet===-1)S.activePet=0;
+log(`<span class="sys">🎉 捕捉成功！加入了你的队伍！</span>`);
+B.over=true;save();rBattle();
+}else{log(`<span class="foe">捕捉失败，它挣脱了！</span>`);foeTurn();save();rBattle();}
+}
+</script>
+<script>
+"use strict";
+/* ============ 背包/装备 ============ */
+function rBag(){
+const m=$("main"),p=S.player;
+let h=`<div class="card"><h3>🎒 背包</h3><p class="dim">已装备：</p><div class="statgrid">`;
+for(const slot of["weapon","armor","boots","charm"]){
+const it=S.equip[slot];
+h+=`<div>${SLOTNAME[slot]}：<b>${it?ITEMS[it.iid].name+(it.enh?` +${it.enh}`:""):"空"}</b></div>`;
+}
+h+=`</div><button class="btn small" id="enhance">🔨 铁匠铺·强化装备</button></div><div class="card"><h3>物品</h3>`;
+if(!S.bag.length)h+=`<p class="dim">空空如也，去闯荡江湖打怪掉落吧。</p>`;
+S.bag.forEach((it,i)=>{
+if(it.use){const s=SHOP.find(x=>x.id===it.use)||{name:it.name};
+h+=`<div class="mob"><div><div class="mn">${it.name}</div><div class="md">药品</div></div><button class="btn" data-use="${i}">使用</button></div>`;return;}
+const d=ITEMS[it.iid];
+h+=`<div class="mob"><div><div class="mn">${d.name}${it.enh?` <span class="gold">+${it.enh}</span>`:""}</div>
+<div class="md">${SLOTNAME[d.slot]} · ${[d.atk&&"攻"+d.atk,d.def&&"防"+d.def,d.hp&&"血"+d.hp,d.spd&&"速"+d.spd].filter(Boolean).join(" ")}</div></div>
+<button class="btn" data-eq="${i}">装备</button></div>`;
+});
+h+=`</div>`;m.innerHTML=h;
+m.querySelectorAll("[data-eq]").forEach(b=>b.onclick=()=>{
+const it=S.bag[+b.dataset.eq],d=ITEMS[it.iid],old=S.equip[d.slot];
+S.equip[d.slot]=it;S.bag.splice(+b.dataset.eq,1);
+if(old)S.bag.push(old);
+calcStats();save();render();toast("装备了");
+});
+m.querySelectorAll("[data-use]").forEach(b=>b.onclick=()=>{
+const it=S.bag[+b.dataset.use];S.bag.splice(+b.dataset.use,1);
+if(it.use==="hp150")p.hp=Math.min(p.maxhp,p.hp+150);
+if(it.use==="hp450")p.hp=Math.min(p.maxhp,p.hp+450);
+if(it.use==="mpfull")p.mp=p.maxmp;
+calcStats();save();render();toast("使用了");
+});
+$("enhance").onclick=()=>{
+const slots=Object.entries(S.equip).filter(([s,it])=>it&&it.enh<5);
+if(!slots.length){toast("没有可强化的装备（已满级或未装备）");return;}
+modal(`<h3>🔨 铁匠铺</h3>${slots.map(([s,it],i)=>{const d=ITEMS[it.iid],cost=50*(it.enh+1)*d.tier;
+return`<div class="tier"><div><div class="gold">${d.name} +${it.enh}→+${it.enh+1}</div><div class="m">花费 ${cost} 铜币</div></div><button class="btn small" style="width:auto;margin:0" data-en="${i}">强化</button></div>`;}).join("")}
+<button class="btn small" onclick="closeModal()">关闭</button>`);
+$("modalbox").querySelectorAll("[data-en]").forEach(b=>b.onclick=()=>{
+const[slot,it]=slots[+b.dataset.en],d=ITEMS[it.iid],cost=50*(it.enh+1)*d.tier;
+if(S.player.coins<cost){toast("铜币不足");return;}
+S.player.coins-=cost;it.enh++;calcStats();save();closeModal();render();toast("强化成功！");
+});
+};
+}
+/* ============ 宠物 ============ */
+function rPet(){
+const m=$("main");
+let h=`<div class="card"><h3>🦊 我的宠物</h3><p class="dim">野外把怪物打到30%血以下可捕捉。出战宠物会在战斗中协助攻击。</p>`;
+if(!S.pets.length)h+=`<p class="dim">还没有宠物，去青竹林捕捉小灵猴吧！</p>`;
+S.pets.forEach((pet,i)=>{
+const b=PETS[pet.pid];
+const atk=Math.floor(b.atk*(1+0.15*(pet.level-1))),hp=Math.floor(b.hp*(1+0.15*(pet.level-1)));
+h+=`<div class="mob"><div><div class="mn">${pet.name} <span class="dim">Lv.${pet.level}</span> ${i===S.activePet?'<span class="gold"></span>':""}</div>
+<div class="md">${b.desc}</div><div class="md">气血${hp} 攻击${atk} · 经验${pet.exp}/${petExpNeed(pet.level)}</div></div>
+${i===S.activePet?"":`<button class="btn" data-pet="${i}">出战</button>`}</div>`;
+});
+h+=`</div>`;m.innerHTML=h;
+m.querySelectorAll("[data-pet]").forEach(b=>b.onclick=()=>{S.activePet=+b.dataset.pet;save();render();toast("宠物出战！");});
+}
+/* ============ 门派 ============ */
+function rSect(){
+const m=$("main"),p=S.player,sc=SECTS[p.sect];
+let h=`<div class="card"><h3>🥋 ${sc.name}</h3><p class="dim">${sc.desc}</p><p>已学武功：${p.skills.map(s=>SKILLS[s].name).join("、")}</p>`;
+Object.entries(SKILLS).forEach(([id,sk])=>{
+if(sk.sect!==p.sect||p.skills.includes(id))return;
+const can=p.level>=sk.lv&&p.coins>=sk.cost;
+h+=`<div class="tier"><div><div class="gold">${sk.name}</div><div class="m">${sk.desc} · 需${sk.lv}级 ${sk.cost}铜币</div></div>
+<button class="btn small" style="width:auto;margin:0" ${can?"":"disabled"} data-sk="${id}">${can?"学习":"未达标"}</button></div>`;
+});
+h+=`</div><div class="card"><h3>📜 师门任务</h3>`;
+if(!p.task){h+=`<p class="dim">掌门有任务交给你：击败10个敌人，奖励300铜币+200修为。</p><button class="btn" id="taskget">接取任务</button>`;}
+else if(p.taskDone){h+=`<p>任务完成！</p><button class="btn primary" id="taskdone">领取奖励</button>`;}
+else{h+=`<p>进行中：击败敌人 ${p.task.done}/${p.task.need}</p>`;}
+h+=`</div>`;m.innerHTML=h;
+m.querySelectorAll("[data-sk]").forEach(b=>b.onclick=()=>{
+const sk=SKILLS[b.dataset.sk];p.coins-=sk.cost;p.skills.push(b.dataset.sk);
+save();render();toast("学会了！");
+});
+const tg=$("taskget");if(tg)tg.onclick=()=>{p.task={need:10,done:0};p.taskDone=false;save();render();};
+const td=$("taskdone");if(td)td.onclick=()=>{p.coins+=300;gainExpSilent(200);p.task=null;p.taskDone=false;save();render();toast("领取了任务奖励！");};
+}
+function gainExpSilent(n){const p=S.player;p.exp+=n;while(p.exp>=expNeed(p.level)){p.exp-=expNeed(p.level);p.level++;}calcStats();}
+/* ============ 商店 ============ */
+function rShop(){
+const m=$("main"),p=S.player;
+let h=`<div class="card"><h3>🏪 江湖药铺</h3><p class="dim">你有铜币 ${p.coins}</p>`;
+SHOP.forEach(s=>{
+h+=`<div class="tier"><div><div class="gold">${s.name}</div><div class="m">${s.desc} · ${s.price}铜币</div></div>
+<button class="btn small" style="width:auto;margin:0" data-buy="${s.id}">购买</button></div>`;
+});
+h+=`</div>`;m.innerHTML=h;
+m.querySelectorAll("[data-buy]").forEach(b=>b.onclick=()=>{
+const s=SHOP.find(x=>x.id===b.dataset.buy);
+if(p.coins<s.price){toast("铜币不足");return;}
+p.coins-=s.price;S.bag.push({name:s.name,use:s.id});save();render();toast("购买了");
+});
+}
+/* ============ 元宝商城 ============ */
+function rGold(){
+const m=$("main"),p=S.player;
+const tier=Math.min(4,Math.floor(p.level/6)+1);
+let h=`<div class="card"><h3>💎 元宝商城</h3><p class="dim">你有元宝 <b class="gold">${p.gold}</b> · 没元宝？去充值！</p>
+<div class="tier"><div><div class="gold">体力丹</div><div class="m">+30体力 · 10元宝</div></div><button class="btn small" style="width:auto;margin:0" data-g="tili">购买</button></div>
+<div class="tier"><div><div class="gold">灵兽蛋</div><div class="m">随机开出当前区域宠物 · 88元宝</div></div><button class="btn small" style="width:auto;margin:0" data-g="egg">购买</button></div>
+<div class="tier"><div><div class="gold">神兵宝箱</div><div class="m">随机开出${tier}阶武器 · 68元宝</div></div><button class="btn small" style="width:auto;margin:0" data-g="box">购买</button></div>
+</div>`;m.innerHTML=h;
+m.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>{
+const k=b.dataset.g;
+if(k==="tili"&&p.gold>=10){p.gold-=10;p.stamina=Math.min(p.maxStamina,p.stamina+30);toast("体力+30！");}
+else if(k==="egg"&&p.gold>=88){p.gold-=88;const pool=Object.keys(PETS).slice(0,tier);const pid=pick(pool);
+S.pets.push({pid,name:PETS[pid].name,level:p.level,exp:0});if(S.activePet===-1)S.activePet=0;toast("开出了！");}
+else if(k==="box"&&p.gold>=68){p.gold-=68;const pool=Object.keys(ITEMS).filter(x=>ITEMS[x].slot==="weapon"&&ITEMS[x].tier===tier);
+const iid=pick(pool);S.bag.push({iid,enh:0});toast("开出了！");}
+else{toast("元宝不足，请充值");return;}
+save();render();
+});
+}
+</script>
+<script>
+"use strict";
+/* ============ 模拟充值 ============ */
+function rPay(){
+ const m=$("main"),p=S.player;
+ let h=`<div class="card"><h3>💰 充值元宝</h3>
+ <p class="dim">⚠️ 原型演示：模拟支付流程，不产生真实扣款。正式版将接入微信/支付宝。</p>
+ <p>当前元宝：<b class="gold">${p.gold}</b></p>`;
+ TIERS.forEach((t,i)=>{
+  h+=`<div class="tier"><div><div class="gold">${t.gold} 元宝 ${t.bonus?`<span class="dim">${t.bonus}</span>`:""}</div><div class="m">￥${t.money}</div></div>
+  <button class="btn small primary" style="width:auto;margin:0" data-tier="${i}">充值</button></div>`;
+ });
+ h+=`</div><div class="card"><h3>🧾 我的充值记录</h3>`;
+ if(!S.orders.length)h+=`<p class="dim">暂无充值记录</p>`;
+ [...S.orders].reverse().forEach(o=>{
+  h+=`<div class="order"><span class="ok">✅</span> ${o.time} · ￥${o.money} → ${o.gold}元宝 <span class="dim">#${o.id}</span></div>`;
+ });
+ h+=`</div>`;m.innerHTML=h;
+ m.querySelectorAll("[data-tier]").forEach(b=>b.onclick=()=>payModal(+b.dataset.tier));
+}
+function payModal(i){
+ const t=TIERS[i],oid="T"+Date.now().toString().slice(-8);
+ modal(`<h3>模拟收银台</h3>
+ <p class="center">订单 <b class="gold">#${oid}</b></p>
+ <p class="center" style="font-size:22px;margin:8px 0">￥${t.money} → <b class="gold">${t.gold}元宝</b></p>
+ <div class="qrcode"></div>
+ <p class="paynote">原型演示：假装这里有个付款码 😄<br>点击下方按钮模拟"支付成功"</p>
+ <div class="rowbtns"><button class="btn primary" id="payok">我已付款</button><button class="btn" id="paycancel">取消</button></div>`);
+ $("payok").onclick=()=>{
+  $("payok").disabled=true;$("payok").textContent="支付处理中…";
+  setTimeout(()=>{
+   S.player.gold+=t.gold;
+   S.orders.push({id:oid,money:t.money,gold:t.gold,time:nowStr(),status:"已到账"});
+   save();closeModal();render();toast(`🎉 充值成功！元宝+${t.gold}`);
+  },1200);
+ };
+ $("paycancel").onclick=closeModal;
+}
+/* ============ 排行 ============ */
+function rRank(){
+ const m=$("main"),zl=zhanli(),p=S.player;
+ const all=[...RANKS.map(r=>({...r})),{name:p.name+"（我）",zl,me:true}].sort((a,b)=>b.zl-a.zl);
+ m.innerHTML=`<div class="card"><h3>🏆 武林战力榜</h3><p class="dim">我的战力：<b class="gold">${zl}</b> · 第 ${all.findIndex(r=>r.me)+1} 名</p>`+
+ all.map((r,i)=>`<div class="rankrow ${r.me?'me':''}"><span>${i+1}. ${r.name}</span><span>${r.zl}</span></div>`).join("")+`</div>`;
+}
+/* ============ 更多：GM后台/帮助/存档 ============ */
+function rMore(){
+ const m=$("main"),p=S.player;
+ const total=S.orders.reduce((a,o)=>a+o.money,0);
+ m.innerHTML=`<div class="card"><h3>📊 GM 后台（店主视角）</h3>
+ <div class="statgrid"><div>累计充值笔数<b>${S.orders.length}</b></div><div>累计充值金额<b>￥${total}</b></div>
+ <div>发放元宝总数<b>${S.orders.reduce((a,o)=>a+o.gold,0)}</b></div><div>建号时间<b style="font-size:11px">${S.created}</b></div></div>
+ <p class="dim" style="margin-top:8px">正式版这里会显示所有玩家的订单，并支持订单查询、补发、封号等管理功能。</p></div>
+ <div class="card"><h3>❓ 玩法说明</h3><p class="dim">
+ · 去「江湖」挑战敌人，升级变强<br>· 怪物掉装备，去「背包」穿戴、铁匠铺强化<br>
+ · 野怪打到30%血可捕捉为宠物，宠物会帮你打架<br>
+ · 「门派」学高级武功、做师门任务<br>
+ · 体力不够就打坐，或去商城买体力丹<br>
+ · 「充值」是模拟的，不花真钱，随便点！</p></div>
+ <div class="card"><h3>💾 存档</h3>
+ <button class="btn small" id="resave">手动保存</button>
+ <button class="btn small danger" id="reset">删号重来（清空存档）</button></div>`;
+ $("resave").onclick=()=>{save();toast("已保存");};
+ $("reset").onclick=()=>{
+  if(confirm("确定删除存档、重新开始吗？")){localStorage.removeItem(SAVE_KEY);location.reload();}
+ };
+}
+/* ============ 启动 ============ */
+(function init(){
+ S=load();
+ if(S&&S.player){calcStats();TAB="home";render();}
+ else{rCreate();}
+ setInterval(()=>{ // 每60秒回1点体力
+  if(S&&S.player&&S.player.stamina<S.player.maxStamina){S.player.stamina++;save();if(TAB==="home"&&!B)renderTop();}
+ },60000);
+})();
+</script>
+</body>
+</html>
