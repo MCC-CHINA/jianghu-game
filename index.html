@@ -18,12 +18,14 @@ body{background:#141009;color:#e8dcc0;font-family:"Songti SC","STSong","SimSun",
 .ptier.地{background:#2a4a2a;color:#9ae09a}
 .ptier.天{background:#5a2a2a;color:#f0a8a8}
 .ptier.神{background:#6a4a00;color:#ffe97b;font-weight:bold}
-/* 排行榜炫酷称号 */
-.rt{display:inline-block;font-weight:bold;padding:1px 8px;border-radius:10px;margin:1px 2px;font-size:12px;background-size:200% auto;animation:shine 3s linear infinite;white-space:nowrap}
-.rt1{background-image:linear-gradient(90deg,#ffdf6b,#ff9d3c,#fff3b0,#ff9d3c,#ffdf6b);color:#5a2a00;box-shadow:0 0 10px #ffdf6b}
-.rt2{background-image:linear-gradient(90deg,#e8e8ff,#9a9ae0,#ffffff,#9a9ae0,#e8e8ff);color:#1a1a4a;box-shadow:0 0 8px #b8b0f0}
-.rt3{background-image:linear-gradient(90deg,#ffd9b8,#e08a5f,#ffe9d0,#e08a5f,#ffd9b8);color:#4a2000;box-shadow:0 0 6px #e0a06a}
-@keyframes shine{to{background-position:200% center}}
+/* 排行榜炫酷称号：半透明流光 */
+.rt{position:relative;display:inline-block;font-weight:bold;padding:2px 10px;border-radius:12px;margin:1px 2px;font-size:12px;white-space:nowrap;overflow:hidden;border:1px solid;backdrop-filter:blur(2px)}
+.rt::after{content:"";position:absolute;top:0;left:-70%;width:45%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.6),transparent);transform:skewX(-20deg);animation:sweep 2.6s ease-in-out infinite}
+@keyframes sweep{to{left:140%}}
+.rt1{background:linear-gradient(90deg,rgba(255,223,107,.28),rgba(255,157,60,.5),rgba(255,223,107,.28));border-color:rgba(255,215,100,.9);color:#ffe97b;text-shadow:0 0 8px rgba(255,190,60,.95);box-shadow:0 0 12px rgba(255,200,80,.55)}
+.rt2{background:linear-gradient(90deg,rgba(200,200,255,.22),rgba(150,150,230,.45),rgba(200,200,255,.22));border-color:rgba(180,180,255,.85);color:#d8d8ff;text-shadow:0 0 8px rgba(150,150,255,.9);box-shadow:0 0 10px rgba(150,150,255,.5)}
+.rt3{background:linear-gradient(90deg,rgba(255,200,150,.22),rgba(220,130,90,.45),rgba(255,200,150,.22));border-color:rgba(255,180,120,.85);color:#ffd9b0;text-shadow:0 0 8px rgba(230,140,80,.9);box-shadow:0 0 8px rgba(230,150,90,.45)}
+.rt-moon{background:linear-gradient(90deg,rgba(255,182,213,.25),rgba(255,255,255,.4),rgba(255,182,213,.25));border-color:rgba(255,182,213,.9);color:#ffd6e8;text-shadow:0 0 10px rgba(255,150,200,.95);box-shadow:0 0 14px rgba(255,170,210,.55)}
 #topbar .pname .title{color:#ffe9a8;font-size:13px;margin-right:4px;text-shadow:0 0 6px rgba(245,214,123,.6)}
 .bars{margin-top:6px;display:flex;flex-direction:column;gap:4px}
 .bar{height:14px;background:#0d0a06;border:1px solid #5a4a26;border-radius:7px;overflow:hidden;position:relative;font-size:10px}
@@ -140,24 +142,32 @@ const ITEMS={ // iid: {name,slot,atk,def,hp,spd,luck,tier}
  c3:{name:"灵珠",slot:"charm",atk:7,def:4,hp:80,tier:3},c4:{name:"龙纹佩",slot:"charm",atk:12,def:7,hp:140,tier:4}
 };
 const SLOTNAME={weapon:"武器",armor:"护甲",boots:"鞋子",charm:"饰品"};
-const PETS={ // pid: {name,hp,atk,def,spd,desc}
- linghou:{name:"小灵猴",hp:60,atk:10,def:5,spd:12,desc:"青竹林的机灵小猴，动作敏捷"},
- tiedog:{name:"铁背犬",hp:110,atk:16,def:10,spd:8,desc:"黑风寨驯养的獒犬，忠心护主"},
- youmingzhu:{name:"幽冥蛛",hp:150,atk:24,def:14,spd:10,desc:"幽冥谷的毒蛛，獠牙淬毒"},
- xuediao:{name:"雪雕",hp:200,atk:34,def:18,spd:16,desc:"华山之巅的雪雕，翱翔九天"}
+const PETS={ // pid: {name,hp,atk,def,spd,desc,tier}
+ linghou:{name:"小灵猴",hp:60,atk:10,def:5,spd:12,desc:"青竹林的机灵小猴，动作敏捷",tier:1},
+ rougutu:{name:"柔骨兔·小舞",hp:70,atk:12,def:6,spd:14,desc:"十万年柔骨兔化形，腿法惊人",tier:1},
+ lanyinhuang:{name:"蓝银皇·阿银",hp:90,atk:8,def:12,spd:6,desc:"蓝银皇血脉，生命力磅礴",tier:1},
+ tiedog:{name:"铁背犬",hp:110,atk:16,def:10,spd:8,desc:"黑风寨驯养的獒犬，忠心护主",tier:2},
+ guihu:{name:"鬼虎",hp:130,atk:20,def:12,spd:10,desc:"影虎一族，神出鬼没",tier:2},
+ renmianzhu:{name:"人面魔蛛",hp:140,atk:22,def:10,spd:12,desc:"人面蛛身，剧毒无比",tier:2},
+ youmingzhu:{name:"幽冥蛛",hp:150,atk:24,def:14,spd:10,desc:"幽冥谷的毒蛛，獠牙淬毒",tier:3},
+ taitan:{name:"泰坦巨猿·二明",hp:220,atk:40,def:24,spd:8,desc:"森林之王，力大无穷",tier:3},
+ xiemohu:{name:"暗魔邪神虎",hp:200,atk:44,def:18,spd:14,desc:"邪神血脉，风雷双翼",tier:3},
+ xuediao:{name:"雪雕",hp:200,atk:34,def:18,spd:16,desc:"华山之巅的雪雕，翱翔九天",tier:4},
+ tianqing:{name:"天青牛蟒·大明",hp:300,atk:52,def:30,spd:12,desc:"十万年天青牛蟒，君临星斗",tier:4},
+ bingdi:{name:"冰碧帝皇蝎",hp:280,atk:58,def:24,spd:18,desc:"极北冰帝，极致之冰",tier:4}
 };
 function mkMonster(name,lv,catchPet,boss){return{name,lv,catchPet:catchPet||null,boss:!!boss,
  hp:Math.floor(45+lv*24),atk:Math.floor(8+lv*2.3),def:Math.floor(4+lv*1.3),spd:Math.floor(5+lv*0.9),
  exp:Math.floor(22+lv*13),coins:rnd(10+lv*5,16+lv*8)};}
 const ZONES=[
  {name:"青竹林",req:1,desc:"新手历练之地，竹影婆娑",tier:1,
-  mobs:[()=>mkMonster("野猴",1,"linghou"),()=>mkMonster("青竹蛇",2,"linghou"),()=>mkMonster("山贼喽啰",3),()=>mkMonster("小头目·赵虎",5,null,true)]},
+  mobs:[()=>mkMonster("野猴",1,"linghou"),()=>mkMonster("青竹蛇",2,"linghou"),()=>mkMonster("魂兽·柔骨兔",2,"rougutu"),()=>mkMonster("山贼喽啰",3),()=>mkMonster("小头目·赵虎",5,null,true)]},
  {name:"黑风寨",req:6,desc:"贼寇盘踞的山寨，危机四伏",tier:2,
-  mobs:[()=>mkMonster("寨丁",6,"tiedog"),()=>mkMonster("巡山刀客",7,"tiedog"),()=>mkMonster("黑风双煞",9),()=>mkMonster("寨主·黑风虎",11,null,true)]},
+  mobs:[()=>mkMonster("寨丁",6,"tiedog"),()=>mkMonster("巡山刀客",7,"tiedog"),()=>mkMonster("魂兽·鬼虎",8,"guihu"),()=>mkMonster("黑风双煞",9),()=>mkMonster("寨主·黑风虎",11,null,true)]},
  {name:"幽冥谷",req:12,desc:"瘴气弥漫的险谷，毒物横行",tier:3,
-  mobs:[()=>mkMonster("毒蛛",12,"youmingzhu"),()=>mkMonster("尸煞",13,"youmingzhu"),()=>mkMonster("谷主亲卫",15),()=>mkMonster("谷主·幽冥老怪",17,null,true)]},
+  mobs:[()=>mkMonster("毒蛛",12,"youmingzhu"),()=>mkMonster("尸煞",13,"youmingzhu"),()=>mkMonster("魂兽·泰坦巨猿",14,"taitan"),()=>mkMonster("谷主亲卫",15),()=>mkMonster("谷主·幽冥老怪",17,null,true)]},
  {name:"华山之巅",req:18,desc:"武林圣地，高手如云",tier:4,
-  mobs:[()=>mkMonster("各派弟子",18,"xuediao"),()=>mkMonster("武林长老",20,"xuediao"),()=>mkMonster("退隐高手",21),()=>mkMonster("武林盟主",23,null,true)]}
+  mobs:[()=>mkMonster("各派弟子",18,"xuediao"),()=>mkMonster("武林长老",20,"xuediao"),()=>mkMonster("魂兽·天青牛蟒",20,"tianqing"),()=>mkMonster("退隐高手",21),()=>mkMonster("武林盟主",23,null,true)]}
 ];
 const SHOP=[
  {id:"jinchuang",name:"金疮药",price:50,desc:"恢复150点气血",use:"hp150"},
@@ -174,8 +184,12 @@ const RANKS=[{name:"武林神话·叶孤鸿",zl:99999},{name:"剑圣·西门飘�
 const RANK_PAY=[{name:"神豪·王多鱼",pay:99999},{name:"江南首富·沈万三",pay:52000},{name:"西域土豪·金轮法王",pay:26000},{name:"盐帮帮主·方中信",pay:12000},{name:"总镖头·铁中堂",pay:6000},{name:"富商·陶朱公",pay:2600},{name:"钱庄掌柜·金算盘",pay:1200},{name:"小地主·黄世仁",pay:500},{name:"暴发户·苟富贵",pay:150}];
 /* 排行榜称号：前三名自动获得，属性可叠加 */
 const RANK_TITLES={
- zl:[{name:"战力之巅",cls:"rt1",bonus:{atk:30,hp:300}},{name:"武林传奇",cls:"rt2",bonus:{atk:20,hp:200}},{name:"江湖豪杰",cls:"rt3",bonus:{atk:10,hp:100}}],
- pay:[{name:"神豪无双",cls:"rt1",bonus:{atk:25,hp:250,luck:2}},{name:"富甲天下",cls:"rt2",bonus:{atk:15,hp:150,luck:1}},{name:"一掷千金",cls:"rt3",bonus:{atk:8,hp:80}}]
+ zl:[{name:"👑战力之巅",cls:"rt1",bonus:{atk:30,hp:300}},{name:"⚔️武林传奇",cls:"rt2",bonus:{atk:20,hp:200}},{name:"🛡️江湖豪杰",cls:"rt3",bonus:{atk:10,hp:100}}],
+ pay:[{name:"💎神豪无双",cls:"rt1",bonus:{atk:25,hp:250,luck:2}},{name:"💰富甲天下",cls:"rt2",bonus:{atk:15,hp:150,luck:1}},{name:"🪙一掷千金",cls:"rt3",bonus:{atk:8,hp:80}}]
+};
+/* 节日限定称号 */
+const EVENT_TITLES={
+ midautumn:{name:"🐰中秋快乐",cls:"rt-moon",bonus:{atk:15,hp:150},desc:"2026中秋限定"}
 };
 function myRankTitles(){
  const t=[],zl=zhanli();
@@ -279,6 +293,8 @@ function calcStats(){
  if(fjlv){p.atk+=4*fm*fjlv;p.maxhp+=50*fm*fjlv;p.maxmp+=10*fm*fjlv;}
  for(const t of myRankTitles()){const b=t.bonus; // 排行榜称号加成（可叠加）
   p.atk+=b.atk||0;p.def+=b.def||0;p.maxhp+=b.hp||0;p.maxmp+=b.mp||0;p.spd+=b.spd||0;p.luck+=b.luck||0;}
+ for(const eid of(S.eventTitles||[])){const e=EVENT_TITLES[eid];if(!e)continue;const b=e.bonus; // 节日称号加成（可叠加）
+  p.atk+=b.atk||0;p.def+=b.def||0;p.maxhp+=b.hp||0;p.maxmp+=b.mp||0;p.spd+=b.spd||0;p.luck+=b.luck||0;}
  const vb=1+vipLevel()*0.02; // VIP加成：每级攻击/气血+2%
  p.atk=Math.floor(p.atk*vb); p.maxhp=Math.floor(p.maxhp*vb);
  p.hp=Math.min(p.hp,p.maxhp); p.mp=Math.min(p.mp,p.maxmp);
@@ -294,7 +310,7 @@ function newGame(name,sectKey){
    stamina:50,maxStamina:50,skills:[sc.skill],task:null,taskDone:false,
    base:{maxhp:sc.hp,maxmp:sc.mp,atk:sc.atk,def:sc.def,spd:sc.spd}},
   equip:{weapon:null,armor:null,boots:null,charm:null},bag:[],pets:[],activePet:-1,
-  orders:[],zone:0,created:nowStr(),gongfa:{},douqi:0,yihuo:[],fenjue:{lv:0}};
+  orders:[],zone:0,created:nowStr(),gongfa:{},douqi:0,yihuo:[],fenjue:{lv:0},eventTitles:[]};
  calcStats();S.player.hp=S.player.maxhp;S.player.mp=S.player.maxmp;save();
 }
 /* ============ 顶栏/导航 ============ */
@@ -668,7 +684,7 @@ let h=`<div class="card"><h3>💎 元宝商城</h3><p class="dim">你有元宝 <
 m.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>{
 const k=b.dataset.g;
 if(k==="tili"&&p.gold>=10){p.gold-=10;p.stamina=Math.min(p.maxStamina,p.stamina+30);toast("体力+30！");}
-else if(k==="egg"&&p.gold>=88){p.gold-=88;const pool=Object.keys(PETS).slice(0,tier);const pid=pick(pool);
+else if(k==="egg"&&p.gold>=88){p.gold-=88;const pool=Object.keys(PETS).filter(k=>PETS[k].tier<=tier);const pid=pick(pool);
 S.pets.push({pid,name:PETS[pid].name,level:p.level,exp:0});if(S.activePet===-1)S.activePet=0;toast("开出了！");}
 else if(k==="box"&&p.gold>=68){p.gold-=68;const pool=Object.keys(ITEMS).filter(x=>ITEMS[x].slot==="weapon"&&ITEMS[x].tier===tier&&!ITEMS[x].gift);
 const iid=pick(pool);S.bag.push({iid,enh:0});toast("开出了！");}
@@ -763,6 +779,8 @@ function rRank(){
  const myT=myRankTitles();
  h+=`<div class="card"><h3>🎖️ 我的荣誉称号</h3><p class="dim">任一榜单前三名自动获得称号，多个称号属性可叠加。</p>`;
  h+=myT.length?myT.map(t=>`<div class="tier"><div><span class="rt ${t.cls}">${t.name}</span><span class="dim"> ${t.board}第${t.rank}名</span><div class="m">${bonusStr(t.bonus)}</div></div></div>`).join(""):`<p class="dim">暂未上榜，继续努力！</p>`;
+ const evts=(S.eventTitles||[]).map(eid=>EVENT_TITLES[eid]).filter(Boolean);
+ if(evts.length)h+=evts.map(e=>`<div class="tier"><div><span class="rt ${e.cls}">${e.name}</span><span class="dim"> ${e.desc}</span><div class="m">${bonusStr(e.bonus)}</div></div></div>`).join("");
  h+=`</div>`;m.innerHTML=h;
 }
 /* ============ 更多：GM后台/帮助/存档 ============ */
@@ -780,11 +798,20 @@ function rMore(){
  · 「门派」学高级武功、做师门任务<br>
  · 体力不够就打坐，或去商城买体力丹<br>
  · 「充值」是模拟的，不花真钱，随便点！累计充值提升VIP等级，加攻击气血、每日领礼包<br>
- · 「排行」有战力榜和充值榜，任一榜前三名自动获得炫酷称号（属性可叠加）：战力榜「战力之巅/武林传奇/江湖豪杰」，充值榜「神豪无双/富甲天下/一掷千金」</p></div>
+ · 宠物可捕捉斗罗魂兽：柔骨兔·小舞、蓝银皇·阿银、鬼虎、人面魔蛛、泰坦巨猿·二明、暗魔邪神虎、天青牛蟒·大明、冰碧帝皇蝎<br>
+ · 「排行」有战力榜和充值榜，前三名自动获得炫酷称号（属性可叠加）：👑战力之巅/⚔️武林传奇/🛡️江湖豪杰，💎神豪无双/💰富甲天下/🪙一掷千金<br>
+ · 「更多」→「节日活动」可领中秋限定称号「🐰中秋快乐」（攻击+15 气血+150，可叠加）</p></div>
+ <div class="card"><h3>🎑 节日活动</h3>
+ <div class="tier"><div><div class="gold">中秋赏月 · 限时</div><div class="m">领取限定称号 <span class="rt rt-moon">🐰中秋快乐</span><br>攻击+15 气血+150，与其他称号叠加</div></div>
+ <button class="btn small primary" style="width:auto;margin:0" id="evtMid"${(S.eventTitles||[]).includes("midautumn")?" disabled":""}>${(S.eventTitles||[]).includes("midautumn")?"已领取":"领取"}</button></div></div>
  <div class="card"><h3>💾 存档</h3>
  <button class="btn small" id="resave">手动保存</button>
  <button class="btn small danger" id="reset">删号重来（清空存档）</button></div>`;
  $("resave").onclick=()=>{save();toast("已保存");};
+ const em=$("evtMid");
+ if(em)em.onclick=()=>{S.eventTitles=S.eventTitles||[];
+  if(S.eventTitles.includes("midautumn"))return;
+  S.eventTitles.push("midautumn");calcStats();save();render();toast("🎑 获得限定称号「🐰中秋快乐」！");};
  $("reset").onclick=()=>{
   if(confirm("确定删除存档、重新开始吗？")){localStorage.removeItem(SAVE_KEY);location.reload();}
  };
