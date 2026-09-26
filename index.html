@@ -703,7 +703,7 @@ function newGame(name,sectKey){
 }
 /* ============ 顶栏/导航 ============ */
 function escHtml(s){return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
-function vipName(n,v){v=Math.min(v||0,12);if(v<1)return escHtml(n);return `<span class="vipn${v}">${escHtml(n)}</span>`;}
+function vipName(n,v){v=Math.min(v||0,12);if(v<6)return escHtml(n);return `<span class="vipn${v}">${escHtml(n)}</span>`;}
 function renderTop(){
  const p=S.player,t=$("topbar");t.style.display="block";
  const v=vipLevel();
