@@ -116,6 +116,10 @@ const ITEMS={ // iid: {name,slot,atk,def,hp,spd,luck,tier}
  w0:{name:"小红剑·开荒神兵",slot:"weapon",atk:26,luck:9,tier:1,gift:1},
  w1:{name:"桃木剑",slot:"weapon",atk:5,tier:1},w2:{name:"精钢长剑",slot:"weapon",atk:12,tier:2},
  w3:{name:"寒铁宝刀",slot:"weapon",atk:22,tier:3},w4:{name:"龙泉宝剑",slot:"weapon",atk:36,tier:4},
+ w5:{name:"乌木剑",slot:"weapon",atk:8,tier:1},w6:{name:"炼狱战斧",slot:"weapon",atk:16,tier:2},
+ w7:{name:"井中月",slot:"weapon",atk:26,tier:3},w8:{name:"裁决之杖",slot:"weapon",atk:44,tier:4},
+ w9:{name:"骨玉权杖",slot:"weapon",atk:40,spd:4,tier:4},w10:{name:"龙纹剑",slot:"weapon",atk:48,tier:4},
+ w11:{name:"嗜魂法杖",slot:"weapon",atk:54,luck:3,tier:5},w12:{name:"屠龙刀",slot:"weapon",atk:68,luck:5,tier:5},
  a1:{name:"粗布衣",slot:"armor",def:4,hp:20,tier:1},a2:{name:"镖师劲装",slot:"armor",def:9,hp:50,tier:2},
  a3:{name:"软猬甲",slot:"armor",def:16,hp:100,tier:3},a4:{name:"金丝宝甲",slot:"armor",def:26,hp:180,tier:4},
  b1:{name:"草鞋",slot:"boots",spd:2,def:1,tier:1},b2:{name:"快靴",slot:"boots",spd:4,def:2,tier:2},
@@ -155,6 +159,27 @@ const TIERS=[
  {money:198,gold:2280,bonus:"多送20%"}
 ];
 const RANKS=[{name:"武林神话·叶孤鸿",zl:99999},{name:"剑圣·西门飘雪",zl:52000},{name:"魔教教主·任逍遥",zl:38000},{name:"丐帮帮主·洪七",zl:26000},{name:"武当掌门·张真人",zl:18000},{name:"峨眉掌门·灭绝师太",zl:12000},{name:"少林方丈·玄慈",zl:9000},{name:"黑风寨主·黑风虎",zl:5000},{name:"采花大盗·田伯光",zl:2800},{name:"江南大侠·江别鹤",zl:1500}];
+/* ============ 限时物品 ============ */
+function itemExpired(it){return !!(it&&it.expire&&Date.now()>it.expire);}
+function expireText(it){if(!it||!it.expire)return"";const ms=it.expire-Date.now();
+if(ms<=0)return"⏳已到期";const h=Math.floor(ms/36e5);
+return h>=24?`⏳剩余${Math.floor(h/24)}天${h%24}小时`:`⏳剩余${h}小时`;}
+function sweepExpired(){let ch=false;
+for(const s of["weapon","armor","boots","charm"]){const it=S.equip[s];
+if(itemExpired(it)){S.bag.push(it);S.equip[s]=null;ch=true;}}
+if(ch){calcStats();save();}return ch;}
+/* ============ 功法 ============ */
+const GONGFA={
+ jingangzhao:{name:"金钟罩",desc:"少林护体神功，刀枪不入",max:5,req:1,bonus:{def:4,hp:40}},
+ yijinjing:{name:"易筋经",desc:"达摩祖师绝学，易筋洗髓",max:5,req:5,bonus:{atk:3,hp:30}},
+ taijishengong:{name:"太极神功",desc:"武当镇派心法，以柔克刚",max:5,req:8,bonus:{def:3,spd:2,hp:30}},
+ jiuyang:{name:"九阳神功",desc:"至阳至刚，内力生生不息",max:5,req:10,bonus:{atk:5,hp:60,mp:12}},
+ kuihua:{name:"葵花宝典",desc:"天下武功，唯快不破",max:5,req:12,bonus:{spd:4,atk:4}},
+ dugujiujian:{name:"独孤九剑",desc:"剑魔独孤求败绝学，无招胜有招",max:5,req:15,bonus:{atk:8,luck:1}}
+};
+function gfLv(gid){return (S.gongfa&&S.gongfa[gid])||0;}
+function gfCost(lv){return 300*Math.pow(2,lv);}
+const GFNAME={atk:"攻击",def:"防御",hp:"气血",mp:"内力",spd:"速度",luck:"幸运"};
 /* ============ VIP系统 ============ */
 const VIP_NEED=[0,6,30,98,198,498,998]; // 索引即VIP等级：升到该级所需累计充值
 function vipTotal(){return S.orders.reduce((a,o)=>a+o.money,0);}
@@ -187,6 +212,9 @@ function calcStats(){
  }
  const worn=VIP_TITLES[S.title||0]; // 佩戴称号加成
  if(worn){p.atk+=worn.atk;p.maxhp+=worn.hp;}
+ for(const[gid,lv]of Object.entries(S.gongfa||{})){const g=GONGFA[gid];if(!g||!lv)continue; // 功法加成
+  for(const[k,v]of Object.entries(g.bonus)){
+   if(k==="hp")p.maxhp+=v*lv;else if(k==="mp")p.maxmp+=v*lv;else p[k]=(p[k]||0)+v*lv;}}
  const vb=1+vipLevel()*0.02; // VIP加成：每级攻击/气血+2%
  p.atk=Math.floor(p.atk*vb); p.maxhp=Math.floor(p.maxhp*vb);
  p.hp=Math.min(p.hp,p.maxhp); p.mp=Math.min(p.mp,p.maxmp);
@@ -202,7 +230,7 @@ function newGame(name,sectKey){
    stamina:50,maxStamina:50,skills:[sc.skill],task:null,taskDone:false,
    base:{maxhp:sc.hp,maxmp:sc.mp,atk:sc.atk,def:sc.def,spd:sc.spd}},
   equip:{weapon:null,armor:null,boots:null,charm:null},bag:[],pets:[],activePet:-1,
-  orders:[],zone:0,created:nowStr()};
+  orders:[],zone:0,created:nowStr(),gongfa:{}};
  calcStats();S.player.hp=S.player.maxhp;S.player.mp=S.player.maxmp;save();
 }
 /* ============ 顶栏/导航 ============ */
@@ -218,14 +246,14 @@ function renderTop(){
  </div>
  <div class="wallet"><span>🪙铜币 <b>${p.coins}</b></span><span>💰元宝 <b>${p.gold}</b></span><span>⚡体力 <b>${p.stamina}/${p.maxStamina}</b></span><span>🍀幸运 <b>${p.luck||0}</b></span><span>⚔️战力 <b>${zhanli()}</b></span></div>`;
 }
-const TABS=[["home","🏠<br>江湖"],["bag","🎒<br>背包"],["pet","🦊<br>宠物"],["sect","🥋<br>门派"],["shop","🏪<br>商店"],["gold","💎<br>商城"],["pay","💰<br>充值"],["rank","🏆<br>排行"],["more","⚙️<br>更多"]];
+const TABS=[["home","🏠<br>江湖"],["bag","🎒<br>背包"],["pet","🦊<br>宠物"],["sect","🥋<br>门派"],["gongfa","📖<br>功法"],["shop","🏪<br>商店"],["gold","💎<br>商城"],["pay","💰<br>充值"],["rank","🏆<br>排行"],["more","⚙️<br>更多"]];
 function renderTabs(){
  const t=$("tabbar");t.style.display="flex";
  t.innerHTML=TABS.map(([k,n])=>`<button class="${TAB===k?'on':''}" data-t="${k}">${n}</button>`).join("");
  t.querySelectorAll("button").forEach(b=>b.onclick=()=>{TAB=b.dataset.t;B=null;render();});
 }
-function render(){renderTop();renderTabs();
- ({home:rHome,bag:rBag,pet:rPet,sect:rSect,shop:rShop,gold:rGold,pay:rPay,rank:rRank,more:rMore}[TAB])();}
+function render(){if(S&&S.player&&sweepExpired())setTimeout(()=>toast("⏳ 小红剑已到期，已自动卸下"),50);renderTop();renderTabs();
+ ({home:rHome,bag:rBag,pet:rPet,sect:rSect,gongfa:rGongfa,shop:rShop,gold:rGold,pay:rPay,rank:rRank,more:rMore}[TAB])();}
 /* ============ 创建角色 ============ */
 let selSect="shaolin";
 function rCreate(){
@@ -333,7 +361,7 @@ log(`<span class="sys">⚔️ 战胜了！获得修为 ${f.exp}、铜币 ${f.coi
 gainExp(f.exp);p.coins+=f.coins;gainPetExp(Math.floor(f.exp/2));
 // 掉落
 const tier=ZONES[B.zi].tier;
-const pool=Object.keys(ITEMS).filter(k=>ITEMS[k].tier===tier);
+const pool=Object.keys(ITEMS).filter(k=>ITEMS[k].tier===tier&&!ITEMS[k].gift);
 if(f.boss||Math.random()<0.3){
 const iid=pick(pool);
 S.bag.push({iid,enh:0});
@@ -416,7 +444,7 @@ const m=$("main"),p=S.player;
 let h=`<div class="card"><h3>🎒 背包</h3><p class="dim">已装备：</p><div class="statgrid">`;
 for(const slot of["weapon","armor","boots","charm"]){
 const it=S.equip[slot];
-h+=`<div>${SLOTNAME[slot]}：<b>${it?ITEMS[it.iid].name+(it.enh?` +${it.enh}`:""):"空"}</b></div>`;
+h+=`<div>${SLOTNAME[slot]}：<b>${it?ITEMS[it.iid].name+(it.enh?` +${it.enh}`:"")+(it.expire?` <span class="dim">${expireText(it)}</span>`:""):"空"}</b></div>`;
 }
 h+=`</div><button class="btn small" id="enhance">🔨 铁匠铺·强化装备</button></div><div class="card"><h3>物品</h3>`;
 if(!S.bag.length)h+=`<p class="dim">空空如也，去闯荡江湖打怪掉落吧。</p>`;
@@ -424,13 +452,14 @@ S.bag.forEach((it,i)=>{
 if(it.use){const s=SHOP.find(x=>x.id===it.use)||{name:it.name};
 h+=`<div class="mob"><div><div class="mn">${it.name}</div><div class="md">药品</div></div><button class="btn" data-use="${i}">使用</button></div>`;return;}
 const d=ITEMS[it.iid];
-h+=`<div class="mob"><div><div class="mn">${d.name}${it.enh?` <span class="gold">+${it.enh}</span>`:""}</div>
+h+=`<div class="mob"><div><div class="mn">${d.name}${it.enh?` <span class="gold">+${it.enh}</span>`:""}${it.expire?` <span class="dim">${expireText(it)}</span>`:""}</div>
 <div class="md">${SLOTNAME[d.slot]} · ${[d.atk&&"攻"+d.atk,d.def&&"防"+d.def,d.hp&&"血"+d.hp,d.spd&&"速"+d.spd,d.luck&&"🍀幸运+"+d.luck].filter(Boolean).join(" ")}</div></div>
 <button class="btn" data-eq="${i}">装备</button></div>`;
 });
 h+=`</div>`;m.innerHTML=h;
 m.querySelectorAll("[data-eq]").forEach(b=>b.onclick=()=>{
 const it=S.bag[+b.dataset.eq],d=ITEMS[it.iid],old=S.equip[d.slot];
+if(itemExpired(it)){toast("⏳ 这把武器已到期，无法装备");return;}
 S.equip[d.slot]=it;S.bag.splice(+b.dataset.eq,1);
 if(old)S.bag.push(old);
 calcStats();save();render();toast("装备了");
@@ -493,6 +522,27 @@ const tg=$("taskget");if(tg)tg.onclick=()=>{p.task={need:10,done:0};p.taskDone=f
 const td=$("taskdone");if(td)td.onclick=()=>{p.coins+=300;gainExpSilent(200);p.task=null;p.taskDone=false;save();render();toast("领取了任务奖励！");};
 }
 function gainExpSilent(n){const p=S.player;p.exp+=n;while(p.exp>=expNeed(p.level)){p.exp-=expNeed(p.level);p.level++;}calcStats();}
+/* ============ 功法 ============ */
+function rGongfa(){
+const m=$("main"),p=S.player;
+let h=`<div class="card"><h3>📖 功法修炼</h3><p class="dim">修炼功法永久提升属性，每本最高5重，费用随重数翻倍。</p>`;
+for(const[gid,g]of Object.entries(GONGFA)){
+ const lv=gfLv(gid),maxed=lv>=g.max,locked=p.level<g.req,cost=gfCost(lv);
+ const per=Object.entries(g.bonus).map(([k,v])=>`${GFNAME[k]}+${v}`).join(" ");
+ h+=`<div class="tier"><div><div class="gold">《${g.name}》 <span class="dim">${lv}/${g.max}重</span></div>
+ <div class="m">${g.desc}</div><div class="m">每重：${per}</div>
+ ${locked?`<div class="m" style="color:#e08a8a">需要 ${g.req} 级解锁</div>`:""}
+ </div><button class="btn small primary" style="width:auto;margin:0" data-gf="${gid}"${(maxed||locked)?" disabled":""}>${maxed?"已满重":`修炼·${cost}铜币`}</button></div>`;
+}
+h+=`</div>`;m.innerHTML=h;
+m.querySelectorAll("[data-gf]").forEach(b=>b.onclick=()=>{
+ const gid=b.dataset.gf,g=GONGFA[gid],lv=gfLv(gid),cost=gfCost(lv);
+ if(lv>=g.max||p.level<g.req)return;
+ if(p.coins<cost){toast("铜币不足");return;}
+ p.coins-=cost;S.gongfa[gid]=lv+1;calcStats();save();render();
+ toast(`📖《${g.name}》突破至第${lv+1}重！`);
+});
+}
 /* ============ 商店 ============ */
 function rShop(){
 const m=$("main"),p=S.player;
@@ -511,7 +561,7 @@ p.coins-=s.price;S.bag.push({name:s.name,use:s.id});save();render();toast("购�
 /* ============ 元宝商城 ============ */
 function rGold(){
 const m=$("main"),p=S.player;
-const tier=Math.min(4,Math.floor(p.level/6)+1);
+const tier=Math.min(5,Math.floor(p.level/6)+1);
 let h=`<div class="card"><h3>💎 元宝商城</h3><p class="dim">你有元宝 <b class="gold">${p.gold}</b> · 没元宝？去充值！</p>
 <div class="tier"><div><div class="gold">体力丹</div><div class="m">+30体力 · 10元宝</div></div><button class="btn small" style="width:auto;margin:0" data-g="tili">购买</button></div>
 <div class="tier"><div><div class="gold">灵兽蛋</div><div class="m">随机开出当前区域宠物 · 88元宝</div></div><button class="btn small" style="width:auto;margin:0" data-g="egg">购买</button></div>
@@ -522,7 +572,7 @@ const k=b.dataset.g;
 if(k==="tili"&&p.gold>=10){p.gold-=10;p.stamina=Math.min(p.maxStamina,p.stamina+30);toast("体力+30！");}
 else if(k==="egg"&&p.gold>=88){p.gold-=88;const pool=Object.keys(PETS).slice(0,tier);const pid=pick(pool);
 S.pets.push({pid,name:PETS[pid].name,level:p.level,exp:0});if(S.activePet===-1)S.activePet=0;toast("开出了！");}
-else if(k==="box"&&p.gold>=68){p.gold-=68;const pool=Object.keys(ITEMS).filter(x=>ITEMS[x].slot==="weapon"&&ITEMS[x].tier===tier);
+else if(k==="box"&&p.gold>=68){p.gold-=68;const pool=Object.keys(ITEMS).filter(x=>ITEMS[x].slot==="weapon"&&ITEMS[x].tier===tier&&!ITEMS[x].gift);
 const iid=pick(pool);S.bag.push({iid,enh:0});toast("开出了！");}
 else{toast("元宝不足，请充值");return;}
 save();render();
@@ -552,7 +602,7 @@ function rPay(){
  <p class="dim">⚠️ 原型演示：模拟支付流程，不产生真实扣款。正式版将接入微信/支付宝。</p>
  <p>当前元宝：<b class="gold">${p.gold}</b></p>`;
  TIERS.forEach((t,i)=>{
-  h+=`<div class="tier"><div><div class="gold">${t.gold} 元宝 ${t.bonus?`<span class="dim">${t.bonus}</span>`:""}${i===0&&!S.orders.length?` <span class="dim">🎁首充赠小红剑</span>`:""}</div><div class="m">￥${t.money}</div></div>
+  h+=`<div class="tier"><div><div class="gold">${t.gold} 元宝 ${t.bonus?`<span class="dim">${t.bonus}</span>`:""}${i===0&&!S.orders.length?` <span class="dim">🎁首充赠小红剑（限时3天）</span>`:""}</div><div class="m">￥${t.money}</div></div>
   <button class="btn small primary" style="width:auto;margin:0" data-tier="${i}">充值</button></div>`;
  });
  h+=`</div><div class="card"><h3>🧾 我的充值记录</h3>`;
@@ -590,10 +640,10 @@ function payModal(i){
    const newV=vipLevel();
    let msg=`🎉 充值成功！元宝+${t.gold}`;
    if(newV>oldV){msg=`🎉 充值成功！晋升 👑VIP${newV}！`;S.title=newV;}
-   if(isFirst){ // 首充赠开荒神兵小红剑
-    const sword={iid:"w0",enh:0},cur=S.equip.weapon?ITEMS[S.equip.weapon.iid]:null;
-    if(!cur||(cur.atk||0)<26){if(S.equip.weapon)S.bag.push(S.equip.weapon);S.equip.weapon=sword;msg+=` 小红剑已穿戴！`;}
-    else{S.bag.push(sword);msg+=` 获赠小红剑！`;}
+   if(isFirst){ // 首充赠开荒神兵小红剑（限时3天）
+    const sword={iid:"w0",enh:0,expire:Date.now()+3*864e5},cur=S.equip.weapon?ITEMS[S.equip.weapon.iid]:null;
+    if(!cur||(cur.atk||0)<26){if(S.equip.weapon)S.bag.push(S.equip.weapon);S.equip.weapon=sword;msg+=` 小红剑已穿戴！（限时3天）`;}
+    else{S.bag.push(sword);msg+=` 获赠小红剑！（限时3天）`;}
    }
    calcStats();
    save();closeModal();render();
@@ -624,7 +674,7 @@ function rMore(){
  · 「门派」学高级武功、做师门任务<br>
  · 体力不够就打坐，或去商城买体力丹<br>
  · 「充值」是模拟的，不花真钱，随便点！累计充值提升VIP等级，加攻击气血、每日领礼包<br>
- · 首充送小红剑（攻击26、🍀幸运+9，暴击率更高）；VIP称号可佩戴，加攻击气血</p></div>
+ · 首充送小红剑（攻击26、🍀幸运+9，暴击率更高，限时3天）；VIP称号可佩戴，加攻击气血；📖功法页可修炼功法永久加属性</p></div>
  <div class="card"><h3>💾 存档</h3>
  <button class="btn small" id="resave">手动保存</button>
  <button class="btn small danger" id="reset">删号重来（清空存档）</button></div>`;
