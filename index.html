@@ -162,6 +162,7 @@ const ITEMS={ // iid: {name,slot,atk,def,hp,spd,luck,tier}
  w7:{name:"井中月",slot:"weapon",atk:26,tier:3},w8:{name:"裁决之杖",slot:"weapon",atk:44,tier:4},
  w9:{name:"骨玉权杖",slot:"weapon",atk:40,spd:4,tier:4},w10:{name:"龙纹剑",slot:"weapon",atk:48,tier:4},
  w11:{name:"嗜魂法杖",slot:"weapon",atk:54,luck:3,tier:5},w12:{name:"屠龙刀",slot:"weapon",atk:68,luck:5,tier:5},
+ w13:{name:"轩辕神剑",slot:"weapon",atk:95,luck:6,spd:6,tier:6,gift:1}, // 终极武器：神兵合成获得
  a1:{name:"粗布衣",slot:"armor",def:4,hp:20,tier:1},a2:{name:"镖师劲装",slot:"armor",def:9,hp:50,tier:2},
  a3:{name:"软猬甲",slot:"armor",def:16,hp:100,tier:3},a4:{name:"金丝宝甲",slot:"armor",def:26,hp:180,tier:4},
  b1:{name:"草鞋",slot:"boots",spd:2,def:1,tier:1},b2:{name:"快靴",slot:"boots",spd:4,def:2,tier:2},
@@ -170,6 +171,9 @@ const ITEMS={ // iid: {name,slot,atk,def,hp,spd,luck,tier}
  c3:{name:"灵珠",slot:"charm",atk:7,def:4,hp:80,tier:3},c4:{name:"龙纹佩",slot:"charm",atk:12,def:7,hp:140,tier:4}
 };
 const SLOTNAME={weapon:"武器",armor:"护甲",boots:"鞋子",charm:"饰品"};
+function topWeaponOfTier(t){let best=null;for(const k of Object.keys(ITEMS)){const d=ITEMS[k];if(d.slot!=="weapon"||d.gift||d.tier!==t)continue;if(!best||d.atk>ITEMS[best].atk)best=k;}return best;} // 本关最高级武器
+const SYNTH_NEED=[["w5","乌木剑","青竹林·小头目·赵虎"],["w6","炼狱战斧","黑风寨·寨主·黑风虎"],["w7","井中月","幽冥谷·谷主·幽冥老怪"],["w10","龙纹剑","华山之巅·武林盟主"]];
+const SYNTH_COST=3000000;
 const PTN=["","黄","玄","地","天","神","圣"]; // 宠物品级名：圣凌驾于神之上，唯限时活动可得
 const PET_TMULT=[0,1,1.15,1.3,1.6,2,2.6]; // 品级助战倍率
 const PETS={ // pid: {name,hp,atk,def,spd,desc,tier:1黄 2玄 3地 4天 5神}
@@ -761,7 +765,12 @@ if(B.wb){ // 世界BOSS：掉落功法（神级以下）
 // 掉落（VIP称号提升爆率）
 const tier=ZONES[B.zi].tier;
 const pool=Object.keys(ITEMS).filter(k=>ITEMS[k].tier===tier&&!ITEMS[k].gift);
-if(f.boss||Math.random()<0.3*(1+vipDrop()/100)){
+if(f.boss){
+// BOSS：概率掉落本关最高级武器，概率受爆率加成
+const tw=topWeaponOfTier(tier);
+if(tw&&Math.random()<0.3*(1+vipDrop()/100)){S.bag.push({iid:tw,enh:0});log(`<span class="sys">BOSS掉落：${ITEMS[tw].name}！集齐四把BOSS神兵可合成轩辕神剑</span>`);}
+else{const iid=pick(pool);S.bag.push({iid,enh:0});log(`<span class="sys">获得了！</span>`);}
+}else if(Math.random()<0.3*(1+vipDrop()/100)){
 const iid=pick(pool);
 S.bag.push({iid,enh:0});
 log(`<span class="sys">获得了！</span>`);
@@ -855,7 +864,7 @@ for(const slot of["weapon","armor","boots","charm"]){
 const it=S.equip[slot];
 h+=`<div>${SLOTNAME[slot]}：<b>${it?itemNameHTML(it)+(it.enh?` +${it.enh}`:"")+(it.expire?` <span class="dim">${expireText(it)}</span>`:""):"空"}</b></div>`;
 }
-h+=`</div><button class="btn small" id="enhance">铁匠铺·强化装备</button></div><div class="card"><h3>物品</h3>`;
+h+=`</div><button class="btn small" id="enhance">铁匠铺·强化装备</button> <button class="btn small" id="synth">神兵合成</button></div><div class="card"><h3>物品</h3>`;
 if(!S.bag.length)h+=`<p class="dim">空空如也，去闯荡江湖打怪掉落吧。</p>`;
 S.bag.forEach((it,i)=>{
 if(it.use){const s=SHOP.find(x=>x.id===it.use)||{name:it.name};
@@ -883,6 +892,20 @@ if(it.use==="hp450")p.hp=Math.min(p.maxhp,p.hp+450);
 if(it.use==="mpfull")p.mp=p.maxmp;
 calcStats();save();render();toast("用药了，效果拔群！");
 });
+$("synth").onclick=()=>synthModal();
+function synthModal(){
+ const rows=SYNTH_NEED.map(([iid,nm,from])=>{const has=S.bag.filter(x=>x.iid===iid).length;
+ return `<div class="tier"><div><div class="gold">${nm}</div><div class="m">掉落：${from} · 拥有 ${has}/1</div></div></div>`;}).join("");
+ modal(`<h3>神兵合成</h3><p class="dim">集齐四把BOSS神兵 + 300万铜币，合成终极武器「轩辕神剑」（攻击95·幸运+6·速度+6）！材料需放在背包中（已装备的请先卸下）。</p>${rows}<div class="tier"><div><div class="gold">铜币 × 300万</div><div class="m">拥有 ${S.player.coins}</div></div></div><div class="rowbtns"><button class="btn primary" id="dosynth">合成</button><button class="btn" onclick="closeModal()">关闭</button></div>`);
+ $("dosynth").onclick=()=>{
+  for(const [iid,nm] of SYNTH_NEED){if(!S.bag.some(x=>x.iid===iid)){toast(`缺少${nm}，去挑战对应BOSS掉落！`);return;}}
+  if(S.player.coins<SYNTH_COST){toast("铜币不足300万");return;}
+  for(const [iid] of SYNTH_NEED){S.bag.splice(S.bag.findIndex(x=>x.iid===iid),1);}
+  S.player.coins-=SYNTH_COST;
+  S.bag.push({iid:"w13",enh:0});
+  save();closeModal();render();toast("合成成功！获得终极武器轩辕神剑！");
+ };
+}
 $("enhance").onclick=()=>{
 const slots=Object.entries(S.equip).filter(([s,it])=>it&&it.enh<5);
 if(!slots.length){toast("没有可强化的装备（已满级或未装备）");return;}
@@ -1421,7 +1444,7 @@ function rMore(){
  <div>建号时间<b style="font-size:11px">${S.created}</b></div></div>
  <p class="dim" style="margin-top:8px">正式版这里会显示所有玩家的订单，并支持订单查询、补发、封号等管理功能。</p></div>
  <div class="card"><h3>玩法说明</h3><p class="dim">
- · 去「江湖」挑战敌人，升级变强<br>· 怪物掉装备，去「背包」穿戴、铁匠铺强化<br>
+ · 去「江湖」挑战敌人，升级变强<br>· 怪物掉装备，去「背包」穿戴、铁匠铺强化；BOSS概率掉落本关最高级武器（爆率加成提升概率），集齐四把BOSS神兵+300万铜币可在背包「神兵合成」打造终极武器轩辕神剑<br>
  · 野怪打到30%血可捕捉为宠物，宠物会帮你打架<br>
  · 技能全是斗破斗技：八极崩、焰分噬浪尺、佛怒火莲、三千雷动、帝印诀等，去「门派」学习<br>
  · 竞技场：底部「竞技」页，每日5次挑战排名更高的对手，获胜排名上升；前三名每日可领元宝/铜币/灵羽<br>
