@@ -615,14 +615,14 @@ function renderTop(){
  $("topPay").onclick=()=>{TAB="pay";B=null;render();window.scrollTo(0,0);};
  const tv=$("topVip");if(tv)tv.onclick=()=>{TAB="vipinfo";B=null;render();window.scrollTo(0,0);};
 }
-const TABS=[["home","江湖"],["bag","背包"],["pet","宠物"],["wing","翅膀"],["partner","伙伴"],["sect","门派"],["gongfa","功法"],["shop","商店"],["gold","商城"],["rank","排行"],["title","称号"],["arena","竞技"],["event","活动"],["more","更多"]];
+const TABS=[["home","江湖"],["bag","背包"],["pet","宠物"],["wing","翅膀"],["partner","伙伴"],["sect","门派"],["gongfa","功法"],["shop","商店"],["rank","排行"],["title","称号"],["arena","竞技"],["event","活动"],["more","更多"]];
 function renderTabs(){
  const t=$("tabbar");t.style.display="flex";
  t.innerHTML=TABS.map(([k,n])=>`<button class="${TAB===k?'on':''}" data-t="${k}">${n}</button>`).join("");
  t.querySelectorAll("button").forEach(b=>b.onclick=()=>{TAB=b.dataset.t;B=null;render();});
 }
 function render(){if(S&&S.player&&sweepExpired())setTimeout(()=>toast(" 小红剑已到期，已自动卸下"),50);renderTop();renderTabs();
- ({home:rHome,bag:rBag,pet:rPet,sect:rSect,gongfa:rGongfa,shop:rShop,gold:rGold,pay:rPay,rank:rRank,title:rTitle,arena:rArena,wing:rWing,partner:rPartner,event:rEvent,more:rMore,vipinfo:rVip}[TAB])();}
+ ({home:rHome,bag:rBag,pet:rPet,sect:rSect,gongfa:rGongfa,shop:rShop,pay:rPay,rank:rRank,title:rTitle,arena:rArena,wing:rWing,partner:rPartner,event:rEvent,more:rMore,vipinfo:rVip}[TAB])();}
 /* ============ 创建角色 ============ */
 let selSect="shaolin";
 function rCreate(){
@@ -1079,28 +1079,23 @@ m.querySelectorAll("[data-yh]").forEach(b=>b.onclick=()=>{
 /* ============ 商店 ============ */
 function rShop(){
 const m=$("main"),p=S.player;
+const tier=Math.min(5,Math.floor(p.level/6)+1);
 let h=`<div class="card"><h3>江湖药铺</h3><p class="dim">你有铜币 ${p.coins}</p>`;
 SHOP.forEach(s=>{
 h+=`<div class="tier"><div><div class="gold">${s.name}</div><div class="m">${s.desc} · ${s.price}铜币</div></div>
 <button class="btn small" style="width:auto;margin:0" data-buy="${s.id}">购买</button></div>`;
 });
-h+=`</div>`;m.innerHTML=h;
-m.querySelectorAll("[data-buy]").forEach(b=>b.onclick=()=>{
-const s=SHOP.find(x=>x.id===b.dataset.buy);
-if(p.coins<s.price){toast("铜币不足");return;}
-p.coins-=s.price;S.bag.push({name:s.name,use:s.use});save();render();toast("购买了");
-});
-}
-/* ============ 元宝商城 ============ */
-function rGold(){
-const m=$("main"),p=S.player;
-const tier=Math.min(5,Math.floor(p.level/6)+1);
-let h=`<div class="card"><h3>元宝商城</h3><p class="dim">你有元宝 <b class="gold">${p.gold}</b>· 没元宝？去充值！</p>
+h+=`</div><div class="card"><h3>元宝商城</h3><p class="dim">你有元宝 <b class="gold">${p.gold}</b>· 没元宝？去充值！</p>
 <div class="tier"><div><div class="gold">体力丹</div><div class="m">+30体力 · 10元宝</div></div><button class="btn small" style="width:auto;margin:0" data-g="tili">购买</button></div>
 <div class="tier"><div><div class="gold">灵兽蛋</div><div class="m">随机开出黄~天级宠物 · 88元宝</div></div><button class="btn small" style="width:auto;margin:0" data-g="egg">购买</button></div>
 <div class="tier"><div><div class="gold">神兵宝箱</div><div class="m">随机开出${tier}阶武器 · 68元宝</div></div><button class="btn small" style="width:auto;margin:0" data-g="box">购买</button></div>
 <div class="tier"><div><div class="gold">灵羽</div><div class="m">翅膀升阶材料 · 10元宝/个</div></div><button class="btn small" style="width:auto;margin:0" data-g="feather">购买</button></div>
 </div>`;m.innerHTML=h;
+m.querySelectorAll("[data-buy]").forEach(b=>b.onclick=()=>{
+const s=SHOP.find(x=>x.id===b.dataset.buy);
+if(p.coins<s.price){toast("铜币不足");return;}
+p.coins-=s.price;S.bag.push({name:s.name,use:s.use});save();render();toast("购买了");
+});
 m.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>{
 const k=b.dataset.g;
 if(k==="tili"&&p.gold>=10){p.gold-=10;p.stamina=Math.min(p.maxStamina,p.stamina+30);toast("体力+30！");}
