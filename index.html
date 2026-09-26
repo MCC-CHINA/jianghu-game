@@ -18,6 +18,12 @@ body{background:#141009;color:#e8dcc0;font-family:"Songti SC","STSong","SimSun",
 .ptier.地{background:#2a4a2a;color:#9ae09a}
 .ptier.天{background:#5a2a2a;color:#f0a8a8}
 .ptier.神{background:#6a4a00;color:#ffe97b;font-weight:bold}
+/* 排行榜炫酷称号 */
+.rt{display:inline-block;font-weight:bold;padding:1px 8px;border-radius:10px;margin:1px 2px;font-size:12px;background-size:200% auto;animation:shine 3s linear infinite;white-space:nowrap}
+.rt1{background-image:linear-gradient(90deg,#ffdf6b,#ff9d3c,#fff3b0,#ff9d3c,#ffdf6b);color:#5a2a00;box-shadow:0 0 10px #ffdf6b}
+.rt2{background-image:linear-gradient(90deg,#e8e8ff,#9a9ae0,#ffffff,#9a9ae0,#e8e8ff);color:#1a1a4a;box-shadow:0 0 8px #b8b0f0}
+.rt3{background-image:linear-gradient(90deg,#ffd9b8,#e08a5f,#ffe9d0,#e08a5f,#ffd9b8);color:#4a2000;box-shadow:0 0 6px #e0a06a}
+@keyframes shine{to{background-position:200% center}}
 #topbar .pname .title{color:#ffe9a8;font-size:13px;margin-right:4px;text-shadow:0 0 6px rgba(245,214,123,.6)}
 .bars{margin-top:6px;display:flex;flex-direction:column;gap:4px}
 .bar{height:14px;background:#0d0a06;border:1px solid #5a4a26;border-radius:7px;overflow:hidden;position:relative;font-size:10px}
@@ -165,6 +171,21 @@ const TIERS=[
  {money:198,gold:2280,bonus:"多送20%"}
 ];
 const RANKS=[{name:"武林神话·叶孤鸿",zl:99999},{name:"剑圣·西门飘雪",zl:52000},{name:"魔教教主·任逍遥",zl:38000},{name:"丐帮帮主·洪七",zl:26000},{name:"武当掌门·张真人",zl:18000},{name:"峨眉掌门·灭绝师太",zl:12000},{name:"少林方丈·玄慈",zl:9000},{name:"黑风寨主·黑风虎",zl:5000},{name:"采花大盗·田伯光",zl:2800},{name:"江南大侠·江别鹤",zl:1500}];
+const RANK_PAY=[{name:"神豪·王多鱼",pay:99999},{name:"江南首富·沈万三",pay:52000},{name:"西域土豪·金轮法王",pay:26000},{name:"盐帮帮主·方中信",pay:12000},{name:"总镖头·铁中堂",pay:6000},{name:"富商·陶朱公",pay:2600},{name:"钱庄掌柜·金算盘",pay:1200},{name:"小地主·黄世仁",pay:500},{name:"暴发户·苟富贵",pay:150}];
+/* 排行榜称号：前三名自动获得，属性可叠加 */
+const RANK_TITLES={
+ zl:[{name:"战力之巅",cls:"rt1",bonus:{atk:30,hp:300}},{name:"武林传奇",cls:"rt2",bonus:{atk:20,hp:200}},{name:"江湖豪杰",cls:"rt3",bonus:{atk:10,hp:100}}],
+ pay:[{name:"神豪无双",cls:"rt1",bonus:{atk:25,hp:250,luck:2}},{name:"富甲天下",cls:"rt2",bonus:{atk:15,hp:150,luck:1}},{name:"一掷千金",cls:"rt3",bonus:{atk:8,hp:80}}]
+};
+function myRankTitles(){
+ const t=[],zl=zhanli();
+ const zr=[...RANKS.map(r=>({...r})),{zl,me:true}].sort((a,b)=>b.zl-a.zl).findIndex(r=>r.me);
+ if(zr<3)t.push({board:"战力榜",rank:zr+1,...RANK_TITLES.zl[zr]});
+ const pay=S.orders.reduce((a,o)=>a+o.money,0);
+ const pr=[...RANK_PAY.map(r=>({...r})),{pay,me:true}].sort((a,b)=>b.pay-a.pay).findIndex(r=>r.me);
+ if(pr<3)t.push({board:"充值榜",rank:pr+1,...RANK_TITLES.pay[pr]});
+ return t;
+}
 /* ============ 限时物品 ============ */
 function itemExpired(it){return !!(it&&it.expire&&Date.now()>it.expire);}
 function expireText(it){if(!it||!it.expire)return"";const ms=it.expire-Date.now();
@@ -256,6 +277,8 @@ function calcStats(){
   for(const[k,v]of Object.entries(f.bonus)){if(k==="hp")p.maxhp+=v;else if(k==="mp")p.maxmp+=v;else p[k]=(p[k]||0)+v;}}
  const fjlv=(S.fenjue&&S.fenjue.lv)||0,fm=fenjueTier()+1; // 焚诀加成（随异火进化）
  if(fjlv){p.atk+=4*fm*fjlv;p.maxhp+=50*fm*fjlv;p.maxmp+=10*fm*fjlv;}
+ for(const t of myRankTitles()){const b=t.bonus; // 排行榜称号加成（可叠加）
+  p.atk+=b.atk||0;p.def+=b.def||0;p.maxhp+=b.hp||0;p.maxmp+=b.mp||0;p.spd+=b.spd||0;p.luck+=b.luck||0;}
  const vb=1+vipLevel()*0.02; // VIP加成：每级攻击/气血+2%
  p.atk=Math.floor(p.atk*vb); p.maxhp=Math.floor(p.maxhp*vb);
  p.hp=Math.min(p.hp,p.maxhp); p.mp=Math.min(p.mp,p.maxmp);
@@ -730,9 +753,17 @@ function payModal(i){
 /* ============ 排行 ============ */
 function rRank(){
  const m=$("main"),zl=zhanli(),p=S.player;
- const all=[...RANKS.map(r=>({...r})),{name:p.name+"（我）",zl,me:true}].sort((a,b)=>b.zl-a.zl);
- m.innerHTML=`<div class="card"><h3>🏆 武林战力榜</h3><p class="dim">我的战力：<b class="gold">${zl}</b> · 第 ${all.findIndex(r=>r.me)+1} 名</p>`+
- all.map((r,i)=>`<div class="rankrow ${r.me?'me':''}"><span>${i+1}. ${r.name}</span><span>${r.zl}</span></div>`).join("")+`</div>`;
+ const pay=S.orders.reduce((a,o)=>a+o.money,0);
+ const zlist=[...RANKS.map(r=>({...r})),{name:p.name+"（我）",zl,me:true}].sort((a,b)=>b.zl-a.zl);
+ const plist=[...RANK_PAY.map(r=>({...r})),{name:p.name+"（我）",pay,me:true}].sort((a,b)=>b.pay-a.pay);
+ let h=`<div class="card"><h3>🏆 武林战力榜</h3><p class="dim">我的战力：<b class="gold">${zl}</b> · 第 ${zlist.findIndex(r=>r.me)+1} 名</p>`;
+ h+=zlist.map((r,i)=>`<div class="rankrow${r.me?" me":""}"><span>${i+1}. ${r.name}${i<3?` <span class="rt ${RANK_TITLES.zl[i].cls}">${RANK_TITLES.zl[i].name}</span>`:""}</span><span>${r.zl}</span></div>`).join("")+`</div>`;
+ h+=`<div class="card"><h3>💰 充值风云榜</h3><p class="dim">我的累计充值：<b class="gold">￥${pay}</b> · 第 ${plist.findIndex(r=>r.me)+1} 名</p>`;
+ h+=plist.map((r,i)=>`<div class="rankrow${r.me?" me":""}"><span>${i+1}. ${r.name}${i<3?` <span class="rt ${RANK_TITLES.pay[i].cls}">${RANK_TITLES.pay[i].name}</span>`:""}</span><span>￥${r.pay}</span></div>`).join("")+`</div>`;
+ const myT=myRankTitles();
+ h+=`<div class="card"><h3>🎖️ 我的荣誉称号</h3><p class="dim">任一榜单前三名自动获得称号，多个称号属性可叠加。</p>`;
+ h+=myT.length?myT.map(t=>`<div class="tier"><div><span class="rt ${t.cls}">${t.name}</span><span class="dim"> ${t.board}第${t.rank}名</span><div class="m">${bonusStr(t.bonus)}</div></div></div>`).join(""):`<p class="dim">暂未上榜，继续努力！</p>`;
+ h+=`</div>`;m.innerHTML=h;
 }
 /* ============ 更多：GM后台/帮助/存档 ============ */
 function rMore(){
@@ -749,7 +780,7 @@ function rMore(){
  · 「门派」学高级武功、做师门任务<br>
  · 体力不够就打坐，或去商城买体力丹<br>
  · 「充值」是模拟的，不花真钱，随便点！累计充值提升VIP等级，加攻击气血、每日领礼包<br>
- · 首充送小红剑（攻击26、🍀幸运+9，暴击率更高，限时3天）；VIP称号可佩戴，加攻击气血；📖功法页可修炼功法（黄/玄/地/天/神五级）、突破斗气境界（斗者→斗帝）、炼化异火进化焚诀</p></div>
+ · 「排行」有战力榜和充值榜，任一榜前三名自动获得炫酷称号（属性可叠加）：战力榜「战力之巅/武林传奇/江湖豪杰」，充值榜「神豪无双/富甲天下/一掷千金」</p></div>
  <div class="card"><h3>💾 存档</h3>
  <button class="btn small" id="resave">手动保存</button>
  <button class="btn small danger" id="reset">删号重来（清空存档）</button></div>`;
