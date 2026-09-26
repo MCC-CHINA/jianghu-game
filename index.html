@@ -211,12 +211,13 @@ if(itemExpired(it)){S.bag.push(it);S.equip[s]=null;ch=true;}}
 if(ch){calcStats();save();}return ch;}
 /* ============ 功法 ============ */
 const GONGFA={
- jingangzhao:{name:"金钟罩",tier:"黄",desc:"少林护体神功，刀枪不入",max:5,req:1,bonus:{def:4,hp:40}},
- yijinjing:{name:"易筋经",tier:"玄",desc:"达摩祖师绝学，易筋洗髓",max:5,req:5,bonus:{atk:3,hp:30}},
- taijishengong:{name:"太极神功",tier:"玄",desc:"武当镇派心法，以柔克刚",max:5,req:8,bonus:{def:3,spd:2,hp:30}},
- jiuyang:{name:"九阳神功",tier:"地",desc:"至阳至刚，内力生生不息",max:5,req:10,bonus:{atk:5,hp:60,mp:12}},
- kuihua:{name:"葵花宝典",tier:"地",desc:"天下武功，唯快不破",max:5,req:12,bonus:{spd:4,atk:4}},
- dugujiujian:{name:"独孤九剑",tier:"天",desc:"剑魔独孤求败绝学，无招胜有招",max:5,req:15,bonus:{atk:8,luck:1}}
+ jingangzhao:{name:"金钟罩",tier:"黄",price:50,desc:"少林护体神功，刀枪不入",max:5,req:1,bonus:{def:4,hp:40}},
+ yijinjing:{name:"易筋经",tier:"玄",price:150,desc:"达摩祖师绝学，易筋洗髓",max:5,req:5,bonus:{atk:3,hp:30}},
+ taijishengong:{name:"太极神功",tier:"玄",price:150,desc:"武当镇派心法，以柔克刚",max:5,req:8,bonus:{def:3,spd:2,hp:30}},
+ jiuyang:{name:"九阳神功",tier:"地",price:400,desc:"至阳至刚，内力生生不息",max:5,req:10,bonus:{atk:5,hp:60,mp:12}},
+ kuihua:{name:"葵花宝典",tier:"地",price:400,desc:"天下武功，唯快不破",max:5,req:12,bonus:{spd:4,atk:4}},
+ dugujiujian:{name:"独孤九剑",tier:"天",price:880,desc:"剑魔独孤求败绝学，无招胜有招",max:5,req:15,bonus:{atk:8,luck:1}},
+ darin:{name:"大日焚天诀",tier:"神",vip6:1,desc:"上古神诀，大日焚天，唯VIP6可得",max:5,req:20,bonus:{atk:15,hp:150,mp:30}}
 };
 /* 焚诀：可吞噬异火进化，黄→玄→地→天→神 */
 const FENJUE_TIERS=["黄","玄","地","天","神"];
@@ -249,6 +250,25 @@ function fenjueTier(){return Math.min(4,(S.yihuo||[]).length);}
 function bonusStr(b){return Object.entries(b||{}).map(([k,v])=>`${GFNAME[k]||k}+${v}`).join(" ");}
 function gfLv(gid){return (S.gongfa&&S.gongfa[gid])||0;}
 function gfCost(lv){return 300*Math.pow(2,lv);}
+function gfLearned(gid){ // 是否已习得
+ if(gid==="darin")return vipLevel()>=6;
+ return !!((S.gongfaLearned&&S.gongfaLearned[gid])||gfLv(gid)>0);
+}
+/* 世界BOSS */
+function wbLeft(){const d=new Date().toDateString();if(!S.wboss||S.wboss.date!==d)S.wboss={date:d,left:3};return S.wboss.left;}
+function wbStats(){const lv=S.player.level;
+ return{name:"远古魔龙·帝天",lv:lv+5,boss:true,
+ hp:Math.floor(2500+lv*1200),atk:Math.floor(35+lv*14),def:Math.floor(12+lv*6),spd:Math.floor(10+lv*2),
+ exp:500+lv*80,coins:500+lv*100};}
+function startWBattle(){
+ const p=S.player;
+ if(wbLeft()<=0){toast("今日挑战次数已用完，明日再战");return;}
+ if(p.stamina<10){toast("体力不足（需10点），去打坐或商城买体力丹");return;}
+ p.stamina-=10;S.wboss.left--;
+ const f=wbStats();B={wb:true,foe:{...f,maxhp:f.hp},log:[],over:false};
+ log(`<span class="sys">🌍 世界BOSS降临！${f.name}出现了！</span>`);
+ save();rBattle();
+}
 const GFNAME={atk:"攻击",def:"防御",hp:"气血",mp:"内力",spd:"速度",luck:"幸运"};
 /* ============ VIP系统 ============ */
 const VIP_NEED=[0,6,30,98,198,498,998]; // 索引即VIP等级：升到该级所需累计充值
@@ -310,7 +330,7 @@ function newGame(name,sectKey){
    stamina:50,maxStamina:50,skills:[sc.skill],task:null,taskDone:false,
    base:{maxhp:sc.hp,maxmp:sc.mp,atk:sc.atk,def:sc.def,spd:sc.spd}},
   equip:{weapon:null,armor:null,boots:null,charm:null},bag:[],pets:[],activePet:-1,
-  orders:[],zone:0,created:nowStr(),gongfa:{},douqi:0,yihuo:[],fenjue:{lv:0},eventTitles:[]};
+  orders:[],zone:0,created:nowStr(),gongfa:{},gongfaLearned:{},douqi:0,yihuo:[],fenjue:{lv:0},eventTitles:[]};
  calcStats();S.player.hp=S.player.maxhp;S.player.mp=S.player.maxmp;save();
 }
 /* ============ 顶栏/导航 ============ */
@@ -363,8 +383,11 @@ function rHome(){
  });
  h+=`<button class="btn small" id="dazuo">🧘 打坐调息（+10体力）</button>
  <p class="dim">师门任务：${p.task?("已接取：击败"+p.task.need+"个敌人（"+p.task.done+"/"+p.task.need+"）"+(p.taskDone?" ✅可领奖":"")):"未接取，去门派接取"}</p></div>`;
+ h+=`<div class="card"><h3>🌍 世界BOSS</h3><p class="dim">远古魔龙·帝天降临！战胜掉落功法秘籍（神级以下）。每日可挑战 <b class="gold">${wbLeft()}</b> 次，每次消耗10点体力。</p>
+ <button class="btn primary" id="wbBtn"${wbLeft()>0?"":" disabled"}>挑战世界BOSS</button></div>`;
  m.innerHTML=h;
  m.querySelectorAll("[data-z]").forEach(b=>b.onclick=()=>rZone(+b.dataset.z));
+ const wb=$("wbBtn");if(wb)wb.onclick=startWBattle;
  $("dazuo").onclick=()=>{
   const now=Date.now();
   if(S.dazuoCD&&now-S.dazuoCD<60000){toast("调息中…"+Math.ceil((60000-(now-S.dazuoCD))/1000)+"秒");return;}
@@ -439,6 +462,17 @@ B.over=true;const p=S.player,f=B.foe;
 if(win){
 log(`<span class="sys">⚔️ 战胜了！获得修为 ${f.exp}、铜币 ${f.coins}</span>`);
 gainExp(f.exp);p.coins+=f.coins;gainPetExp(Math.floor(f.exp/2));
+if(B.wb){ // 世界BOSS：掉落功法（神级以下）
+ const cand=Object.keys(GONGFA).filter(g=>GONGFA[g].tier!=="神"&&!gfLearned(g));
+ if(cand.length){
+  const w={黄:40,玄:30,地:20,天:10};let tot=0;
+  const bag=cand.map(g=>{const ww=w[GONGFA[g].tier]||10;tot+=ww;return[g,ww];});
+  let r=Math.random()*tot,pg=bag[0][0];
+  for(const[g,ww]of bag){r-=ww;if(r<=0){pg=g;break;}}
+  S.gongfaLearned=S.gongfaLearned||{};S.gongfaLearned[pg]=1;
+  log(`<span class="sys">🎁 世界BOSS掉落：功法《${GONGFA[pg].name}》！去功法页修炼吧</span>`);
+ }else{p.gold+=88;log(`<span class="sys">🎁 功法已集齐，获得88元宝！</span>`);}
+}else{
 // 掉落
 const tier=ZONES[B.zi].tier;
 const pool=Object.keys(ITEMS).filter(k=>ITEMS[k].tier===tier&&!ITEMS[k].gift);
@@ -446,6 +480,7 @@ if(f.boss||Math.random()<0.3){
 const iid=pick(pool);
 S.bag.push({iid,enh:0});
 log(`<span class="sys">🎁 获得了！</span>`);
+}
 }
 if(p.task&&!p.taskDone){p.task.done++;if(p.task.done>=p.task.need){p.taskDone=true;log(`<span class="sys">📜 师门任务完成，可回门派领奖！</span>`);}}
 }else{
@@ -611,14 +646,28 @@ let h=`<div class="card"><h3>🔥 斗气境界</h3>
 <div class="tier"><div><div class="gold">${dq.name}</div><div class="m">${bonusStr(dq.bonus)||"初入斗气，仍需修炼"}</div>
 ${nd?`<div class="m">下一境：${nd.name}（需${breq}级）</div>`:`<div class="m">已至斗帝巅峰，睥睨天下！</div>`}</div>
 ${nd?`<button class="btn small primary" style="width:auto;margin:0" id="dqB"${canB?"":" disabled"}>突破·${bcost}铜币</button>`:""}</div></div>`;
-h+=`<div class="card"><h3>📖 功法修炼</h3><p class="dim">功法分黄/玄/地/天/神五级，花费铜币修炼，每本最高5重。</p>`;
+h+=`<div class="card"><h3>📖 功法修炼</h3><p class="dim">功法分黄/玄/地/天/神五级。神级以下可元宝购买或挑战🌍世界BOSS掉落，神级唯👑VIP6可得；习得后花费铜币修炼，每本最高5重。</p>`;
 for(const[gid,g]of Object.entries(GONGFA)){
- const lv=gfLv(gid),maxed=lv>=g.max,locked=p.level<g.req,cost=gfCost(lv);
+ const lv=gfLv(gid),learned=gfLearned(gid),maxed=lv>=g.max,locked=p.level<g.req;
  const per=Object.entries(g.bonus).map(([k,v])=>`${GFNAME[k]}+${v}`).join(" ");
+ let btn,sub="";
+ if(g.vip6){
+  if(vipLevel()>=6){
+   btn=`<button class="btn small primary" style="width:auto;margin:0" data-gf="${gid}"${maxed?" disabled":""}>${maxed?"已满重":`修炼·${gfCost(lv)}铜币`}</button>`;
+  }else{
+   btn=`<button class="btn small" style="width:auto;margin:0" disabled>👑VIP6专属</button>`;
+   sub=`<div class="m" style="color:#e08a8a">累计充值至VIP6即可获得</div>`;
+  }
+ }else if(!learned){
+  btn=`<button class="btn small primary" style="width:auto;margin:0" data-buygf="${gid}">购买·${g.price}元宝</button>`;
+  sub=`<div class="m">或挑战🌍世界BOSS掉落</div>`;
+ }else{
+  btn=`<button class="btn small primary" style="width:auto;margin:0" data-gf="${gid}"${(maxed||locked)?" disabled":""}>${maxed?"已满重":`修炼·${gfCost(lv)}铜币`}</button>`;
+ }
  h+=`<div class="tier"><div><div class="gold">《${g.name}》 <span class="ptier ${g.tier}">${g.tier}级</span> <span class="dim">${lv}/${g.max}重</span></div>
- <div class="m">${g.desc}</div><div class="m">每重：${per}</div>
- ${locked?`<div class="m" style="color:#e08a8a">需要 ${g.req} 级解锁</div>`:""}
- </div><button class="btn small primary" style="width:auto;margin:0" data-gf="${gid}"${(maxed||locked)?" disabled":""}>${maxed?"已满重":`修炼·${cost}铜币`}</button></div>`;
+ <div class="m">${g.desc}</div><div class="m">每重：${per}</div>${sub}
+ ${learned&&locked?`<div class="m" style="color:#e08a8a">需要 ${g.req} 级修炼</div>`:""}
+ </div>${btn}</div>`;
 }
 const ft=fenjueTier(),flv=(S.fenjue&&S.fenjue.lv)||0,fmaxed=flv>=5,fcost=gfCost(flv);
 h+=`<div class="tier"><div><div class="gold">《焚诀》 <span class="ptier ${FENJUE_TIERS[ft]}">${FENJUE_TIERS[ft]}级·可进化</span> <span class="dim">${flv}/5重</span></div>
@@ -643,10 +692,17 @@ if(fb)fb.onclick=()=>{if(fmaxed)return;if(p.coins<fcost){toast("铜币不足");r
  p.coins-=fcost;S.fenjue=S.fenjue||{lv:0};S.fenjue.lv=flv+1;calcStats();save();render();toast(`📖《焚诀》突破至第${flv+1}重！`);};
 m.querySelectorAll("[data-gf]").forEach(b=>b.onclick=()=>{
  const gid=b.dataset.gf,g=GONGFA[gid],lv=gfLv(gid),cost=gfCost(lv);
- if(lv>=g.max||p.level<g.req)return;
+ if(!gfLearned(gid)||lv>=g.max||p.level<g.req)return;
  if(p.coins<cost){toast("铜币不足");return;}
  p.coins-=cost;S.gongfa[gid]=lv+1;calcStats();save();render();
  toast(`📖《${g.name}》突破至第${lv+1}重！`);
+});
+m.querySelectorAll("[data-buygf]").forEach(b=>b.onclick=()=>{
+ const gid=b.dataset.buygf,g=GONGFA[gid];
+ if(gfLearned(gid))return;
+ if(p.gold<g.price){toast("元宝不足");return;}
+ p.gold-=g.price;S.gongfaLearned=S.gongfaLearned||{};S.gongfaLearned[gid]=1;
+ save();render();toast(`📖习得《${g.name}》！`);
 });
 m.querySelectorAll("[data-yh]").forEach(b=>b.onclick=()=>{
  const f=YIHUO.find(x=>x.name===b.dataset.yh);
@@ -754,6 +810,7 @@ function payModal(i){
    const newV=vipLevel();
    let msg=`🎉 充值成功！元宝+${t.gold}`;
    if(newV>oldV){msg=`🎉 充值成功！晋升 👑VIP${newV}！`;S.title=newV;}
+   if(newV>=6&&!((S.gongfaLearned||{}).darin)){S.gongfaLearned=S.gongfaLearned||{};S.gongfaLearned.darin=1;msg+=` 获赠神级功法《大日焚天诀》！`;}
    if(isFirst){ // 首充赠开荒神兵小红剑（限时3天）
     const sword={iid:"w0",enh:0,expire:Date.now()+3*864e5},cur=S.equip.weapon?ITEMS[S.equip.weapon.iid]:null;
     if(!cur||(cur.atk||0)<26){if(S.equip.weapon)S.bag.push(S.equip.weapon);S.equip.weapon=sword;msg+=` 小红剑已穿戴！（限时3天）`;}
@@ -800,7 +857,8 @@ function rMore(){
  · 「充值」是模拟的，不花真钱，随便点！累计充值提升VIP等级，加攻击气血、每日领礼包<br>
  · 宠物可捕捉斗罗魂兽：柔骨兔·小舞、蓝银皇·阿银、鬼虎、人面魔蛛、泰坦巨猿·二明、暗魔邪神虎、天青牛蟒·大明、冰碧帝皇蝎<br>
  · 「排行」有战力榜和充值榜，前三名自动获得炫酷称号（属性可叠加）：👑战力之巅/⚔️武林传奇/🛡️江湖豪杰，💎神豪无双/💰富甲天下/🪙一掷千金<br>
- · 「更多」→「节日活动」可领中秋限定称号「🐰中秋快乐」（攻击+15 气血+150，可叠加）</p></div>
+ · 「更多」→「节日活动」可领中秋限定称号「🐰中秋快乐」（攻击+15 气血+150，可叠加）<br>
+ · 📖功法：神级以下先元宝购买（或打🌍世界BOSS掉落）再修炼，神级《大日焚天诀》唯👑VIP6可得；《焚诀》炼化异火可进化</p></div>
  <div class="card"><h3>🎑 节日活动</h3>
  <div class="tier"><div><div class="gold">中秋赏月 · 限时</div><div class="m">领取限定称号 <span class="rt rt-moon">🐰中秋快乐</span><br>攻击+15 气血+150，与其他称号叠加</div></div>
  <button class="btn small primary" style="width:auto;margin:0" id="evtMid"${(S.eventTitles||[]).includes("midautumn")?" disabled":""}>${(S.eventTitles||[]).includes("midautumn")?"已领取":"领取"}</button></div></div>
