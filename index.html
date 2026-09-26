@@ -11,6 +11,7 @@ body{background:#141009;color:#e8dcc0;font-family:"Songti SC","STSong","SimSun",
 #topbar{position:sticky;top:0;z-index:10;background:#241b0f;border-bottom:2px solid #8a6d2f;padding:8px 12px}
 #topbar .pname{font-size:16px;font-weight:bold;color:#f5d67b;letter-spacing:1px}
 #topbar .pname .lv{background:#8a6d2f;color:#141009;font-size:12px;padding:1px 8px;border-radius:10px;margin-left:6px;vertical-align:2px}
+#topbar .pname .vip{background:linear-gradient(180deg,#f5d67b,#c8903c);color:#3a2a08;font-size:12px;font-weight:bold;padding:1px 8px;border-radius:10px;margin-left:6px;vertical-align:2px}
 .bars{margin-top:6px;display:flex;flex-direction:column;gap:4px}
 .bar{height:14px;background:#0d0a06;border:1px solid #5a4a26;border-radius:7px;overflow:hidden;position:relative;font-size:10px}
 .bar>i{display:block;height:100%;border-radius:6px;transition:width .3s}
@@ -152,6 +153,11 @@ const TIERS=[
  {money:198,gold:2280,bonus:"多送20%"}
 ];
 const RANKS=[{name:"武林神话·叶孤鸿",zl:99999},{name:"剑圣·西门飘雪",zl:52000},{name:"魔教教主·任逍遥",zl:38000},{name:"丐帮帮主·洪七",zl:26000},{name:"武当掌门·张真人",zl:18000},{name:"峨眉掌门·灭绝师太",zl:12000},{name:"少林方丈·玄慈",zl:9000},{name:"黑风寨主·黑风虎",zl:5000},{name:"采花大盗·田伯光",zl:2800},{name:"江南大侠·江别鹤",zl:1500}];
+/* ============ VIP系统 ============ */
+const VIP_NEED=[0,6,30,98,198,498,998]; // 索引即VIP等级：升到该级所需累计充值
+function vipTotal(){return S.orders.reduce((a,o)=>a+o.money,0);}
+function vipLevel(){const t=vipTotal();let v=0;for(let i=1;i<VIP_NEED.length;i++)if(t>=VIP_NEED[i])v=i;return v;}
+function vipGift(){const v=vipLevel();return{coins:v*300,stam:10+v*5,gold:v*8};}
 </script>
 <script>
 "use strict";
@@ -173,6 +179,8 @@ function calcStats(){
   if(slot==="weapon")p.atk+=e*2; if(slot==="armor")p.def+=e*2;
   if(slot==="boots")p.spd+=e*1; if(slot==="charm"){p.maxhp+=e*15;}
  }
+ const vb=1+vipLevel()*0.02; // VIP加成：每级攻击/气血+2%
+ p.atk=Math.floor(p.atk*vb); p.maxhp=Math.floor(p.maxhp*vb);
  p.hp=Math.min(p.hp,p.maxhp); p.mp=Math.min(p.mp,p.maxmp);
 }
 function zhanli(){
@@ -192,7 +200,8 @@ function newGame(name,sectKey){
 /* ============ 顶栏/导航 ============ */
 function renderTop(){
  const p=S.player,t=$("topbar");t.style.display="block";
- t.innerHTML=`<div class="pname">${p.name}<span class="lv">Lv.${p.level} ${SECTS[p.sect].name}</span></div>
+ const v=vipLevel();
+ t.innerHTML=`<div class="pname">${p.name}<span class="lv">Lv.${p.level} ${SECTS[p.sect].name}</span>${v?`<span class="vip">👑VIP${v}</span>`:""}</div>
  <div class="bars">
   <div class="bar hp"><i style="width:${p.hp/p.maxhp*100}%"></i><span>气血 ${p.hp}/${p.maxhp}</span></div>
   <div class="bar mp"><i style="width:${p.mp/p.maxmp*100}%"></i><span>内力 ${p.mp}/${p.maxmp}</span></div>
@@ -516,7 +525,15 @@ save();render();
 /* ============ 模拟充值 ============ */
 function rPay(){
  const m=$("main"),p=S.player;
- let h=`<div class="card"><h3>💰 充值元宝</h3>
+ const v=vipLevel(),total=vipTotal(),next=v<VIP_NEED.length-1?VIP_NEED[v+1]:null;
+ const today=nowStr().slice(0,10),claimed=S.vipClaim===today,g=vipGift();
+ let h=`<div class="card"><h3>👑 VIP特权</h3>
+ <p>当前等级：<b class="gold">VIP${v}</b> · 累计充值 <b class="gold">￥${total}</b></p>
+ <p class="dim">${next?`再充 ￥${next-total} 晋升 VIP${v+1}`:`已达最高 VIP${v}，威震江湖！`}</p>
+ <div class="statgrid"><div>攻击/气血加成<b>+${v*2}%</b></div><div>每日VIP礼包<b>${v?(claimed?"已领取":"可领取"):"VIP1开启"}</b></div></div>
+ <p class="dim" style="margin:6px 0">今日礼包：铜币${g.coins} · 体力${g.stam} · 元宝${g.gold}</p>
+ <button class="btn small primary" id="vipclaim" ${(!v||claimed)?"disabled":""}>${claimed?"今日已领取":(v?"领取今日VIP礼包":"充值任意金额开启VIP")}</button></div>
+ <div class="card"><h3>💰 充值元宝</h3>
  <p class="dim">⚠️ 原型演示：模拟支付流程，不产生真实扣款。正式版将接入微信/支付宝。</p>
  <p>当前元宝：<b class="gold">${p.gold}</b></p>`;
  TIERS.forEach((t,i)=>{
@@ -529,6 +546,15 @@ function rPay(){
   h+=`<div class="order"><span class="ok">✅</span> ${o.time} · ￥${o.money} → ${o.gold}元宝 <span class="dim">#${o.id}</span></div>`;
  });
  h+=`</div>`;m.innerHTML=h;
+ const vc=$("vipclaim");
+ if(vc)vc.onclick=()=>{
+  const vv=vipLevel(),tt=nowStr().slice(0,10);
+  if(!vv||S.vipClaim===tt)return;
+  const gg=vipGift();
+  S.vipClaim=tt;p.coins+=gg.coins;p.gold+=gg.gold;
+  p.stamina=Math.min(p.maxStamina,p.stamina+gg.stam);
+  save();render();toast(`🎁 VIP${vv}每日礼包到账！`);
+ };
  m.querySelectorAll("[data-tier]").forEach(b=>b.onclick=()=>payModal(+b.dataset.tier));
 }
 function payModal(i){
@@ -542,9 +568,13 @@ function payModal(i){
  $("payok").onclick=()=>{
   $("payok").disabled=true;$("payok").textContent="支付处理中…";
   setTimeout(()=>{
+   const oldV=vipLevel();
    S.player.gold+=t.gold;
    S.orders.push({id:oid,money:t.money,gold:t.gold,time:nowStr(),status:"已到账"});
-   save();closeModal();render();toast(`🎉 充值成功！元宝+${t.gold}`);
+   const newV=vipLevel();
+   calcStats();
+   save();closeModal();render();
+   toast(newV>oldV?`🎉 充值成功！晋升 👑VIP${newV}！`:`🎉 充值成功！元宝+${t.gold}`);
   },1200);
  };
  $("paycancel").onclick=closeModal;
@@ -562,14 +592,15 @@ function rMore(){
  const total=S.orders.reduce((a,o)=>a+o.money,0);
  m.innerHTML=`<div class="card"><h3>📊 GM 后台（店主视角）</h3>
  <div class="statgrid"><div>累计充值笔数<b>${S.orders.length}</b></div><div>累计充值金额<b>￥${total}</b></div>
- <div>发放元宝总数<b>${S.orders.reduce((a,o)=>a+o.gold,0)}</b></div><div>建号时间<b style="font-size:11px">${S.created}</b></div></div>
+ <div>发放元宝总数<b>${S.orders.reduce((a,o)=>a+o.gold,0)}</b></div><div>VIP等级<b>👑VIP${vipLevel()}</b></div>
+ <div>建号时间<b style="font-size:11px">${S.created}</b></div></div>
  <p class="dim" style="margin-top:8px">正式版这里会显示所有玩家的订单，并支持订单查询、补发、封号等管理功能。</p></div>
  <div class="card"><h3>❓ 玩法说明</h3><p class="dim">
  · 去「江湖」挑战敌人，升级变强<br>· 怪物掉装备，去「背包」穿戴、铁匠铺强化<br>
  · 野怪打到30%血可捕捉为宠物，宠物会帮你打架<br>
  · 「门派」学高级武功、做师门任务<br>
  · 体力不够就打坐，或去商城买体力丹<br>
- · 「充值」是模拟的，不花真钱，随便点！</p></div>
+ · 「充值」是模拟的，不花真钱，随便点！累计充值提升VIP等级，加攻击气血、每日领礼包</p></div>
  <div class="card"><h3>💾 存档</h3>
  <button class="btn small" id="resave">手动保存</button>
  <button class="btn small danger" id="reset">删号重来（清空存档）</button></div>`;
