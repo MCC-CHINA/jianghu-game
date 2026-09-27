@@ -32,19 +32,21 @@ body{background:#141009;color:#e8dcc0;font-family:"Songti SC","STSong","SimSun",
 /* 神级物品：七彩流光 */
 .godflow{font-weight:bold;background:linear-gradient(90deg,#ff2d2d,#ff7f00,#ffe600,#2dff2d,#00e5ff,#2d7fff,#a52dff,#ffd700,#ff2d2d);background-size:300% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:rainbow 3s linear infinite}
 .goldflow{font-weight:bold;background:linear-gradient(90deg,#fff3b0,#ffd700,#ff9d00,#ffd700,#fff3b0);background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:rainbow 4s linear infinite}
-.ptier.圣{background:linear-gradient(90deg,#ff2d2d,#ff7f00,#ffe600,#2dff2d,#00e5ff,#a52dff,#ffd700);background-size:300% auto;animation:rainbow 3s linear infinite;color:#fff;font-weight:bold;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+/* 品级色：黄白 玄蓝 地紫 天橙 神粉流光 圣金流光 至尊七彩流光 */
+.ptier.黄,.tn-黄{color:#f2f2f2}
+.ptier.玄,.tn-玄{color:#6db3ff}
+.ptier.地,.tn-地{color:#c58fff}
+.ptier.天,.tn-天{color:#ffab4a}
+.ptier.神,.tn-神{font-weight:bold;background:linear-gradient(90deg,#ffd6f5,#ff8fd6,#ff4fb8,#ff8fd6,#ffd6f5);background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:rainbow 3s linear infinite}
+.ptier.圣,.tn-圣{font-weight:bold;background:linear-gradient(90deg,#fff3b0,#ffd700,#ff9d00,#ffd700,#fff3b0);background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:rainbow 3s linear infinite}
+.ptier.至尊,.tn-至尊{font-weight:bold;background:linear-gradient(90deg,#ff2d2d,#ff7f00,#ffe600,#2dff2d,#00e5ff,#2d7fff,#a52dff,#ffd700,#ff2d2d);background-size:300% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:rainbow 3s linear infinite}
 /* 称号页：只显示称号牌；未获得灰色未点亮 */
 .tgrid{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:4px 0}
 .tt{display:inline-block;cursor:default}
 .tt.locked .rtx{filter:grayscale(1) brightness(.55);opacity:.65}
 .tt.worn{outline:2px solid #f5d67b;border-radius:10px;box-shadow:0 0 10px rgba(245,214,123,.6)}
 .ptier{font-size:11px;padding:1px 6px;border-radius:8px;margin-left:4px;white-space:nowrap}
-.ptier.黄{background:#5a4a1a;color:#f5d67b}
-.ptier.玄{background:#3a3a6a;color:#b8b0f0}
-.ptier.地{background:#2a4a2a;color:#9ae09a}
-.ptier.天{background:#5a2a2a;color:#f0a8a8}
-.ptier.神{background:#6a4a00;color:#ffe97b;font-weight:bold}
-.ptier.至尊{background:linear-gradient(135deg,#fff3b0,#ffd700 40%,#ff9d00);color:#5a3000;font-weight:bold;box-shadow:0 0 10px rgba(255,180,0,.9);border:1px solid #ffe97b}
+.ptier{font-weight:bold}
 /* 称号牌：琉璃透明感（半透紫晶牌+流光羽翼+中央宝石） */
 .rtx{position:relative;display:inline-flex;align-items:center;vertical-align:middle;margin:4px 2px;filter:drop-shadow(0 0 6px rgba(150,130,255,.45))}
 .rtx b{position:relative;overflow:hidden;flex:none;font-size:13px;font-weight:bold;white-space:nowrap;padding:5px 18px 6px;letter-spacing:3px;color:#f5f2ff;background:linear-gradient(180deg,rgba(215,205,255,.34) 0%,rgba(150,135,235,.22) 35%,rgba(96,74,200,.30) 70%,rgba(58,36,150,.38) 100%);border:1px solid rgba(226,216,255,.65);border-radius:6px;text-shadow:0 0 8px rgba(190,170,255,1),0 0 3px #fff,0 1px 3px rgba(40,20,110,.9);box-shadow:0 0 12px rgba(150,130,255,.5),inset 0 1px 2px rgba(255,255,255,.5),inset 0 -3px 6px rgba(90,60,200,.35)}
@@ -491,7 +493,7 @@ function wornTitleInfo(){const w=S.wornTitle;if(!w)return null;
  return null;}
 function godName(n){return `<span class="godflow">${n}</span>`;} // 神/圣级名：七彩流光
 function goldName(n){return `<span class="goldflow">${n}</span>`;} // 至尊名：金色
-function tieredName(n,t){if(t===6)return goldName(n);if(t>=4)return godName(n);return n;} // 品级名色
+function tieredName(n,t){return `<span class="tn-${PTIERS[t]}">${n}</span>`;} // 品级名色：黄白/玄蓝/地紫/天橙/神粉流光/圣金流光/至尊七彩
 function itemNameHTML(it){const d=ITEMS[it.iid];return d.tier>=5?godName(d.name):d.name;} // 装备名（5阶神级流光）
 function myRankTitles(){
  const t=[],zl=zhanli();
@@ -1314,6 +1316,7 @@ m.querySelectorAll("[data-yh]").forEach(b=>b.onclick=()=>{
 });
 }
 /* ============ 商店 ============ */
+const EXCHANGES=[{gold:10,coins:100000},{gold:50,coins:550000},{gold:100,coins:1200000}]; // 元宝兑换铜币
 function rShop(){
 const m=$("main"),p=S.player;
 const tier=Math.min(5,Math.floor(p.level/6)+1),ptier=Math.min(4,Math.floor(p.level/8)); // 装备1-5阶，宠物0-4品
@@ -1331,6 +1334,8 @@ h+=`</div><div class="card"><h3>元宝商城</h3><p class="dim">你有元宝 <b 
 <div class="tier"><div><div class="gold">双倍经验丹</div><div class="m">打怪修为×2，持续30分钟 · 25元宝</div></div><button class="btn small" style="width:auto;margin:0" data-g="exp2">购买</button></div>
 <div class="tier"><div><div class="gold">三倍经验丹</div><div class="m">打怪修为×3，持续30分钟 · 45元宝</div></div><button class="btn small" style="width:auto;margin:0" data-g="exp3">购买</button></div>
 <div class="tier"><div><div class="gold">五倍经验丹</div><div class="m">打怪修为×5，持续30分钟 · 80元宝</div></div><button class="btn small" style="width:auto;margin:0" data-g="exp5">购买</button></div>
+</div><div class="card"><h3>元宝兑换</h3><p class="dim">你有元宝 <b class="gold">${p.gold}</b> · 你有铜币 ${p.coins}</p>
+${EXCHANGES.map((e,i)=>`<div class="tier"><div><div class="gold">铜币 × ${e.coins/10000}万</div><div class="m">消耗 ${e.gold} 元宝${i>0?" · 多送":""}</div></div><button class="btn small" style="width:auto;margin:0" data-x="${i}">兑换</button></div>`).join("")}
 </div>`;m.innerHTML=h;
 m.querySelectorAll("[data-buy]").forEach(b=>b.onclick=()=>{
 const s=SHOP.find(x=>x.id===b.dataset.buy);
@@ -1349,6 +1354,11 @@ else if(k==="xilian"&&p.gold>=38){p.gold-=38;addConsumable("洗炼石","xilian")
 else if(EXPDAN[k]&&p.gold>=EXPDAN[k].price){p.gold-=EXPDAN[k].price;addConsumable(EXPDAN[k].name,k);toast(EXPDAN[k].name+"+1，在背包中使用生效！");}
 else{toast("元宝不足，请充值");return;}
 save();render();
+});
+m.querySelectorAll("[data-x]").forEach(b=>b.onclick=()=>{
+const e=EXCHANGES[+b.dataset.x];
+if(p.gold<e.gold){toast("元宝不足，请充值");return;}
+p.gold-=e.gold;p.coins+=e.coins;save();render();toast(`兑换成功！铜币+${e.coins/10000}万`);
 });
 }
 </script>
@@ -1737,19 +1747,19 @@ function rEvent(){
  <button class="btn small primary" style="width:auto;margin:0" id="evtMid"${midGot?" disabled":""}>${midGot?"已领取":"领取"}</button></div>
  <div class="tier"><div><div class="gold">节日庆典</div><div class="m">每日可领取一个随机限定称号<br>剩余未获得：${festLeft} 个</div></div>
  <button class="btn small primary" style="width:auto;margin:0" id="evtFest"${festCan?"":" disabled"}>${festClaimed?"今日已领取":(festLeft?"领取今日称号":"已集齐")}</button></div>
- <div class="tier"><div><div class="gold">神功现世</div><div class="m">累计充值满￥498 领取神级《<span class="godflow">大日焚天诀</span>》（${total}/498）<br><span class="dim">原需VIP6，限时直得</span></div></div>
+ <div class="tier"><div><div class="gold">神功现世</div><div class="m">累计充值满￥498 领取神级《${tieredName("大日焚天诀",4)}》（${total}/498）<br><span class="dim">原需VIP6，限时直得</span></div></div>
  <button class="btn small primary" style="width:auto;margin:0" id="evtDarin"${canDarin?"":" disabled"}>${darinGot?"已领取":(total>=498?"领取":`差￥${498-total}`)}</button></div>
  <div class="tier"><div><div class="gold">神将降临</div><div class="m">累计充值满￥1288 领取神话伙伴×1（${total}/1288）<br><span class="dim">神话伙伴：顶级资质，助战无双</span></div></div>
  <button class="btn small primary" style="width:auto;margin:0" id="evtMythic"${canMythic?"":" disabled"}>${mythicGot?"已领取":(total>=1288?"领取":`差￥${1288-total}`)}</button></div>
- <div class="tier"><div><div class="gold">圣宠降临</div><div class="m">累计充值满￥2998 领取圣级宠物「九天圣龙」（${total}/2998）<br><span class="dim">圣级凌驾神级之上，助战倍率2.6</span></div></div>
+ <div class="tier"><div><div class="gold">圣宠降临</div><div class="m">累计充值满￥2998 领取圣级宠物「${tieredName("九天圣龙",5)}」（${total}/2998）<br><span class="dim">圣级凌驾神级之上，助战倍率2.6</span></div></div>
  <button class="btn small primary" style="width:auto;margin:0" id="evtSPet"${canSPet?"":" disabled"}>${sPetGot?"已领取":(total>=2998?"领取":`差￥${2998-total}`)}</button></div>
- <div class="tier"><div><div class="gold">圣功现世</div><div class="m">累计充值满￥3999 领取圣级功法《<span class="godflow">圣心诀</span>》（${total}/3999）<br><span class="dim">圣级功法，属性碾压神级</span></div></div>
+ <div class="tier"><div><div class="gold">圣功现世</div><div class="m">累计充值满￥3999 领取圣级功法《${tieredName("圣心诀",5)}》（${total}/3999）<br><span class="dim">圣级功法，属性碾压神级</span></div></div>
  <button class="btn small primary" style="width:auto;margin:0" id="evtSGf"${canSGf?"":" disabled"}>${sGfGot?"已领取":(total>=3999?"领取":`差￥${3999-total}`)}</button></div>
  <div class="tier"><div><div class="gold">圣凰降临</div><div class="m">累计充值满￥5999 领取圣级宠物「混沌圣凰」（${total}/5999）<br><span class="dim">圣级圣兽，速度无双</span></div></div>
  <button class="btn small primary" style="width:auto;margin:0" id="evtSHuang"${canSHuang?"":" disabled"}>${sHuangGot?"已领取":(total>=5999?"领取":`差￥${5999-total}`)}</button></div>
- <div class="tier"><div><div class="gold">至尊降临</div><div class="m">累计充值满￥7999 领取<span class="ptier 至尊">至尊终极</span>伙伴×1（${total}/7999）<br><span class="dim">全场最强伙伴，金色品质</span></div></div>
+ <div class="tier"><div><div class="gold">至尊降临</div><div class="m">累计充值满￥7999 领取<span class="ptier 至尊">至尊终极</span>伙伴×1（${total}/7999）<br><span class="dim">全场最强伙伴，七彩流光</span></div></div>
  <button class="btn small primary" style="width:auto;margin:0" id="evtZZ"${canZZ?"":" disabled"}>${zzGot?"已领取":(total>=7999?"领取":`差￥${7999-total}`)}</button></div>
- <div class="tier"><div><div class="gold">鸿蒙降临</div><div class="m">累计充值满￥9999 领取<span class="ptier 至尊">至尊终极</span>宠物「${goldName("鸿蒙至尊龙")}」+ 至尊终极功法《${goldName("鸿蒙至尊诀")}》（${total}/9999）<br><span class="dim">终极之上的终极，万中无一</span></div></div>
+ <div class="tier"><div><div class="gold">鸿蒙降临</div><div class="m">累计充值满￥9999 领取<span class="ptier 至尊">至尊终极</span>宠物「${tieredName("鸿蒙至尊龙",6)}」+ 至尊终极功法《${tieredName("鸿蒙至尊诀",6)}》（${total}/9999）<br><span class="dim">终极之上的终极，万中无一</span></div></div>
  <button class="btn small primary" style="width:auto;margin:0" id="evtHM"${canHm?"":" disabled"}>${hmGot?"已领取":(total>=9999?"领取":`差￥${9999-total}`)}</button></div></div>`;
  // ---- 每日活动 ----
  const wbl=wbLeft();
