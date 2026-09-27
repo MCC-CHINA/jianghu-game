@@ -1496,6 +1496,8 @@ function rTitle(){
 function hashStr(s){let h=0;s=String(s);for(let i=0;i<s.length;i++){h=(h*31+s.charCodeAt(i))>>>0;}return h;}
 const NPC_PETS=["啸天虎","碧鳞蛇","金翅雕","金蚕蛊","苍原狼","月影兔","灵羽鸡","泰坦巨猿","天青牛蟒","九幽冥雀"];
 const NPC_TITLES=["武林新秀","一方豪杰","江湖名宿","绝世高手","武林神话","独步天下","剑啸江湖","笑傲群雄"];
+const NPC_EQPRE=["铁","精钢","银","金","龙纹","轩辕"];
+const NPC_EQN={weapon:"剑",hat:"盔",armor:"甲",pants:"裤",bracer:"护腕",ring:"戒",necklace:"项链",medal:"勋章",boots:"靴",charm:"佩"};
 function npcProfile(name,ref){
  ref=ref||{};const h=hashStr(name);
  const power=ref.zl||(ref.pay||0)*1.2||(ref.score||0)*10||((ref.tier||1)*9000)||(ref.lv||20)*900||8000;
@@ -1504,9 +1506,36 @@ function npcProfile(name,ref){
   zl:Math.round(ref.zl||power),
   atk:Math.round(power*0.016*f),def:Math.round(power*0.011*f),
   maxhp:Math.round(power*0.85*f),spd:Math.round(power*0.007*f),
-  pet:NPC_PETS[h%NPC_PETS.length],wingT:1+h%12,title:NPC_TITLES[h%NPC_TITLES.length]};
+  pet:NPC_PETS[h%NPC_PETS.length],wingT:1+h%12,title:NPC_TITLES[h%NPC_TITLES.length],
+  eqTier:1+Math.min(5,Math.floor(power/25000)),gfPick:h%(Object.keys(GONGFA).length)};
+}
+function npcEquip(np){
+ const pre=NPC_EQPRE[np.eqTier-1]||"铁",o={};
+ for(const s of["weapon","hat","armor","pants","bracer1","bracer2","ring1","ring2","necklace","medal","boots","charm"]){
+  const base=s.replace(/[12]$/,"");o[s]=pre+NPC_EQN[base];}
+ return o;
+}
+function npcGongfa(np){
+ const ks=Object.keys(GONGFA),n=1+(hashStr(np.name)%3),o=[];
+ for(let i=0;i<n;i++)o.push(GONGFA[ks[(np.gfPick+i*7)%ks.length]].name);
+ return [...new Set(o)];
 }
 function myBestPetName(){let s=0,n="暂无宠物";for(const pet of(S.pets||[])){const sc=petScore(pet);if(sc>s){s=sc;n=pet.name;}}return n;}
+function myEquipStr(){
+ const o=[];
+ for(const s of SLOTS){const it=S.equip[s];if(it&&ITEMS[it.iid])o.push(SLOTNAME[s]+"："+itemNameHTML(it));}
+ return o.length?o.join(" · "):"暂无装备";
+}
+function myGongfaStr(){
+ const ks=Object.keys(S.gongfaLearned||{}).filter(g=>GONGFA[g]);
+ return ks.length?ks.map(g=>GONGFA[g].name).join(" · "):"暂无功法";
+}
+function eqGfRows(eqObj,gfArr){
+ let eqs=[];
+ for(const s of SLOTS){if(eqObj[s])eqs.push(SLOTNAME[s]+"："+escHtml(eqObj[s]));}
+ return `<div class="tier"><div><div class="m">装备</div><div class="gold" style="font-size:13px;line-height:1.7">${eqs.length?eqs.join(" · "):"暂无装备"}</div></div></div>`
+  +`<div class="tier"><div><div class="m">功法</div><div class="gold" style="font-size:13px;line-height:1.7">${gfArr.length?gfArr.map(escHtml).join(" · "):"暂无功法"}</div></div></div>`;
+}
 function cmpRow(label,nv,pv){
  const hc=nv>pv?"good":nv<pv?"bad":"",pc=pv>nv?"good":pv<nv?"bad":"",d=nv-pv;
  return `<div class="tier"><div><div class="m">${label}</div><div class="gold"><span class="${hc}">${nv}</span> <span class="dim">vs</span> <span class="${pc}">${pv}</span></div><div class="m dim">${d===0?"双方持平":d>0?"对方高 "+d:"你高 "+(-d)}</div></div></div>`;
@@ -1519,12 +1548,15 @@ function viewProfile(r){
  if(me){
   h+=`<p>名字：${vipName(p.name,myVip)} <span class="dim">VIP${myVip}</span></p><p class="dim">${SECTS[p.sect].name} · Lv.${p.level}</p>`;
   h+=cmpRow("战力",myZl,myZl)+cmpRow("攻击",p.atk,p.atk)+cmpRow("防御",p.def,p.def)+cmpRow("气血",p.maxhp,p.maxhp)+cmpRow("速度",p.spd,p.spd);
+  h+=`<div class="tier"><div><div class="m">装备</div><div class="gold" style="font-size:13px;line-height:1.7">${myEquipStr()}</div></div></div>`
+   +`<div class="tier"><div><div class="m">功法</div><div class="gold" style="font-size:13px;line-height:1.7">${myGongfaStr()}</div></div></div>`;
  }else{
   const ratio=np.zl/Math.max(1,myZl);
   h+=`<p>名字：${vipName(np.name,np.vip)} <span class="dim">VIP${np.vip}</span></p><p class="dim">${SECTS[np.sect].name} · Lv.${np.lv} · 称号${escHtml(np.title)}</p>`;
   h+=`<p>${ratio>=1?`对方战力约为你的 <b class="bad">${ratio.toFixed(1)}</b> 倍，再接再厉！`:`你的战力已是对方的 <b class="good">${(1/ratio).toFixed(1)}</b> 倍！`}</p>`;
   h+=cmpRow("战力",np.zl,myZl)+cmpRow("等级",np.lv,p.level)+cmpRow("攻击",np.atk,p.atk)+cmpRow("防御",np.def,p.def)+cmpRow("气血",np.maxhp,p.maxhp)+cmpRow("速度",np.spd,p.spd);
   h+=`<div class="tier"><div><div class="m">宠物 / 翅膀</div><div class="gold">${escHtml(np.pet)} <span class="dim">vs</span> ${escHtml(myBestPetName())}</div><div class="m dim">${WING_NAMES[np.wingT]} <span class="dim">vs</span> ${(S.wing&&S.wing.tier)?WING_NAMES[S.wing.tier]:"未激活"}</div></div></div>`;
+  h+=eqGfRows(npcEquip(np),npcGongfa(np));
  }
  h+=`<button class="btn" id="vpClose" style="margin-top:8px">关闭</button></div>`;
  modal(h);
