@@ -452,18 +452,20 @@ const EVENT_TITLES={
  yijianrugu:{name:"一见如故",cls:"rtcust",hue:46,bonus:{atk:12,hp:120},desc:"游历江湖可得"},
  gandan:{name:"肝胆相照",cls:"rtcust",hue:47,bonus:{atk:25,hp:250},desc:"游历江湖可得"},
 };
-/* 充值豪礼：累计充值领取神级宠物/稀有称号 */
+/* 充值豪礼：5档（真实充值+红包共同累积，平民/微氪线） */
 const GIFTS=[
- {id:"pet_sanyan",need:198,kind:"pet",pid:"sanyan",name:"神级宠物「三眼金猊·王秋儿」",desc:"神级魂兽，帝皇瑞兽"},
- {id:"pet_xuenv",need:498,kind:"pet",pid:"xuenv",name:"神级宠物「冰天雪女」",desc:"神级魂兽，极北天王"},
- {id:"title_shenzhi",need:998,kind:"title",eid:"shenzhi",name:"稀有称号「神之眷顾」",desc:"攻击+50 气血+500 幸运+3，可叠加"}
+ {id:"gift_30",need:30,kind:"mix",name:"微氪启程礼",desc:"元宝×1000 · 洗炼石×5 · 五倍经验丹×1",give:[["gold",1000],["xilian",5],["expdan","exp5"]]},
+ {id:"gift_98",need:98,kind:"pet",pid:"tianqing",name:"天级终极宠物「天青牛蟒·大明」",desc:"天级终极魂兽，君临星斗",give:[["pet","tianqing"]]},
+ {id:"pet_sanyan",need:198,kind:"pet",pid:"sanyan",name:"神级宠物「三眼金猊·王秋儿」",desc:"神级魂兽，帝皇瑞兽",give:[["pet","sanyan"]]},
+ {id:"pet_xuenv",need:498,kind:"pet",pid:"xuenv",name:"神级宠物「冰天雪女」",desc:"神级魂兽，极北天王",give:[["pet","xuenv"]]},
+ {id:"title_shenzhi",need:998,kind:"title",eid:"shenzhi",name:"稀有称号「神之眷顾」",desc:"攻击+50 气血+500 幸运+3，可叠加",give:[["title","shenzhi"]]}
 ];
-/* 累计充值奖励：4档（1998起，与充值豪礼不重复），真实充值+红包共同累积进度（红包不计VIP等级） */
-const RECHARGE_REWARDS=[ // 与充值豪礼不重复：只保留豪礼没有的高档（神级奖励名带品级色）
- {need:1998,desc:`元宝×20000 · ${tieredName("神话伙伴",4)}×1 · 限定称号「一代宗师」`,give:[["gold",20000],["partner",4],["title","zongshi"]]},
- {need:2998,desc:`元宝×30000 · ${tieredName("神级功法",4)}《大日焚天诀》· 限定称号「开宗立派」`,give:[["gold",30000],["gongfa","darin"],["title","kaizong"]]},
- {need:5998,desc:`元宝×60000 · ${tieredName("神级双宠",4)}（金猊+雪女）· 限定称号「纵横四海」`,give:[["gold",60000],["pet","sanyan"],["pet","xuenv"],["title","zongheng"]]},
- {need:9999,desc:`元宝×100000 · ${tieredName("神话伙伴",4)}×2 · 限定称号「名扬四海」· 铜币×1000万`,give:[["gold",100000],["partner",4],["partner",4],["title","mingyang"],["coins",10000000]]}
+/* 累计充值奖励：4档（仅真实充值，红包不计入；中氪/土豪线；奖励不与豪礼/限时活动重复） */
+const RECHARGE_REWARDS=[
+ {need:1998,desc:`元宝×20000 · ${tieredName("圣级进化石",5)}×1 · 限定称号「一代宗师」`,give:[["gold",20000],["evo_saint",1],["title","zongshi"]]},
+ {need:2998,desc:`元宝×30000 · ${tieredName("圣级进化石",5)}×2 · 限定称号「开宗立派」`,give:[["gold",30000],["evo_saint",2],["title","kaizong"]]},
+ {need:5998,desc:`元宝×60000 · ${tieredName("至尊进化石",6)}×1 · 限定称号「纵横四海」`,give:[["gold",60000],["evo_zun",1],["title","zongheng"]]},
+ {need:9999,desc:`元宝×100000 · ${tieredName("至尊进化石",6)}×2 · 限定称号「名扬四海」· 铜币×1000万`,give:[["gold",100000],["evo_zun",2],["title","mingyang"],["coins",10000000]]}
 ];
 function rechargeProgress(){return vipTotal()+(S.rechargeBonus||0);} // 累计充值奖励进度：真实充值+红包
 function rpList(){ // 充值红包数组（兼容老存档的数字）
@@ -484,6 +486,11 @@ function grantReward(g){
  else if(k==="gongfa"){S.gongfaLearned=S.gongfaLearned||{};if(gfLearned(v))p.gold+=2000;else S.gongfaLearned[v]=1;}
  else if(k==="gongfa_rand_god"){const cand=Object.keys(GONGFA).filter(x=>GONGFA[x].tier===4&&!GONGFA[x].vip6&&!gfLearned(x));S.gongfaLearned=S.gongfaLearned||{};if(cand.length)S.gongfaLearned[pick(cand)]=1;else p.gold+=2000;}
  else if(k==="title"){S.eventTitles=S.eventTitles||[];if(!S.eventTitles.includes(v))S.eventTitles.push(v);}
+ else if(k==="xilian")addConsumable("洗炼石","xilian",v);
+ else if(k==="expdan")addConsumable(EXPDAN[v].name,v,1);
+ else if(k==="evostone")addConsumable("神级进化石","evostone",v);
+ else if(k==="evo_saint")addConsumable("圣级进化石","evo_saint",v);
+ else if(k==="evo_zun")addConsumable("至尊进化石","evo_zun",v);
  else if(k==="partner"){if(!Array.isArray(S.partners))S.partners=[];const used=S.partners.map(x=>x.name);const name=pick(PARTNER_NAMES.filter(n=>!used.includes(n)))||pick(PARTNER_NAMES);S.partners.push({name,quality:v,level:p.level,exp:0,equip:{weapon:null,armor:null,boots:null,charm:null}});if(S.activePartner===-1||S.activePartner===undefined)S.activePartner=0;}
 }
 /* 称号牌渲染：皇冠+翼饰+缎带 */
@@ -1509,20 +1516,20 @@ function rPay(){
  <p>我的玩家账号：<b class="gold" id="myacc">${p.account||""}</b> <button class="btn small" style="width:auto;margin:0;padding:4px 10px" id="cpacc">复制</button></p>
  <p>当前元宝：<b class="gold">${p.gold}</b></p>
  <div class="rowbtns"><input id="cdinput" placeholder="输入兑换码，如 ABCD-EFGH-IJKL" style="flex:1;padding:10px;border-radius:8px;border:1px solid #444;background:#1a1a22;color:#fff;font-size:15px;letter-spacing:1px"><button class="btn small primary" style="width:auto;margin:0" id="cdgo">兑换</button></div>
- <p class="dim" style="margin-top:6px">兑换码由客服后台生成，一码一用，区分大小写可忽略，自动忽略空格与横杠。</p></div><div class="card"><h3>充值豪礼</h3><p class="dim">神级宠物与稀有称号只能通过充值豪礼或限时活动获得。</p>`;
+ <p class="dim" style="margin-top:6px">兑换码由客服后台生成，一码一用，区分大小写可忽略，自动忽略空格与横杠。</p></div><div class="card"><h3>充值豪礼</h3><p class="dim">5档壕礼：30/98/198/498/998。真实充值与红包共同累积进度，平民打怪攒红包也能领！</p>`;
  GIFTS.forEach(gf=>{
- const ok=total>=gf.need,got=(S.claimedGifts||{})[gf.id];
- h+=`<div class="tier"><div><div class="gold">${gf.kind==="pet"&&gf.pid&&PETS[gf.pid]?tieredName(gf.name,PETS[gf.pid].tier):(gf.kind==="title"?godName(gf.name):gf.name)}</div><div class="m">${gf.desc} · 累计充值满￥${gf.need}（${total}/${gf.need}）</div></div>
+ const ok=prog>=gf.need,got=(S.claimedGifts||{})[gf.id];
+ h+=`<div class="tier"><div><div class="gold">${gf.kind==="pet"&&gf.pid&&PETS[gf.pid]?tieredName(gf.name,PETS[gf.pid].tier):(gf.kind==="title"?godName(gf.name):gf.name)}</div><div class="m">${gf.desc} · 累计满￥${gf.need}（${prog}/${gf.need}，含红包）</div></div>
  <button class="btn small primary" style="width:auto;margin:0" data-gift="${gf.id}"${(ok&&!got)?"":" disabled"}>${got?"已领取":(ok?"领取":"未达成")}</button></div>`;
  });
  h+=`</div><div class="card"><h3>累计充值奖励</h3>
- <p class="dim">真实充值与红包共同累积进度，4档高阶壕礼（低档请看上方充值豪礼，不重复发放）！散人打怪掉落充值红包，开启后计入下方奖励进度（不计入VIP等级）。</p>
- <p>奖励进度：<b class="gold">￥${prog}</b> <span class="dim">（真实充值￥${total} + 红包￥${bonus}）</span></p>
+ <p class="dim">4档高阶壕礼，仅真实充值累积（红包不计入，红包去领上方充值豪礼）！</p>
+ <p>奖励进度：<b class="gold">￥${total}</b> <span class="dim">（真实充值，红包￥${bonus}另计入充值豪礼）</span></p>
  <div class="tier"><div><div class="gold">充值红包×${rpN}</div><div class="m">金额0.5/1/3/5/10元，越大越稀有 · 今日已掉落 ${rpDayN}/100</div></div>
  <button class="btn small primary" style="width:auto;margin:0" id="openrp"${rpN?"":" disabled"}>${rpN?"开启红包":"暂无红包"}</button></div>`;
  RECHARGE_REWARDS.forEach((rw,i)=>{
- const ok=prog>=rw.need,got=(S.claimedRecharge||[]).includes(rw.need);
- h+=`<div class="tier"><div><div class="gold">累计满￥${rw.need}</div><div class="m">${rw.desc}</div><div class="m dim">进度 ${Math.min(prog,rw.need)}/${rw.need}</div></div>
+ const ok=total>=rw.need,got=(S.claimedRecharge||[]).includes(rw.need);
+ h+=`<div class="tier"><div><div class="gold">累计满￥${rw.need}</div><div class="m">${rw.desc}</div><div class="m dim">进度 ${Math.min(total,rw.need)}/${rw.need}（仅真实充值）</div></div>
  <button class="btn small primary" style="width:auto;margin:0" data-rw="${i}"${(ok&&!got)?"":" disabled"}>${got?"已领取":(ok?"领取":"未达成")}</button></div>`;
  });
  h+=`</div><div class="card"><h3>我的充值记录</h3>`;
@@ -1558,16 +1565,15 @@ function rPay(){
  const cpa=$("cpacc");if(cpa)cpa.onclick=()=>{const t=$("myacc").textContent;if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(()=>toast("账号已复制"),()=>toast("复制失败，请手动记录"));}else{toast("账号："+t);}};
  m.querySelectorAll("[data-gift]").forEach(b=>b.onclick=()=>{
  const gf=GIFTS.find(x=>x.id===b.dataset.gift);
- const total=S.orders.reduce((a,o)=>a+o.money,0);
- if(!gf||total<gf.need||(S.claimedGifts||{})[gf.id])return;
+ const pg=rechargeProgress();
+ if(!gf||pg<gf.need||(S.claimedGifts||{})[gf.id])return;
  S.claimedGifts=S.claimedGifts||{};S.claimedGifts[gf.id]=1;
- if(gf.kind==="pet"){const pb=PETS[gf.pid];S.pets.push({pid:gf.pid,name:pb.name,level:S.player.level,exp:0});if(S.activePet===-1&&S.player.level>=10)S.activePet=0;}
- else{S.eventTitles=S.eventTitles||[];if(!S.eventTitles.includes(gf.eid))S.eventTitles.push(gf.eid);}
+ (gf.give||[]).forEach(g=>grantReward(g));
  calcStats();save();render();toast(`获得${gf.name}！`);
  });
  m.querySelectorAll("[data-rw]").forEach(b=>b.onclick=()=>{
- const rw=RECHARGE_REWARDS[+b.dataset.rw],pg=rechargeProgress();
- if(!rw||pg<rw.need||(S.claimedRecharge||[]).includes(rw.need))return;
+ const rw=RECHARGE_REWARDS[+b.dataset.rw];
+ if(!rw||total<rw.need||(S.claimedRecharge||[]).includes(rw.need))return;
  S.claimedRecharge=S.claimedRecharge||[];S.claimedRecharge.push(rw.need);
  rw.give.forEach(grantReward);
  calcStats();save();render();toast(`累计充值奖励到账！`);
@@ -1590,9 +1596,9 @@ function grantRecharge(tier,oid){ // 兑换码到账（后台管控，游戏内�
  if(newV>oldV){msg=`兑换成功！晋升 VIP${newV}！`;S.wornTitle={k:"vip",id:newV};}
  if(newV>=6&&!((S.gongfaLearned||{}).darin)){S.gongfaLearned=S.gongfaLearned||{};S.gongfaLearned.darin=1;msg+=` 获赠神级功法《大日焚天诀》！`;}
  if(isFirst){
-  const sword={iid:"w0",enh:0,expire:Date.now()+3*864e5},cur=S.equip.weapon?ITEMS[S.equip.weapon.iid]:null;
-  if(!cur||(cur.atk||0)<26){if(S.equip.weapon)S.bag.push(S.equip.weapon);S.equip.weapon=sword;msg+=` 小红剑已穿戴！（限时3天）`;}
-  else{S.bag.push(sword);msg+=` 获赠小红剑！（限时3天）`;}
+  const sword={iid:"w0",enh:0},cur=S.equip.weapon?ITEMS[S.equip.weapon.iid]:null;
+  if(!cur||(cur.atk||0)<26){if(S.equip.weapon)S.bag.push(S.equip.weapon);S.equip.weapon=sword;msg+=` 小红剑已穿戴！（永久）`;}
+  else{S.bag.push(sword);msg+=` 获赠小红剑！（永久）`;}
  }
  calcStats();save();render();toast(msg);
 }
@@ -1871,14 +1877,15 @@ function rEvent(){
  const v=vipLevel(),vclaimed=S.vipClaim===today;
  const vSt=!v?"VIP1开启":(vclaimed?"今日已领取":"可领取");
  const fgSt=S.firstGift?"已领取":(S.orders.length?"可领取":"首充后可领");
- const giftN=GIFTS.filter(gf=>total>=gf.need&&!(S.claimedGifts||{})[gf.id]).length;
+ const giftProg=vipTotal()+(S.rechargeBonus||0);
+ const giftN=GIFTS.filter(gf=>giftProg>=gf.need&&!(S.claimedGifts||{})[gf.id]).length;
  const giftSt=giftN?`${giftN}个可领取`:"暂无可领";
  h+=`<div class="card"><h3>福利领取</h3>
  <div class="tier"><div><div class="gold">每日VIP礼包</div><div class="m">${vSt}</div></div>
  <button class="btn small" style="width:auto;margin:0" data-go="pay">前往领取</button></div>
  <div class="tier"><div><div class="gold">首充礼包</div><div class="m">${fgSt} · 288元宝+2万铜币+体力+灵兽蛋</div></div>
  <button class="btn small" style="width:auto;margin:0" data-go="pay">前往领取</button></div>
- <div class="tier"><div><div class="gold">充值豪礼</div><div class="m">${giftSt} · 神级宠物/稀有称号</div></div>
+ <div class="tier"><div><div class="gold">充值豪礼</div><div class="m">${giftSt} · 5档壕礼（30/98/198/498/998，红包可累积）</div></div>
  <button class="btn small" style="width:auto;margin:0" data-go="pay">前往领取</button></div></div>`;
  m.innerHTML=h;
  const em=$("evtMid");
@@ -1936,7 +1943,7 @@ function rEvent(){
 function rMore(){
  const m=$("main");
  m.innerHTML=`<div class="card"><h3>玩法说明</h3><p class="dim">
- · 建号三选一：战士（攻击+10%）/ 法师（内力上限+30%）/ 射手（速度+15%）；建号自动生成玩家账号（JH+6位数字），充值兑换要用；建号即得本职业2个入门技能<br>· 去「江湖」挑战敌人，战斗点「攻击」自动施展本职业最强技能（内力不够则普通攻击），升级变强；野怪打到30%血以下可捕捉为宠物<br>· 技能三职业完全隔离，「技能」页只能学本职业的：战士（罗汉拳/打狗棒法/焰分噬浪尺/帝印诀）、法师（绵掌/弄炎诀/五轮离火法/佛怒火莲）、射手（峨眉刺/三千雷动/风之极·陨杀/大天造化掌）<br>· 12个装备栏：武器/帽子/护甲/裤子/护腕×2/戒指×2/项链/勋章/鞋子/饰品；武器分职业，BOSS掉落本关职业武器（优先掉没有的）；武器共7阶（1黄2玄3地4天5神6圣7至尊），带随机属性，洗炼石可重置，幸运上限9，铁匠铺可强化<br>· 背包「神兵合成」：集齐本关战士/法师/射手三职业武器+铜币→本关终极武器；集齐四把+300万铜币→轩辕神剑（6阶圣）；轩辕神剑+1000万铜币→至尊终极武器（7阶至尊·全游戏最高阶：战士斩尤帝剑/法师灭尤帝杖/射手断尤帝弓）；同部位四件BOSS防具+200万铜币→轩辕防具<br>· 宠物分黄/玄/地/天/神/圣/至尊七级，每级又分低/中/高/终极四档，10级可出战助战；3只同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用）；神级以上需进化石：神级1999/圣级19999/至尊29999元宝，商城有售，世界BOSS也掉落（至尊石概率极低）<br>· 伙伴5级可出战，出战将其30%属性加给你，可穿全部12栏装备，战斗胜利得修为升级；「宠物」页铜币/元宝招募；神级终极：VIP8免费领/「神将降临」（￥1288）/千金募名将；圣级：千金募名将极低概率（3%）；3位同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用；神级以上需进化石）；至尊终极（萧炎/薰儿随机其一）：「至尊降临」（￥7999）或圣级合成（30%，需至尊进化石）<br>· 功法分七级四档，习得后花铜币修炼（最高5重）加属性；神级唯VIP6/限时活动「神功现世」；圣级/至尊级唯限时活动可得<br>· 翅膀20级激活，灵羽升级，每阶攻击+12/气血+120/速度+3<br>· 充值：游戏内无直接充值，右上角「充值」页凭兑换码兑换——把玩家账号告诉客服，客服后台生成你的专属码后在此输入，一码一用；首充自动赠小红剑（攻击26/幸运9，限时3天）+首充礼包（288元宝+2万铜币+体力+灵兽蛋）<br>· 累计充值升VIP1-12（6/30/98/198/498/998/1998/2998/4998/7998/12998/19998元），每级攻击/气血+2%、每日VIP礼包、专属称号；VIP6及以上名字彩色显示<br>· 充值豪礼198/498/998三档（神级宠物三眼金猊·王秋儿/冰天雪女、稀有称号神之眷顾）；累计充值奖励1998/2998/5998/9999四档（元宝/神话伙伴/神级功法/限定称号）；打怪掉充值红包（0.5/1/3/5/10元，每日上限100个），红包计入累计充值进度但不计VIP等级<br>· 世界BOSS（活动中心，每日可挑战）：按你造成的伤害比例发奖——击杀/重创（60%）/激战（30%）/参与四档；掉落功法秘籍/异火/灵羽/进化石，神级石（击杀50%/重创30%/激战15%/参与5%）、圣级石（8%/3%/1%）、至尊石（2%/0.8%/0.3%）<br>· 竞技场每日5次，挑战更高排名对手，胜则排名上升，前三每日领奖；江湖任务：击败10个敌人，奖300铜币+200修为<br>· 商店=江湖药铺（铜币）+元宝商城（元宝）+元宝兑换铜币（10元宝→10万/50→55万/100→120万）；经验丹双倍25/三倍45/五倍80元宝，背包使用后30分钟打怪修为加倍<br>· 聊天只有世界频道，5秒发一条，NPC会自动互动；排行榜有战力/充值/宠物/翅膀/等级5榜，前三名得荣誉称号（可佩戴加成）；点击排行/聊天/竞技场中的名字可看档案对比<br>· 称号分VIP称号/限定称号/排行称号，均可佩戴，属性叠加；存档保存在本机，换设备会丢失<br></p></div>
+ · 建号三选一：战士（攻击+10%）/ 法师（内力上限+30%）/ 射手（速度+15%）；建号自动生成玩家账号（JH+6位数字），充值兑换要用；建号即得本职业2个入门技能<br>· 去「江湖」挑战敌人，战斗点「攻击」自动施展本职业最强技能（内力不够则普通攻击），升级变强；野怪打到30%血以下可捕捉为宠物<br>· 技能三职业完全隔离，「技能」页只能学本职业的：战士（罗汉拳/打狗棒法/焰分噬浪尺/帝印诀）、法师（绵掌/弄炎诀/五轮离火法/佛怒火莲）、射手（峨眉刺/三千雷动/风之极·陨杀/大天造化掌）<br>· 12个装备栏：武器/帽子/护甲/裤子/护腕×2/戒指×2/项链/勋章/鞋子/饰品；武器分职业，BOSS掉落本关职业武器（优先掉没有的）；武器共7阶（1黄2玄3地4天5神6圣7至尊），带随机属性，洗炼石可重置，幸运上限9，铁匠铺可强化<br>· 背包「神兵合成」：集齐本关战士/法师/射手三职业武器+铜币→本关终极武器；集齐四把+300万铜币→轩辕神剑（6阶圣）；轩辕神剑+1000万铜币→至尊终极武器（7阶至尊·全游戏最高阶：战士斩尤帝剑/法师灭尤帝杖/射手断尤帝弓）；同部位四件BOSS防具+200万铜币→轩辕防具<br>· 宠物分黄/玄/地/天/神/圣/至尊七级，每级又分低/中/高/终极四档，10级可出战助战；3只同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用）；神级以上需进化石：神级1999/圣级19999/至尊29999元宝，商城有售，世界BOSS也掉落（至尊石概率极低）<br>· 伙伴5级可出战，出战将其30%属性加给你，可穿全部12栏装备，战斗胜利得修为升级；「宠物」页铜币/元宝招募；神级终极：VIP8免费领/「神将降临」（￥1288）/千金募名将；圣级：千金募名将极低概率（3%）；3位同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用；神级以上需进化石）；至尊终极（萧炎/薰儿随机其一）：「至尊降临」（￥7999）或圣级合成（30%，需至尊进化石）<br>· 功法分七级四档，习得后花铜币修炼（最高5重）加属性；神级唯VIP6/限时活动「神功现世」；圣级/至尊级唯限时活动可得<br>· 翅膀20级激活，灵羽升级，每阶攻击+12/气血+120/速度+3<br>· 充值：游戏内无直接充值，右上角「充值」页凭兑换码兑换——把玩家账号告诉客服，客服后台生成你的专属码后在此输入，一码一用；首充自动赠小红剑（攻击26/幸运9，永久）+首充礼包（288元宝+2万铜币+体力+灵兽蛋）<br>· 累计充值升VIP1-12（6/30/98/198/498/998/1998/2998/4998/7998/12998/19998元），每级攻击/气血+2%、每日VIP礼包、专属称号；VIP6及以上名字彩色显示<br>· 充值豪礼5档（30/98/198/498/998）：启程礼（元宝/洗炼石/经验丹）、天级终极宠物天青牛蟒·大明、神级宠物三眼金猊·王秋儿/冰天雪女、稀有称号神之眷顾——真实充值与红包共同累积，平民打怪攒红包也能领<br>· 累计充值奖励4档（1998/2998/5998/9999，仅真实充值）：元宝+圣级/至尊进化石+限定称号（一代宗师/开宗立派/纵横四海/名扬四海）；打怪掉充值红包（0.5/1/3/5/10元，每日上限100个），红包计入充值豪礼进度但不计VIP等级与累计充值奖励<br>· 限时活动（仅真实充值）：神功现世（￥498神级大日焚天诀）、神将降临（￥1288神话伙伴）、圣宠降临（￥2998圣级九天圣龙）、圣功现世（￥3999圣级圣心诀）、圣凰降临（￥5999圣级混沌圣凰）、至尊降临（￥7999至尊萧炎/薰儿）、鸿蒙降临（￥9999至尊古龙/古凰+鸿蒙至尊诀）<br>· 世界BOSS（活动中心，每日可挑战）：按你造成的伤害比例发奖——击杀/重创（60%）/激战（30%）/参与四档；掉落功法秘籍/异火/灵羽/进化石，神级石（击杀50%/重创30%/激战15%/参与5%）、圣级石（8%/3%/1%）、至尊石（2%/0.8%/0.3%）<br>· 竞技场每日5次，挑战更高排名对手，胜则排名上升，前三每日领奖；江湖任务：击败10个敌人，奖300铜币+200修为<br>· 商店=江湖药铺（铜币）+元宝商城（元宝）+元宝兑换铜币（10元宝→10万/50→55万/100→120万）；经验丹双倍25/三倍45/五倍80元宝，背包使用后30分钟打怪修为加倍<br>· 聊天只有世界频道，5秒发一条，NPC会自动互动；排行榜有战力/充值/宠物/翅膀/等级5榜，前三名得荣誉称号（可佩戴加成）；点击排行/聊天/竞技场中的名字可看档案对比<br>· 称号分VIP称号/限定称号/排行称号，均可佩戴，属性叠加；存档保存在本机，换设备会丢失<br></p></div>
  <div class="card"><h3>存档</h3>
  <button class="btn small" id="resave">手动保存</button>
  <button class="btn small danger" id="reset">删号重来（清空存档）</button></div>`;
