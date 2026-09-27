@@ -1056,7 +1056,8 @@ h+=`<div>${SLOTNAME[slot]}：<b>${it?itemNameHTML(it)+qualityTag(it)+(it.enh?` +
 }
 h+=`</div><button class="btn small" id="enhance">铁匠铺·强化装备</button> <button class="btn small" id="synth">神兵合成</button></div><div class="card"><h3>物品</h3>`;
 if(!S.bag.length)h+=`<p class="dim">空空如也，去闯荡江湖打怪掉落吧。</p>`;
-S.bag.forEach((it,i)=>{
+sortIdxByTier(S.bag,it=>it.use?{tier:-1,sub:0}:{tier:ITEMS[it.iid].tier,sub:0}).forEach(i=>{
+const it=S.bag[i];
 if(it.use){const cnt=` <span class="gold">×${it.n||1}</span>`;
 if(it.use==="xilian"){h+=`<div class="mob"><div><div class="mn">${it.name}${cnt}</div><div class="md">材料 · 在武器旁点「洗炼」重置武器随机属性</div></div></div>`;return;}
 if(it.use==="evostone"){h+=`<div class="mob"><div><div class="mn">${tieredName(it.name,4)}${cnt}</div><div class="md">材料 · 天级宠物合成神级必需（宠物页合成）</div></div></div>`;return;}
@@ -1208,8 +1209,8 @@ if(canMythicVip)h+=`<div class="tier"><div><div class="gold">VIP8专属神将</d
 else if(v>=8&&S.claimedMythicVip)h+=`<p class="dim">VIP8专属神将已领取。</p>`;
 h+=`<div class="rowbtns"><button class="btn small" id="recC">广发英雄帖<br><span class="dim">5000铜币</span></button><button class="btn small" id="recG">千金募名将<br><span class="dim">88元宝</span></button></div>`;
 if(!(S.partners||[]).length)h+=`<p class="dim">还没有伙伴，去招募一位与你并肩闯荡吧！</p>`;
-(S.partners||[]).forEach((pt,i)=>{
- const st=partnerStats(pt);
+sortIdxByTier(S.partners||[],pt=>({tier:pt.tier,sub:pt.sub})).forEach(i=>{
+ const pt=S.partners[i],st=partnerStats(pt);
  h+=`<div class="tier"><div><div class="mn">${tieredName(pt.name,pt.tier)} ${tierBadge(pt.tier,pt.sub)}<span class="dim">Lv.${pt.level}</span>${i===S.activePartner?' <span class="gold">出战中</span>':""}</div>
  <div class="md">攻击${st.atk} 防御${st.def} 气血${st.hp} 速度${st.spd}${st.luck?` 幸运${st.luck}`:""} · 经验${pt.exp||0}/${40*pt.level}</div>
  <div class="md">`;
@@ -1259,6 +1260,14 @@ const SYNTH_RATE=[0.8,0.7,0.6,0.5,0.4,0.3]; // 黄->玄 ... 圣->至尊 成功�
 const SYNTH_STONE={3:["evostone","神级进化石"],4:["evo_saint","圣级进化石"],5:["evo_zun","至尊进化石"]}; // 高阶合成所需进化石：商城有售（神1999/圣19999/至尊29999元宝），世界BOSS也掉落（至尊石概率极低）
 function countItem(use){return S.bag.filter(x=>x.use===use&&!x.iid).reduce((a,x)=>a+(x.n||1),0);}
 function synthCount(t){return S.pets.filter((pet,i)=>PETS[pet.pid].tier===t&&i!==S.activePet).length;}
+function sortIdxByTier(arr,infoOf){ // 显示用排序：品级降序（至尊第一），同品级按档降序，再按等级降序；只返回下标，原数组不动
+ return arr.map((_,i)=>i).sort((a,b)=>{
+  const A=infoOf(arr[a]),B=infoOf(arr[b]);
+  if(B.tier!==A.tier)return B.tier-A.tier;
+  if((B.sub||0)!==(A.sub||0))return (B.sub||0)-(A.sub||0);
+  return (arr[b].level||0)-(arr[a].level||0);
+ });
+}
 function doPetSynth(t){
  const idx=[];S.pets.forEach((pet,i)=>{if(PETS[pet.pid].tier===t&&i!==S.activePet)idx.push(i);});
  if(idx.length<3){toast("同品级宠物不足3只（出战中的不可用）");return;}
@@ -1296,8 +1305,8 @@ function rPet(){
 const m=$("main"),p=S.player;
 let h=`<div class="card"><h3>我的宠物</h3><p class="dim">宠物分黄/玄/地/天/神/圣/至尊七级，每级又分低级/中级/高级/终极四档，品级越高助战越强。野外把怪物打到30%血以下可捕捉；3只同品级可合成更高品级（神级以上需对应进化石（商城有售，世界BOSS也掉落，至尊石概率极低）；最高「至尊终极」彩色流光，唯限时活动「鸿蒙降临」可得。</p>`;
 if(!S.pets.length)h+=`<p class="dim">还没有宠物，去青竹林捕捉小灵猴吧！</p>`;
-S.pets.forEach((pet,i)=>{
-const b=PETS[pet.pid];
+sortIdxByTier(S.pets,pet=>{const b=PETS[pet.pid];return{tier:b.tier,sub:b.sub};}).forEach(i=>{
+const pet=S.pets[i],b=PETS[pet.pid];
 const atk=Math.floor(b.atk*(1+0.15*(pet.level-1))),hp=Math.floor(b.hp*(1+0.15*(pet.level-1)));
 h+=`<div class="mob"><div><div class="mn">${tieredName(pet.name,b.tier)} ${tierBadge(b.tier,b.sub)}<span class="dim">Lv.${pet.level}</span>${i===S.activePet?'<span class="gold">出战中</span>':""}</div>
 <div class="md">${b.desc}</div><div class="md">气血${hp} 攻击${atk} · 经验${pet.exp}/${petExpNeed(pet.level)}</div></div>
