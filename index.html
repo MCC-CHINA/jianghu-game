@@ -43,6 +43,8 @@ body{background:#141009;color:#e8dcc0;font-family:"Songti SC","STSong","SimSun",
 .ptier.地{background:#2a4a2a;color:#9ae09a}
 .ptier.天{background:#5a2a2a;color:#f0a8a8}
 .ptier.神{background:#6a4a00;color:#ffe97b;font-weight:bold}
+.ptier.至尊{background:linear-gradient(135deg,#fff3b0,#ffd700 40%,#ff9d00);color:#5a3000;font-weight:bold;box-shadow:0 0 10px rgba(255,180,0,.9);border:1px solid #ffe97b}
+.ptier.zhizun{background:linear-gradient(90deg,#ff2d2d,#ff7f00,#ffe600,#2dff2d,#00e5ff,#a52dff,#ff2d9d,#ff2d2d);background-size:300% auto;animation:rainbow 3s linear infinite;color:#fff;font-weight:bold;text-shadow:0 1px 2px rgba(0,0,0,.6);border:1px solid #fff}
 /* 称号牌：琉璃透明感（半透紫晶牌+流光羽翼+中央宝石） */
 .rtx{position:relative;display:inline-flex;align-items:center;vertical-align:middle;margin:4px 2px;filter:drop-shadow(0 0 6px rgba(150,130,255,.45))}
 .rtx b{position:relative;overflow:hidden;flex:none;font-size:13px;font-weight:bold;white-space:nowrap;padding:5px 18px 6px;letter-spacing:3px;color:#f5f2ff;background:linear-gradient(180deg,rgba(215,205,255,.34) 0%,rgba(150,135,235,.22) 35%,rgba(96,74,200,.30) 70%,rgba(58,36,150,.38) 100%);border:1px solid rgba(226,216,255,.65);border-radius:6px;text-shadow:0 0 8px rgba(190,170,255,1),0 0 3px #fff,0 1px 3px rgba(40,20,110,.9);box-shadow:0 0 12px rgba(150,130,255,.5),inset 0 1px 2px rgba(255,255,255,.5),inset 0 -3px 6px rgba(90,60,200,.35)}
@@ -242,25 +244,35 @@ function mkWeapon(iid){const d=ITEMS[iid],it={iid,enh:0};if(d.slot==="weapon"&&i
 function weaponQuality(it){const b=it.bonus||{},n=Object.keys(b).length;if(b.luck)return["极品","#ff6b35"];if(n>=4)return["稀有","#b45bff"];if(n>=2)return["优秀","#3fa9ff"];return["普通","#9aa3b2"];}
 function qualityTag(it){const d=ITEMS[it.iid];if(d.slot!=="weapon"||it.iid==="w0")return"";const q=weaponQuality(it);return ` <span style="color:${q[1]}">·${q[0]}</span>`;}
 function bonusText(b){const m={atk:"攻",def:"防",hp:"血",spd:"速",luck:"幸运"};return Object.entries(b||{}).map(([k,v])=>m[k]+"+"+v).join(" ");}
-const PTN=["","黄","玄","地","天","神","圣"]; // 宠物品级名：圣凌驾于神之上，唯限时活动可得
-const PET_TMULT=[0,1,1.15,1.3,1.6,2,2.6]; // 品级助战倍率
-const PETS={ // pid: {name,hp,atk,def,spd,desc,tier:1黄 2玄 3地 4天 5神 6圣}
- linghou:{name:"小灵猴",hp:60,atk:10,def:5,spd:12,desc:"青竹林的机灵小猴，动作敏捷",tier:1},
- tiedog:{name:"铁背犬",hp:110,atk:16,def:10,spd:8,desc:"黑风寨驯养的獒犬，忠心护主",tier:1},
- youmingzhu:{name:"幽冥蛛",hp:150,atk:24,def:14,spd:10,desc:"幽冥谷的毒蛛，獠牙淬毒",tier:1},
- xuediao:{name:"雪雕",hp:200,atk:34,def:18,spd:16,desc:"华山之巅的雪雕，翱翔九天",tier:1},
- rougutu:{name:"柔骨兔·小舞",hp:70,atk:12,def:6,spd:14,desc:"十万年柔骨兔化形，腿法惊人",tier:2},
- lanyinhuang:{name:"蓝银皇·阿银",hp:90,atk:8,def:12,spd:6,desc:"蓝银皇血脉，生命力磅礴",tier:2},
- guihu:{name:"鬼虎",hp:130,atk:20,def:12,spd:10,desc:"影虎一族，神出鬼没",tier:2},
- renmianzhu:{name:"人面魔蛛",hp:140,atk:22,def:10,spd:12,desc:"人面蛛身，剧毒无比",tier:3},
- taitan:{name:"泰坦巨猿·二明",hp:220,atk:40,def:24,spd:8,desc:"森林之王，力大无穷",tier:3},
- xiemohu:{name:"暗魔邪神虎",hp:200,atk:44,def:18,spd:14,desc:"邪神血脉，风雷双翼",tier:3},
- tianqing:{name:"天青牛蟒·大明",hp:300,atk:52,def:30,spd:12,desc:"十万年天青牛蟒，君临星斗",tier:4},
- bingdi:{name:"冰碧帝皇蝎",hp:280,atk:58,def:24,spd:18,desc:"极北冰帝，极致之冰",tier:4},
- sanyan:{name:"三眼金猊·王秋儿",hp:400,atk:70,def:35,spd:20,desc:"帝皇瑞兽，执掌命运之力",tier:5},
- xuenv:{name:"冰天雪女",hp:380,atk:75,def:30,spd:22,desc:"极北三大天王之首，冰雪之灵",tier:5},
- shenglong:{name:"九天圣龙",hp:650,atk:115,def:58,spd:32,desc:"上古圣龙，凌驾神级之上的圣兽",tier:6},
- shenghuang:{name:"混沌圣凰",hp:600,atk:125,def:48,spd:38,desc:"混沌圣凰，浴火重生的圣兽",tier:6}
+const PTIERS=["黄","玄","地","天","神","圣","至尊"]; // 统一品级（0-6）：功法/宠物/伙伴共用，至尊最高
+const SUBS=["低级","中级","高级","终极"]; // 品级内四档（0-3）
+const TIER_MULT=[1,1.15,1.3,1.6,2,2.6,3.2]; // 品级助战倍率
+function tierName(t,s){return PTIERS[t]+SUBS[s||0];}
+function tierBadge(t,s){ // 品级徽章：至尊终极为彩色渐变
+ s=s||0;
+ if(t===6&&s===3)return `<span class="ptier zhizun">至尊终极</span>`;
+ return `<span class="ptier ${PTIERS[t]}">${PTIERS[t]}${SUBS[s]}</span>`;
+}
+function petTierMult(b){return TIER_MULT[b.tier]*(1+0.08*(b.sub||0));}
+/* 品级助战倍率见TIER_MULT/petTierMult */
+const PETS={ // pid: {name,hp,atk,def,spd,desc,tier:0黄..6至尊,sub:0低1中2高3终极}
+ linghou:{name:"小灵猴",hp:60,atk:10,def:5,spd:12,desc:"青竹林的机灵小猴，动作敏捷",tier:0,sub:0},
+ tiedog:{name:"铁背犬",hp:110,atk:16,def:10,spd:8,desc:"黑风寨驯养的獒犬，忠心护主",tier:0,sub:1},
+ youmingzhu:{name:"幽冥蛛",hp:150,atk:24,def:14,spd:10,desc:"幽冥谷的毒蛛，獠牙淬毒",tier:0,sub:2},
+ xuediao:{name:"雪雕",hp:200,atk:34,def:18,spd:16,desc:"华山之巅的雪雕，翱翔九天",tier:0,sub:3},
+ rougutu:{name:"柔骨兔·小舞",hp:70,atk:12,def:6,spd:14,desc:"十万年柔骨兔化形，腿法惊人",tier:1,sub:0},
+ lanyinhuang:{name:"蓝银皇·阿银",hp:90,atk:8,def:12,spd:6,desc:"蓝银皇血脉，生命力磅礴",tier:1,sub:1},
+ guihu:{name:"鬼虎",hp:130,atk:20,def:12,spd:10,desc:"影虎一族，神出鬼没",tier:1,sub:2},
+ renmianzhu:{name:"人面魔蛛",hp:140,atk:22,def:10,spd:12,desc:"人面蛛身，剧毒无比",tier:2,sub:0},
+ taitan:{name:"泰坦巨猿·二明",hp:220,atk:40,def:24,spd:8,desc:"森林之王，力大无穷",tier:2,sub:1},
+ xiemohu:{name:"暗魔邪神虎",hp:200,atk:44,def:18,spd:14,desc:"邪神血脉，风雷双翼",tier:2,sub:2},
+ tianqing:{name:"天青牛蟒·大明",hp:300,atk:52,def:30,spd:12,desc:"十万年天青牛蟒，君临星斗",tier:3,sub:0},
+ bingdi:{name:"冰碧帝皇蝎",hp:280,atk:58,def:24,spd:18,desc:"极北冰帝，极致之冰",tier:3,sub:1},
+ sanyan:{name:"三眼金猊·王秋儿",hp:400,atk:70,def:35,spd:20,desc:"帝皇瑞兽，执掌命运之力",tier:4,sub:0},
+ xuenv:{name:"冰天雪女",hp:380,atk:75,def:30,spd:22,desc:"极北三大天王之首，冰雪之灵",tier:4,sub:1},
+ shenglong:{name:"九天圣龙",hp:650,atk:115,def:58,spd:32,desc:"上古圣龙，凌驾神级之上的圣兽",tier:5,sub:0},
+ shenghuang:{name:"混沌圣凰",hp:600,atk:125,def:48,spd:38,desc:"混沌圣凰，浴火重生的圣兽",tier:5,sub:1},
+ hongmeng:{name:"鸿蒙至尊龙",hp:950,atk:175,def:88,spd:50,desc:"鸿蒙至尊圣兽，万兽之皇",tier:6,sub:3}
 };
 function mkMonster(name,lv,catchPet,boss){return{name,lv,catchPet:catchPet||null,boss:!!boss,
  hp:Math.floor(45+lv*24),atk:Math.floor(8+lv*2.3),def:Math.floor(4+lv*1.3),spd:Math.floor(5+lv*0.9),
@@ -438,11 +450,11 @@ function grantReward(g){
  if(k==="gold")p.gold+=v;
  else if(k==="coins")p.coins+=v;
  else if(k==="stamina")p.stamina=Math.min(p.maxStamina,p.stamina+v);
- else if(k==="egg3"){for(let i=0;i<v;i++){const pool=Object.keys(PETS).filter(x=>PETS[x].tier<=3);const pid=pick(pool);S.pets.push({pid,name:PETS[pid].name,level:p.level,exp:0});}if(S.activePet===-1)S.activePet=0;}
+ else if(k==="egg3"){for(let i=0;i<v;i++){const pool=Object.keys(PETS).filter(x=>PETS[x].tier<=2);const pid=pick(pool);S.pets.push({pid,name:PETS[pid].name,level:p.level,exp:0});}if(S.activePet===-1)S.activePet=0;}
  else if(k==="box"){const tier=Math.min(5,Math.floor(p.level/6)+1);for(let i=0;i<v;i++){const pool=Object.keys(ITEMS).filter(x=>ITEMS[x].slot==="weapon"&&ITEMS[x].tier===tier&&!ITEMS[x].gift);S.bag.push(mkWeapon(pick(pool)));}}
  else if(k==="pet"){if(S.pets.some(x=>x.pid===v)){p.gold+=3000;}else{const pb=PETS[v];S.pets.push({pid:v,name:pb.name,level:p.level,exp:0});if(S.activePet===-1)S.activePet=0;}}
  else if(k==="gongfa"){S.gongfaLearned=S.gongfaLearned||{};if(gfLearned(v))p.gold+=2000;else S.gongfaLearned[v]=1;}
- else if(k==="gongfa_rand_god"){const cand=Object.keys(GONGFA).filter(x=>GONGFA[x].tier==="神"&&!GONGFA[x].vip6&&!gfLearned(x));S.gongfaLearned=S.gongfaLearned||{};if(cand.length)S.gongfaLearned[pick(cand)]=1;else p.gold+=2000;}
+ else if(k==="gongfa_rand_god"){const cand=Object.keys(GONGFA).filter(x=>GONGFA[x].tier===4&&!GONGFA[x].vip6&&!gfLearned(x));S.gongfaLearned=S.gongfaLearned||{};if(cand.length)S.gongfaLearned[pick(cand)]=1;else p.gold+=2000;}
  else if(k==="title"){S.eventTitles=S.eventTitles||[];if(!S.eventTitles.includes(v))S.eventTitles.push(v);}
  else if(k==="partner"){if(!Array.isArray(S.partners))S.partners=[];const used=S.partners.map(x=>x.name);const name=pick(PARTNER_NAMES.filter(n=>!used.includes(n)))||pick(PARTNER_NAMES);S.partners.push({name,quality:v,level:p.level,exp:0,equip:{weapon:null,armor:null,boots:null,charm:null}});if(S.activePartner===-1||S.activePartner===undefined)S.activePartner=0;}
 }
@@ -509,15 +521,16 @@ m.querySelectorAll("[data-learn]").forEach(b=>b.onclick=()=>{
 }
 /* ============ 功法 ============ */
 const GONGFA={
- jingangzhao:{name:"金钟罩",tier:"黄",price:50,desc:"少林护体神功，刀枪不入",max:5,req:1,bonus:{def:4,hp:40}},
- yijinjing:{name:"易筋经",tier:"玄",price:150,desc:"达摩祖师绝学，易筋洗髓",max:5,req:5,bonus:{atk:3,hp:30}},
- taijishengong:{name:"太极神功",tier:"玄",price:150,desc:"武当镇派心法，以柔克刚",max:5,req:8,bonus:{def:3,spd:2,hp:30}},
- jiuyang:{name:"九阳神功",tier:"地",price:400,desc:"至阳至刚，内力生生不息",max:5,req:10,bonus:{atk:5,hp:60,mp:12}},
- kuihua:{name:"葵花宝典",tier:"地",price:400,desc:"天下武功，唯快不破",max:5,req:12,bonus:{spd:4,atk:4}},
- dugujiujian:{name:"独孤九剑",tier:"天",price:880,desc:"剑魔独孤求败绝学，无招胜有招",max:5,req:15,bonus:{atk:8,luck:1}},
- darin:{name:"大日焚天诀",tier:"神",vip6:1,desc:"上古神诀，大日焚天，唯VIP6可得",max:5,req:20,bonus:{atk:15,hp:150,mp:30}},
- shengxinjue:{name:"圣心诀",tier:"圣",desc:"圣境无上心法，圣威浩荡，唯限时活动可得",max:5,req:25,bonus:{atk:20,hp:250,mp:40}},
- jiutianlong:{name:"九天圣龙诀",tier:"圣",desc:"圣龙传承，九天十地唯我独尊，唯限时活动可得",max:5,req:30,bonus:{atk:25,hp:300,def:20}}
+ jingangzhao:{name:"金钟罩",tier:0,sub:0,price:50,desc:"少林护体神功，刀枪不入",max:5,req:1,bonus:{def:4,hp:40}},
+ yijinjing:{name:"易筋经",tier:1,sub:0,price:150,desc:"达摩祖师绝学，易筋洗髓",max:5,req:5,bonus:{atk:3,hp:30}},
+ taijishengong:{name:"太极神功",tier:1,sub:1,price:150,desc:"武当镇派心法，以柔克刚",max:5,req:8,bonus:{def:3,spd:2,hp:30}},
+ jiuyang:{name:"九阳神功",tier:2,sub:0,price:400,desc:"至阳至刚，内力生生不息",max:5,req:10,bonus:{atk:5,hp:60,mp:12}},
+ kuihua:{name:"葵花宝典",tier:2,sub:1,price:400,desc:"天下武功，唯快不破",max:5,req:12,bonus:{spd:4,atk:4}},
+ dugujiujian:{name:"独孤九剑",tier:3,sub:0,price:880,desc:"剑魔独孤求败绝学，无招胜有招",max:5,req:15,bonus:{atk:8,luck:1}},
+ darin:{name:"大日焚天诀",tier:4,sub:0,vip6:1,desc:"上古神诀，大日焚天，唯VIP6可得",max:5,req:20,bonus:{atk:15,hp:150,mp:30}},
+ shengxinjue:{name:"圣心诀",tier:5,sub:0,desc:"圣境无上心法，圣威浩荡，唯限时活动可得",max:5,req:25,bonus:{atk:20,hp:250,mp:40}},
+ jiutianlong:{name:"九天圣龙诀",tier:5,sub:1,desc:"圣龙传承，九天十地唯我独尊，唯限时活动可得",max:5,req:30,bonus:{atk:25,hp:300,def:20}},
+ hongmengjue:{name:"鸿蒙至尊诀",tier:6,sub:3,desc:"鸿蒙至尊传承，万法之源，唯限时活动可得",max:5,req:35,bonus:{atk:35,hp:500,def:30,mp:60}}
 };
 /* 焚诀：可吞噬异火进化，黄→玄→地→天→神 */
 const FENJUE_TIERS=["黄","玄","地","天","神"];
@@ -579,7 +592,7 @@ function vipGift(){const v=vipLevel();return{coins:v*300,stam:10+v*5,gold:v*8,fe
 const WING_MAX=12;
 const WING_NAMES=[null,"翠羽之翼","疾风之翼","烈焰之翼","寒冰之翼","雷霆之翼","圣光之翼","暗影之翼","九幽冥翼","天罡神翼","混沌天翼","鸿蒙圣翼","九天神翼"];
 function wingCost(t){return{feather:10+t*10,coins:1000*(t+1)};} // t阶升t+1阶
-function petScore(pet){const b=PETS[pet.pid];return Math.floor((b.atk+b.hp/10)*(1+0.15*(pet.level-1))*(PET_TMULT[b.tier]||1));}
+function petScore(pet){const b=PETS[pet.pid];return Math.floor((b.atk+b.hp/10)*(1+0.15*(pet.level-1))*petTierMult(b));}
 /* ============ 竞技场 ============ */
 const ARENA_TOP=["剑神·西门无恨","刀圣·傅红雪","枪仙·赵子龙","拳皇·洪七公","腿王·聂风","掌尊·张三丰","指圣·一灯大师","棍僧·慧能","鞭后·九尾狐","暗器王·唐三"];
 const ARENA_NAMES=["无名剑客","黑衣刀客","青衫书生","红衣女侠","独臂刀","铁掌帮主","快剑李三","神拳无敌","飞毛腿","峨眉女弟子","武当道童","少林武僧","丐帮长老","魔教护法","江南大盗","塞外豪客","苗疆蛊师","西域剑客","东瀛武士","波斯刀客"];
@@ -601,12 +614,11 @@ function arenaOpp(rank){
  exp:60+p.level*12,coins:150+p.level*25};
 }
 /* ============ 伙伴系统 ============ */
-const PARTNER_Q=["普通","精英","豪杰","传奇","神话","至尊"]; // 至尊凌驾神话，唯限时活动可得
-const PARTNER_QC=["#c9c9c9","#7dd87d","#7db8ff","#c88fff","#ffb84d","#ff4d6d"];
+/* 伙伴品级共用PTIERS/SUBS（黄/玄/地/天/神/圣/至尊 × 低级/中级/高级/终极），徽章用tierBadge */
 const PARTNER_NAMES=["阿飞","沈浪","李寻欢","楚留香","陆小凤","花满楼","西门吹雪","叶孤城","萧峰","段誉","虚竹","令狐冲","杨过","小龙女","郭靖","黄蓉","张无忌","赵敏","韦小宝","双儿","江小鱼","花无缺","楚昭南","练霓裳","卓一航"];
-function partnerBase(q){return{atk:8+q*8,def:5+q*5,hp:120+q*120,spd:4+q*2};}
+function partnerBase(t,s){s=s||0;return{atk:8+t*8+s*2,def:5+t*5+s,hp:120+t*120+s*30,spd:4+t*2+Math.floor(s/2)};}
 function partnerStats(pt){
- const b=partnerBase(pt.quality),lv=pt.level-1;
+ const b=partnerBase(pt.tier,pt.sub),lv=pt.level-1;
  const s={atk:b.atk+lv*2,def:Math.floor(b.def+lv*1.5),hp:b.hp+lv*20,spd:Math.floor(b.spd+lv*0.5),luck:0};
  for(const slot of SLOTS){const it=pt.equip[slot];if(!it)continue;const d=ITEMS[it.iid],e=it.enh||0;
  s.atk+=d.atk||0;s.def+=d.def||0;s.hp+=d.hp||0;s.spd+=d.spd||0;s.luck+=d.luck||0;
@@ -622,14 +634,15 @@ function gainPartnerExp(n){
  pt.exp=(pt.exp||0)+n;
  while(pt.exp>=40*pt.level){pt.exp-=40*pt.level;pt.level++;}
 }
-function recruitPartner(q){
+function recruitPartner(t,s){
  if(!Array.isArray(S.partners))S.partners=[];
  if(S.activePartner===undefined)S.activePartner=-1;
+ if(s===undefined)s=Math.floor(Math.random()*4);
  const used=S.partners.map(x=>x.name);
  const name=pick(PARTNER_NAMES.filter(n=>!used.includes(n)))||pick(PARTNER_NAMES);
- S.partners.push({name,quality:q,level:S.player.level,exp:0,equip:{weapon:null,armor:null,boots:null,charm:null}});
+ S.partners.push({name,tier:t,sub:s,level:S.player.level,exp:0,equip:{weapon:null,armor:null,boots:null,charm:null}});
  if(S.activePartner===-1||S.activePartner===undefined)S.activePartner=0;
- save();render();toast(` ${PARTNER_Q[q]}伙伴「${name}」加入队伍！`);
+ save();render();toast(` ${tierName(t,s)}伙伴「${name}」加入队伍！`);
 }
 const VIP_TITLES=[null, // 索引=VIP等级：称号名+属性+爆率
  {name:"初露锋芒",atk:8,hp:80,drop:5},{name:"江湖新秀",atk:16,hp:160,drop:8},{name:"一方豪杰",atk:28,hp:280,drop:12},
@@ -693,7 +706,7 @@ function calcStats(){
 }
 function zhanli(){
  const p=S.player;let z=p.atk*3+p.def*2+p.maxhp*0.5+p.spd*2;
- const pet=S.pets[S.activePet]; if(pet){const b=PETS[pet.pid];z+=(b.atk*(1+0.15*(pet.level-1)))*2*(PET_TMULT[b.tier]||1);}
+ const pet=S.pets[S.activePet]; if(pet){const b=PETS[pet.pid];z+=(b.atk*(1+0.15*(pet.level-1)))*2*petTierMult(b);}
  return Math.floor(z);
 }
 function newGame(name,sectKey){
@@ -819,7 +832,7 @@ function petTurn(){
 const pet=S.pets[S.activePet];
 if(!pet||B.over)return;
 const b=PETS[pet.pid],f=B.foe;
-const pa=Math.floor(b.atk*(1+0.15*(pet.level-1))*(PET_TMULT[b.tier]||1));
+const pa=Math.floor(b.atk*(1+0.15*(pet.level-1))*petTierMult(b));
 const d=Math.max(1,Math.floor(pa*1.2-f.def*0.5));
 f.hp=Math.max(0,f.hp-d);
 log(`<span class="pet">协助攻击，造成 ${d} 点伤害</span>`);
@@ -847,9 +860,9 @@ log(`<span class="sys">战胜了！获得修为 ${ge}${em>1?`（${em}倍经验�
 if(f.boss)pushChat("world",{sys:1,txt:`恭喜「${p.name}」击败了${f.name}，威震江湖！`,t:Date.now()});
 gainExp(ge);p.coins+=f.coins;gainPetExp(Math.floor(ge/2));gainPartnerExp(Math.floor(ge/2));
 if(B.wb){ // 世界BOSS：掉落功法（神级以下）
- const cand=Object.keys(GONGFA).filter(g=>!["神","圣"].includes(GONGFA[g].tier)&&!gfLearned(g));
+ const cand=Object.keys(GONGFA).filter(g=>GONGFA[g].tier<4&&!gfLearned(g));
  if(cand.length){
- const w={黄:40,玄:30,地:20,天:10};let tot=0;
+ const w={0:40,1:30,2:20,3:10};let tot=0;
  const bag=cand.map(g=>{const ww=w[GONGFA[g].tier]||10;tot+=ww;return[g,ww];});
  let r=Math.random()*tot,pg=bag[0][0];
  for(const[g,ww]of bag){r-=ww;if(r<=0){pg=g;break;}}
@@ -1110,14 +1123,14 @@ if(wu)wu.onclick=()=>{
 function rPartner(){
 const m=$("main"),p=S.player;
 const v=vipLevel(),canMythicVip=v>=8&&!S.claimedMythicVip;
-let h=`<div class="card"><h3>我的伙伴</h3><p class="dim">伙伴可穿戴全部12个装备栏位（武器/帽子/护甲/裤子/护腕×2/戒指×2/项链/勋章/鞋子/饰品）。出战伙伴将其30%属性加给你，战斗胜利出战伙伴获得修为升级。<br>神话伙伴获取：VIP8免费领取 / 限时活动「神将降临」/ 千金募名将（低概率）；至尊伙伴凌驾神话之上，唯限时活动可得。</p>`;
+let h=`<div class="card"><h3>我的伙伴</h3><p class="dim">伙伴可穿戴全部12个装备栏位（武器/帽子/护甲/裤子/护腕×2/戒指×2/项链/勋章/鞋子/饰品）。出战伙伴将其30%属性加给你，战斗胜利出战伙伴获得修为升级。<br>伙伴分黄/玄/地/天/神/圣/至尊七级，每级又分低级/中级/高级/终极四档。神级终极获取：VIP8免费领取 / 限时活动「神将降临」/ 千金募名将（低概率）；至尊终极唯限时活动「至尊降临」可得。</p>`;
 if(canMythicVip)h+=`<div class="tier"><div><div class="gold">VIP8专属神将</div><div class="m">免费招募神话品质伙伴×1</div></div><button class="btn small primary" style="width:auto;margin:0" id="mythicVip">领取</button></div>`;
 else if(v>=8&&S.claimedMythicVip)h+=`<p class="dim">VIP8专属神将已领取。</p>`;
 h+=`<div class="rowbtns"><button class="btn small" id="recC">广发英雄帖<br><span class="dim">5000铜币</span></button><button class="btn small" id="recG">千金募名将<br><span class="dim">88元宝</span></button></div>`;
 if(!(S.partners||[]).length)h+=`<p class="dim">还没有伙伴，去招募一位与你并肩闯荡吧！</p>`;
 (S.partners||[]).forEach((pt,i)=>{
  const st=partnerStats(pt);
- h+=`<div class="tier"><div><div class="mn">${pt.quality>=4?godName(pt.name):pt.name} <span style="color:${PARTNER_QC[pt.quality]}">${PARTNER_Q[pt.quality]}</span><span class="dim">Lv.${pt.level}</span>${i===S.activePartner?' <span class="gold">出战中</span>':""}</div>
+ h+=`<div class="tier"><div><div class="mn">${pt.tier>=4?godName(pt.name):pt.name} ${tierBadge(pt.tier,pt.sub)}<span class="dim">Lv.${pt.level}</span>${i===S.activePartner?' <span class="gold">出战中</span>':""}</div>
  <div class="md">攻击${st.atk} 防御${st.def} 气血${st.hp} 速度${st.spd}${st.luck?` 幸运${st.luck}`:""} · 经验${pt.exp||0}/${40*pt.level}</div>
  <div class="md">`;
  for(const slot of SLOTS){
@@ -1134,7 +1147,7 @@ const rg=$("recG");
 if(rg)rg.onclick=()=>{if(p.gold<88){toast("元宝不足（需88）");return;}p.gold-=88;
  const r=Math.random();recruitPartner(r<0.4?2:(r<0.8?3:4));};
 const mv=$("mythicVip");
-if(mv)mv.onclick=()=>{if(vipLevel()<8||S.claimedMythicVip)return;recruitPartner(4);S.claimedMythicVip=true;save();render();};
+if(mv)mv.onclick=()=>{if(vipLevel()<8||S.claimedMythicVip)return;recruitPartner(4,3);S.claimedMythicVip=true;save();render();};
 m.querySelectorAll("[data-pfight]").forEach(b=>b.onclick=()=>{S.activePartner=+b.dataset.pfight;calcStats();save();render();toast(" 伙伴出战！");});
 m.querySelectorAll("[data-pun]").forEach(b=>b.onclick=()=>{
  const[pi,slot]=b.dataset.pun.split("_"),pt=S.partners[+pi],it=pt.equip[slot];
@@ -1155,12 +1168,12 @@ m.querySelectorAll("[data-peq]").forEach(b=>b.onclick=()=>{
 }
 function rPet(){
 const m=$("main"),p=S.player;
-let h=`<div class="card"><h3>我的宠物</h3><p class="dim">宠物分黄/玄/地/天/神/圣六级，品级越高助战越强。野外把怪物打到30%血以下可捕捉；神级宠物只能通过充值豪礼或限时活动获得；圣级凌驾神级之上，唯限时活动「圣境降临」可得。</p>`;
+let h=`<div class="card"><h3>我的宠物</h3><p class="dim">宠物分黄/玄/地/天/神/圣/至尊七级，每级又分低级/中级/高级/终极四档，品级越高助战越强。野外把怪物打到30%血以下可捕捉；神级以上只能通过充值豪礼或限时活动获得；最高「至尊终极」彩色流光，唯限时活动「鸿蒙降临」可得。</p>`;
 if(!S.pets.length)h+=`<p class="dim">还没有宠物，去青竹林捕捉小灵猴吧！</p>`;
 S.pets.forEach((pet,i)=>{
 const b=PETS[pet.pid];
 const atk=Math.floor(b.atk*(1+0.15*(pet.level-1))),hp=Math.floor(b.hp*(1+0.15*(pet.level-1)));
-h+=`<div class="mob"><div><div class="mn">${b.tier>=5?godName(pet.name):pet.name} <span class="ptier ${PTN[b.tier]}">${PTN[b.tier]}级</span><span class="dim">Lv.${pet.level}</span>${i===S.activePet?'<span class="gold">出战中</span>':""}</div>
+h+=`<div class="mob"><div><div class="mn">${b.tier>=4?godName(pet.name):pet.name} ${tierBadge(b.tier,b.sub)}<span class="dim">Lv.${pet.level}</span>${i===S.activePet?'<span class="gold">出战中</span>':""}</div>
 <div class="md">${b.desc}</div><div class="md">气血${hp} 攻击${atk} · 经验${pet.exp}/${petExpNeed(pet.level)}</div></div>
 ${i===S.activePet?"":`<button class="btn" data-pet="${i}">出战</button>`}</div>`;
 });
@@ -1190,7 +1203,7 @@ let h=`<div class="card"><h3>斗气境界</h3>
 <div class="tier"><div><div class="gold">${dq.name}</div><div class="m">${bonusStr(dq.bonus)||"初入斗气，仍需修炼"}</div>
 ${nd?`<div class="m">下一境：${nd.name}（需${breq}级）</div>`:`<div class="m">已至斗帝巅峰，睥睨天下！</div>`}</div>
 ${nd?`<button class="btn small primary" style="width:auto;margin:0" id="dqB"${canB?"":" disabled"}>突破·${bcost}铜币</button>`:""}</div></div>`;
-h+=`<div class="card"><h3>功法修炼</h3><p class="dim">功法分黄/玄/地/天/神/圣六级。神级以下可元宝购买或挑战世界BOSS掉落，神级唯VIP6可得；圣级凌驾神级之上，唯限时活动「圣境降临」可得；习得后花费铜币修炼，每本最高5重。</p>`;
+h+=`<div class="card"><h3>功法修炼</h3><p class="dim">功法分黄/玄/地/天/神/圣/至尊七级，每级又分低级/中级/高级/终极四档。天级以下可元宝购买或挑战世界BOSS掉落，神级唯VIP6可得；圣级以上唯限时活动可得，最高「至尊终极」彩色流光；习得后花费铜币修炼，每本最高5重。</p>`;
 for(const[gid,g]of Object.entries(GONGFA)){
  const lv=gfLv(gid),learned=gfLearned(gid),maxed=lv>=g.max,locked=p.level<g.req;
  const per=Object.entries(g.bonus).map(([k,v])=>`${GFNAME[k]}+${v}`).join(" ");
@@ -1202,16 +1215,16 @@ for(const[gid,g]of Object.entries(GONGFA)){
  btn=`<button class="btn small" style="width:auto;margin:0" disabled>VIP6专属</button>`;
  sub=`<div class="m" style="color:#e08a8a">VIP6 或 限时活动「神功现世」可获得</div>`;
  }
- }else if(g.tier==="圣"&&!learned){
+ }else if(g.tier>=5&&!learned){
  btn=`<button class="btn small" style="width:auto;margin:0" disabled>限时活动可得</button>`;
- sub=`<div class="m" style="color:#e08a8a">限时活动「圣境降临」可获得</div>`;
+ sub=`<div class="m" style="color:#e08a8a">限时活动可获得</div>`;
  }else if(!learned){
  btn=`<button class="btn small primary" style="width:auto;margin:0" data-buygf="${gid}">购买·${g.price}元宝</button>`;
  sub=`<div class="m">或挑战世界BOSS掉落</div>`;
  }else{
  btn=`<button class="btn small primary" style="width:auto;margin:0" data-gf="${gid}"${(maxed||locked)?" disabled":""}>${maxed?"已满重":`修炼·${gfCost(lv)}铜币`}</button>`;
  }
- h+=`<div class="tier"><div><div class="gold">《${(g.tier==="神"||g.tier==="圣")?godName(g.name):g.name}》 <span class="ptier ${g.tier}">${g.tier}级</span><span class="dim">${lv}/${g.max}重</span></div>
+ h+=`<div class="tier"><div><div class="gold">《${g.tier>=4?godName(g.name):g.name}》 ${tierBadge(g.tier,g.sub)}<span class="dim">${lv}/${g.max}重</span></div>
  <div class="m">${g.desc}</div><div class="m">每重：${per}</div>${sub}
  ${learned&&locked?`<div class="m" style="color:#e08a8a">需要 ${g.req} 级修炼</div>`:""}
  </div>${btn}</div>`;
@@ -1246,7 +1259,7 @@ m.querySelectorAll("[data-gf]").forEach(b=>b.onclick=()=>{
 });
 m.querySelectorAll("[data-buygf]").forEach(b=>b.onclick=()=>{
  const gid=b.dataset.buygf,g=GONGFA[gid];
- if(gfLearned(gid)||g.tier==="圣")return;
+ if(gfLearned(gid)||g.tier>=5)return;
  if(p.gold<g.price){toast("元宝不足");return;}
  p.gold-=g.price;S.gongfaLearned=S.gongfaLearned||{};S.gongfaLearned[gid]=1;
  save();render();toast(`习得《${g.name}》！`);
@@ -1263,7 +1276,7 @@ m.querySelectorAll("[data-yh]").forEach(b=>b.onclick=()=>{
 /* ============ 商店 ============ */
 function rShop(){
 const m=$("main"),p=S.player;
-const tier=Math.min(5,Math.floor(p.level/6)+1);
+const tier=Math.min(5,Math.floor(p.level/6)+1),ptier=Math.min(4,Math.floor(p.level/8)); // 装备1-5阶，宠物0-4品
 let h=`<div class="card"><h3>江湖药铺</h3><p class="dim">你有铜币 ${p.coins}</p>`;
 SHOP.forEach(s=>{
 h+=`<div class="tier"><div><div class="gold">${s.name}</div><div class="m">${s.desc} · ${s.price}铜币</div></div>
@@ -1287,7 +1300,7 @@ p.coins-=s.price;addConsumable(s.name,s.use);save();render();toast("购买了");
 m.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>{
 const k=b.dataset.g;
 if(k==="tili"&&p.gold>=10){p.gold-=10;p.stamina=Math.min(p.maxStamina,p.stamina+30);toast("体力+30！");}
-else if(k==="egg"&&p.gold>=88){p.gold-=88;const pool=Object.keys(PETS).filter(k=>PETS[k].tier<=tier);const pid=pick(pool);
+else if(k==="egg"&&p.gold>=88){p.gold-=88;const pool=Object.keys(PETS).filter(k=>PETS[k].tier<=ptier);const pid=pick(pool);
 S.pets.push({pid,name:PETS[pid].name,level:p.level,exp:0});if(S.activePet===-1)S.activePet=0;toast("开出了！");}
 else if(k==="box"&&p.gold>=68){p.gold-=68;const pool=Object.keys(ITEMS).filter(x=>ITEMS[x].slot==="weapon"&&ITEMS[x].tier===tier&&!ITEMS[x].gift);
 const iid=pick(pool);S.bag.push(mkWeapon(iid));toast("开出了！");}
@@ -1380,7 +1393,7 @@ function rPay(){
  S.firstGift=1;
  p.gold+=288;p.coins+=20000;
  p.stamina=Math.min(p.maxStamina,p.stamina+90);
- const pool=Object.keys(PETS).filter(k=>PETS[k].tier<=4);
+ const pool=Object.keys(PETS).filter(k=>PETS[k].tier<=3);
  const pid=pick(pool);
  S.pets.push({pid,name:PETS[pid].name,level:p.level,exp:0});
  if(S.activePet===-1)S.activePet=0;
@@ -1678,6 +1691,7 @@ function rEvent(){
  const sGfGot=gfLearned("shengxinjue"),canSGf=total>=3999&&!sGfGot;
  const sHuangGot=!!S.claimedSaintHuang,canSHuang=total>=5999&&!sHuangGot;
  const zzGot=!!S.claimedZhizun,canZZ=total>=7999&&!zzGot;
+ const hmGot=!!S.claimedHongmeng,canHm=total>=9999&&!hmGot;
  h+=`<div class="card"><h3> 限时活动</h3>
  <div class="tier"><div><div class="gold">中秋赏月</div><div class="m">限定称号 ${titleBadge(EVENT_TITLES.midautumn.name,"rtcust",EVENT_TITLES.midautumn.hue)}<br>攻击+15 气血+150，可叠加</div></div>
  <button class="btn small primary" style="width:auto;margin:0" id="evtMid"${midGot?" disabled":""}>${midGot?"已领取":"领取"}</button></div>
@@ -1693,8 +1707,10 @@ function rEvent(){
  <button class="btn small primary" style="width:auto;margin:0" id="evtSGf"${canSGf?"":" disabled"}>${sGfGot?"已领取":(total>=3999?"领取":`差￥${3999-total}`)}</button></div>
  <div class="tier"><div><div class="gold">圣凰降临</div><div class="m">累计充值满￥5999 领取圣级宠物「混沌圣凰」（${total}/5999）<br><span class="dim">圣级圣兽，速度无双</span></div></div>
  <button class="btn small primary" style="width:auto;margin:0" id="evtSHuang"${canSHuang?"":" disabled"}>${sHuangGot?"已领取":(total>=5999?"领取":`差￥${5999-total}`)}</button></div>
- <div class="tier"><div><div class="gold">至尊降临</div><div class="m">累计充值满￥7999 领取至尊伙伴×1（${total}/7999）<br><span class="dim">至尊凌驾神话之上，全场最强伙伴</span></div></div>
- <button class="btn small primary" style="width:auto;margin:0" id="evtZZ"${canZZ?"":" disabled"}>${zzGot?"已领取":(total>=7999?"领取":`差￥${7999-total}`)}</button></div></div>`;
+ <div class="tier"><div><div class="gold">至尊降临</div><div class="m">累计充值满￥7999 领取<span class="ptier zhizun">至尊终极</span>伙伴×1（${total}/7999）<br><span class="dim">全场最强伙伴，彩色流光</span></div></div>
+ <button class="btn small primary" style="width:auto;margin:0" id="evtZZ"${canZZ?"":" disabled"}>${zzGot?"已领取":(total>=7999?"领取":`差￥${7999-total}`)}</button></div>
+ <div class="tier"><div><div class="gold">鸿蒙降临</div><div class="m">累计充值满￥9999 领取<span class="ptier zhizun">至尊终极</span>宠物「鸿蒙至尊龙」+ 至尊终极功法《<span class="godflow">鸿蒙至尊诀</span>》（${total}/9999）<br><span class="dim">终极之上的终极，万中无一</span></div></div>
+ <button class="btn small primary" style="width:auto;margin:0" id="evtHM"${canHm?"":" disabled"}>${hmGot?"已领取":(total>=9999?"领取":`差￥${9999-total}`)}</button></div></div>`;
  // ---- 每日活动 ----
  const wbl=wbLeft();
  const taskSt=!p.task?"未接取":(p.taskDone?"可领奖":`进行中 ${p.task.done}/${p.task.need}`);
@@ -1736,8 +1752,8 @@ function rEvent(){
  const emy=$("evtMythic");
  if(emy)emy.onclick=()=>{
  if(vipTotal()<1288||S.claimedMythicEvent)return;
- S.claimedMythicEvent=true;recruitPartner(4);
- toast(" 限时活动：神话伙伴加入队伍！")};
+ S.claimedMythicEvent=true;recruitPartner(4,3);
+ toast(" 限时活动：神级终极伙伴加入队伍！")};
  const esp=$("evtSPet");
  if(esp)esp.onclick=()=>{
  if(vipTotal()<2998||S.claimedSaintPet)return;
@@ -1756,8 +1772,16 @@ function rEvent(){
  const ezz=$("evtZZ");
  if(ezz)ezz.onclick=()=>{
  if(vipTotal()<7999||S.claimedZhizun)return;
- S.claimedZhizun=true;recruitPartner(5);
- toast(" 限时活动：至尊伙伴加入队伍！")};
+ S.claimedZhizun=true;recruitPartner(6,3);
+ toast(" 限时活动：至尊终极伙伴加入队伍！")};
+ const ehm=$("evtHM");
+ if(ehm)ehm.onclick=()=>{
+ if(vipTotal()<9999||S.claimedHongmeng||gfLearned("hongmengjue"))return;
+ S.claimedHongmeng=true;
+ S.pets.push({pid:"hongmeng",name:PETS.hongmeng.name,level:p.level,exp:0});
+ if(S.activePet===-1)S.activePet=0;
+ S.gongfaLearned=S.gongfaLearned||{};S.gongfaLearned.hongmengjue=1;
+ calcStats();save();render();toast(" 限时活动：至尊终极宠物「鸿蒙至尊龙」与功法《鸿蒙至尊诀》到手！")};
  m.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{TAB=b.dataset.go;B=null;render();window.scrollTo(0,0);});
 }
 function rMore(){
@@ -1780,7 +1804,7 @@ function rMore(){
  · 宠物可捕捉斗罗魂兽：柔骨兔·小舞、蓝银皇·阿银、鬼虎、人面魔蛛、泰坦巨猿·二明、暗魔邪神虎、天青牛蟒·大明、冰碧帝皇蝎<br>
  · 「排行」有战力榜和充值榜，前三名自动获得炫酷称号（属性可叠加）：战力之巅/武林传奇/江湖豪杰，神豪无双/富甲天下/一掷千金<br>
  · 宠物分黄/玄/地/天/神五级，品级越高助战越强；新增累计充值奖励（10档，神级宠物/功法/神话伙伴等壕礼）；打怪掉落充值红包（0.5/1/3/5/10元，越大越稀有，每日最多100个），散人也能攒进度领奖励（红包不计VIP等级）<br>
- · 活动中心：限时活动（中秋称号、神功现世）、每日活动（世界BOSS、师门任务）、福利领取（VIP礼包/首充礼包/充值豪礼）都在这里<br>· 神话伙伴：VIP8免费领 / 限时活动「神将降临」（累计充值￥1288）/ 千金募名将低概率出<br></p></div>
+ · 活动中心：限时活动（中秋称号、神功现世）、每日活动（世界BOSS、师门任务）、福利领取（VIP礼包/首充礼包/充值豪礼）都在这里<br>· 伙伴/宠物/功法统一七级（黄/玄/地/天/神/圣/至尊），每级分低级/中级/高级/终极四档，最高「至尊终极」为彩色流光<br>· 神级终极伙伴：VIP8免费领 / 限时活动「神将降临」（累计充值￥1288）/ 千金募名将低概率出；至尊终极伙伴唯「至尊降临」（￥7999）可得<br></p></div>
  <div class="card"><h3>存档</h3>
  <button class="btn small" id="resave">手动保存</button>
  <button class="btn small danger" id="reset">删号重来（清空存档）</button></div>`;
@@ -1797,7 +1821,8 @@ function rMore(){
   S.player.skills=S.player.skills.filter(s=>s!=="bajibeng"&&s!=="shihuyin");
   const st=SECT_STARTER[S.player.sect];if(st&&!S.player.skills.includes(st))S.player.skills.push(st);
  }
- if(!Array.isArray(S.partners))S.partners=[];if(S.activePartner===undefined)S.activePartner=-1;if(!Array.isArray(S.pets))S.pets=[];if(!Array.isArray(S.eventTitles))S.eventTitles=[];if(!S.chat)S.chat={world:[{sys:1,txt:"欢迎来到江湖世界，谨言慎行，行侠仗义！",t:Date.now()}],sect:[],ch:"world",cd:0};migrateTitle();calcStats();TAB="home";render();}
+ if(!Array.isArray(S.partners))S.partners=[];if(S.activePartner===undefined)S.activePartner=-1;
+ for(const pt of S.partners){if(pt.tier===undefined){pt.tier=[0,1,2,3,4,6][pt.quality||0]||0;pt.sub=1;delete pt.quality;}}if(!Array.isArray(S.pets))S.pets=[];if(!Array.isArray(S.eventTitles))S.eventTitles=[];if(!S.chat)S.chat={world:[{sys:1,txt:"欢迎来到江湖世界，谨言慎行，行侠仗义！",t:Date.now()}],sect:[],ch:"world",cd:0};migrateTitle();calcStats();TAB="home";render();}
  else{rCreate();}
  setInterval(()=>{ // 每60秒回1点体力
  if(S&&S.player&&S.player.stamina<S.player.maxStamina){S.player.stamina++;save();if(TAB==="home"&&!B)renderTop();}
