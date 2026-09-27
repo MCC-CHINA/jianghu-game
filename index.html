@@ -616,9 +616,9 @@ function animTitle(name,cls,hue){
  const c=animTitleCls(name,cls,hue);
  return `<span class="atitle ${c}"${c==="at-hue"&&hue!=null?` style="--h:${hue}"`:""}>${name}</span>`;
 }
-/* 佩戴称号渲染：武林神话用徽章图（试点），其余用动态文字 */
+/* 佩戴称号渲染：武林神话用整张横幅图缩小显示（试点），其余用动态文字 */
 function wornTitleHTML(wt){
- if(wt.name==="武林神话")return `<img class="wornimg" src="title-badge-wulin.webp" alt="武林神话">`;
+ if(wt.name==="武林神话")return `<img class="wornimg" src="title-wulin.webp" alt="武林神话">`;
  return animTitle(wt.name,wt.cls,wt.hue);
 }
 // 统一佩戴称号：{k:"vip",id:等级} | {k:"ev",id:称号eid} | {k:"rank",id:"榜:名次"}
