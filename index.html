@@ -1120,6 +1120,7 @@ function calcStats(){
  p.atk+=b.atk||0;p.def+=b.def||0;p.maxhp+=b.hp||0;p.maxmp+=b.mp||0;p.spd+=b.spd||0;p.luck+=b.luck||0;}
  const vb=1+vipLevel()*0.02; // VIP加成：每级攻击/气血+2%
  p.atk=Math.floor(p.atk*vb); p.maxhp=Math.floor(p.maxhp*vb);
+ p.luck=Math.min(9,p.luck||0); // 幸运总上限9（武器/防具/称号/功法等所有来源叠加后封顶）
  p.hp=Math.min(p.hp,p.maxhp); p.mp=Math.min(p.mp,p.maxmp);
 }
 function zhanli(){
