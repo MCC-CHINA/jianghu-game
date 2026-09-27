@@ -1136,7 +1136,7 @@ pet.exp+=n;
 while(pet.exp>=petExpNeed(pet.level)){pet.exp-=petExpNeed(pet.level);pet.level++;}
 }
 /* 世界BOSS：伤害试炼。战斗结算只记录伤害+小额修为/铜币；物品奖励每日按伤害榜排名领取 */
-function wbSettle(win){
+function wbBattleSettle(win){
 const p=S.player,f=B.foe,em=expMult();
 const dmg=B.wbdmg||0,day=wbDay();day.dmg+=dmg;
 const ge=Math.floor(Math.min(dmg*0.2,f.exp)*em),gc=Math.floor(Math.min(dmg*0.02,f.coins));
@@ -1147,7 +1147,7 @@ save();
 }
 function endBattle(win){
 B.over=true;const p=S.player,f=B.foe;
-if(B.wb){wbSettle(win);}
+if(B.wb){wbBattleSettle(win);}
 if(win&&!B.wb){
 const em=expMult(),ge=Math.floor(f.exp*em);
 log(`<span class="sys">战胜了！获得修为 ${ge}${em>1?`（${em}倍经验）`:""}、铜币 ${f.coins}</span>`);
