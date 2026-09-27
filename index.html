@@ -93,6 +93,12 @@ body{background:#141009;color:#e8dcc0;font-family:"Songti SC","STSong","SimSun",
 #topbar .wornt{display:block;margin:0 0 3px;cursor:pointer;line-height:1.25}
 #topbar .wornt .atitle{font-size:19px;letter-spacing:5px}
 #topbar .wornt.none{color:#8a7a5a;font-size:13px;letter-spacing:2px}
+/* 称号徽章图（武林神话试点）：图片+辉光脉动动画 */
+#topbar .wornimg{height:40px;width:auto;border-radius:8px;vertical-align:middle;animation:imgGlow 2s ease-in-out infinite}
+.tt .ttimg{height:36px;width:auto;border-radius:8px;vertical-align:middle}
+.tt:not(.locked) .ttimg{animation:imgGlow 2s ease-in-out infinite}
+.tt.locked .ttimg{filter:grayscale(1) brightness(.55);opacity:.65}
+@keyframes imgGlow{0%,100%{filter:drop-shadow(0 0 3px rgba(255,150,0,.55))}50%{filter:drop-shadow(0 0 12px rgba(255,150,0,1))}}
 #topbar .pname .title{color:#ffe9a8;font-size:13px;margin-right:4px;text-shadow:0 0 6px rgba(245,214,123,.6)}
 .bars{margin-top:6px;display:flex;flex-direction:column;gap:4px}
 .bar{height:14px;background:#0d0a06;border:1px solid #5a4a26;border-radius:7px;overflow:hidden;position:relative;font-size:10px}
@@ -610,6 +616,11 @@ function animTitle(name,cls,hue){
  const c=animTitleCls(name,cls,hue);
  return `<span class="atitle ${c}"${c==="at-hue"&&hue!=null?` style="--h:${hue}"`:""}>${name}</span>`;
 }
+/* 佩戴称号渲染：武林神话用徽章图（试点），其余用动态文字 */
+function wornTitleHTML(wt){
+ if(wt.name==="武林神话")return `<img class="wornimg" src="title-badge-wulin.webp" alt="武林神话">`;
+ return animTitle(wt.name,wt.cls,wt.hue);
+}
 // 统一佩戴称号：{k:"vip",id:等级} | {k:"ev",id:称号eid} | {k:"rank",id:"榜:名次"}
 function migrateTitle(){if(S&&S.player&&S.wornTitle===undefined){const t=S.title||0;S.wornTitle=t?{k:"vip",id:t}:null;}}
 function wornTitleInfo(){const w=S.wornTitle;if(!w)return null;
@@ -1050,7 +1061,7 @@ function renderTop(){
  const p=S.player,t=$("topbar");t.style.display="block";
  const v=vipLevel();
  const wt=wornTitleInfo();
- t.innerHTML=`<div class="pname">${wt?`<div class="wornt" id="topWorn" title="点击更换称号">${animTitle(wt.name,wt.cls,wt.hue)}</div>`:`<div class="wornt none" id="topWorn" title="点击前往称号页">暂无称号·点击获取</div>`}<div><span class="${v>=6?"vipn"+Math.min(v,12):""}">${p.name}</span><span class="lv">Lv.${p.level} ${PROFS[p.prof||"warrior"].name}</span>${v?`<span class="vip" id="topVip" title="查看VIP详情">VIP${v}</span>`:""}</div>
+ t.innerHTML=`<div class="pname">${wt?`<div class="wornt" id="topWorn" title="点击更换称号">${wornTitleHTML(wt)}</div>`:`<div class="wornt none" id="topWorn" title="点击前往称号页">暂无称号·点击获取</div>`}<div><span class="${v>=6?"vipn"+Math.min(v,12):""}">${p.name}</span><span class="lv">Lv.${p.level} ${PROFS[p.prof||"warrior"].name}</span>${v?`<span class="vip" id="topVip" title="查看VIP详情">VIP${v}</span>`:""}</div>
  <div class="bars">
  <div class="bar hp"><i style="width:${p.hp/p.maxhp*100}%"></i><span>气血 ${p.hp}/${p.maxhp}</span></div>
  <div class="bar mp"><i style="width:${p.mp/p.maxmp*100}%"></i><span>内力 ${p.mp}/${p.maxmp}</span></div>
@@ -1968,7 +1979,7 @@ function rTitle(){
  const myT=myRankTitles().map(t=>t.name),evGot=S.eventTitles||[];
  let vipHtml="";
  for(let i=1;i<=12;i++){const tt=VIP_TITLES[i],got=i<=v;
- vipHtml+=`<span class="tt${got?"":" locked"}${isWorn("vip",i)?" worn":""}"${got?` data-wk="vip" data-wid="${i}"`:""}>${titleBadge(tt.name,vipTitleCls(i))}</span>`;}
+ vipHtml+=`<span class="tt${got?"":" locked"}${isWorn("vip",i)?" worn":""}"${got?` data-wk="vip" data-wid="${i}"`:""}>${tt.name==="武林神话"?`<img class="ttimg" src="title-badge-wulin.webp" alt="武林神话">`:titleBadge(tt.name,vipTitleCls(i))}</span>`;}
  let rkHtml="";
  for(const bk of Object.keys(RANK_TITLES))for(let i=0;i<3;i++){const t=RANK_TITLES[bk][i],got=myT.includes(t.name),wid=bk+":"+i;
  rkHtml+=`<span class="tt${got?"":" locked"}${isWorn("rank",wid)?" worn":""}"${got?` data-wk="rank" data-wid="${wid}"`:""}>${titleBadge(t.name,t.cls)}</span>`;}
