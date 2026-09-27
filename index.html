@@ -236,7 +236,7 @@ function doSynth(needs,cost,xid,xname){
  for(const[iid]of needs){S.bag.splice(S.bag.findIndex(x=>x.iid===iid),1);}
  S.player.coins-=cost;
  S.bag.push({iid:xid,enh:0});
- save();closeModal();render();toast(`合成成功！获得${xname}！`);
+ save();closeModal();render();toast(`合成成功！获得${tieredName(xname,5)}！`);
 }
 const CLASS_WPN={1:["w5","w14","w15"],2:["w6","w16","w17"],3:["w7","w18","w19"],4:["w10","w20","w21"]}; // 每关三职业武器
 const ZONE_ULT={1:"w22",2:"w23",3:"w24",4:"w25"}; // 每关终极武器
@@ -499,7 +499,7 @@ function wornTitleInfo(){const w=S.wornTitle;if(!w)return null;
 function godName(n){return `<span class="godflow">${n}</span>`;} // 神/圣级名：七彩流光
 function goldName(n){return `<span class="goldflow">${n}</span>`;} // 至尊名：金色
 function tieredName(n,t){return `<span class="tn-${PTIERS[t]}">${n}</span>`;} // 品级名色：黄白/玄蓝/地紫/天橙/神粉流光/圣金流光/至尊七彩
-function itemNameHTML(it){const d=ITEMS[it.iid];return d.tier>=5?godName(d.name):d.name;} // 装备名（5阶神级流光）
+function itemNameHTML(it){const d=ITEMS[it.iid];return d.tier>=5?tieredName(d.name,d.tier-1):d.name;} // 装备名：5阶神粉流光/6阶圣金流光/7阶至尊七彩
 function myRankTitles(){
  const t=[],zl=zhanli();
  const zr=0; // 排行榜已清空NPC，只剩真实玩家，默认第1名
@@ -898,13 +898,13 @@ if(ge>0){gainExp(ge);p.coins+=gc;gainPetExp(Math.floor(ge/2));gainPartnerExp(Mat
 log(`<span class="sys">获得修为 ${ge}${em>1?`（${em}倍经验）`:""}、铜币 ${gc}</span>`);}
 p.feather=(p.feather||0)+fn;
 log(`<span class="sys">世界BOSS掉落灵羽×${fn}！可在「翅膀」页升级翅膀</span>`);
-if(evoP>0&&Math.random()<evoP){addConsumable("神级进化石","evostone");log(`<span class="sys">世界BOSS掉落神级进化石×1！天级宠物合成神级必需材料</span>`);}
+if(evoP>0&&Math.random()<evoP){addConsumable("神级进化石","evostone");log(`<span class="sys">世界BOSS掉落${tieredName("神级进化石",4)}×1！天级宠物合成神级必需材料</span>`);}
 let saintP=0,zunP=0;
 if(win){saintP=0.08;zunP=0.02;}
 else if(ratio>=0.6){saintP=0.03;zunP=0.008;}
 else if(ratio>=0.3){saintP=0.01;zunP=0.003;}
-if(saintP>0&&Math.random()<saintP){addConsumable("圣级进化石","evo_saint");log(`<span class="sys">鸿运当头！世界BOSS掉落圣级进化石×1！神级宠物合成圣级必需材料</span>`);}
-if(zunP>0&&Math.random()<zunP){addConsumable("至尊进化石","evo_zun");log(`<span class="sys">天选之子！世界BOSS掉落至尊进化石×1！圣级宠物合成至尊级必需材料</span>`);}
+if(saintP>0&&Math.random()<saintP){addConsumable("圣级进化石","evo_saint");log(`<span class="sys">鸿运当头！世界BOSS掉落${tieredName("圣级进化石",5)}×1！神级宠物合成圣级必需材料</span>`);}
+if(zunP>0&&Math.random()<zunP){addConsumable("至尊进化石","evo_zun");log(`<span class="sys">天选之子！世界BOSS掉落${tieredName("至尊进化石",6)}×1！圣级宠物合成至尊级必需材料</span>`);}
 if(win){
 pushChat("world",{sys:1,txt:`恭喜「${p.name}」击败了${f.name}，威震江湖！`,t:Date.now()});
 const cand=Object.keys(GONGFA).filter(g=>GONGFA[g].tier<4&&!gfLearned(g));
@@ -1059,13 +1059,13 @@ if(!S.bag.length)h+=`<p class="dim">空空如也，去闯荡江湖打怪掉落�
 S.bag.forEach((it,i)=>{
 if(it.use){const cnt=` <span class="gold">×${it.n||1}</span>`;
 if(it.use==="xilian"){h+=`<div class="mob"><div><div class="mn">${it.name}${cnt}</div><div class="md">材料 · 在武器旁点「洗炼」重置武器随机属性</div></div></div>`;return;}
-if(it.use==="evostone"){h+=`<div class="mob"><div><div class="mn">${it.name}${cnt}</div><div class="md">材料 · 天级宠物合成神级必需（宠物页合成）</div></div></div>`;return;}
-if(it.use==="evo_saint"){h+=`<div class="mob"><div><div class="mn">${it.name}${cnt}</div><div class="md">材料 · 神级宠物合成圣级必需（商城19999元宝/世界BOSS掉落）</div></div></div>`;return;}
-if(it.use==="evo_zun"){h+=`<div class="mob"><div><div class="mn">${it.name}${cnt}</div><div class="md">材料 · 圣级宠物合成至尊级必需（商城29999元宝/世界BOSS掉落）</div></div></div>`;return;}
+if(it.use==="evostone"){h+=`<div class="mob"><div><div class="mn">${tieredName(it.name,4)}${cnt}</div><div class="md">材料 · 天级宠物合成神级必需（宠物页合成）</div></div></div>`;return;}
+if(it.use==="evo_saint"){h+=`<div class="mob"><div><div class="mn">${tieredName(it.name,5)}${cnt}</div><div class="md">材料 · 神级宠物合成圣级必需（商城19999元宝/世界BOSS掉落）</div></div></div>`;return;}
+if(it.use==="evo_zun"){h+=`<div class="mob"><div><div class="mn">${tieredName(it.name,6)}${cnt}</div><div class="md">材料 · 圣级宠物合成至尊级必需（商城29999元宝/世界BOSS掉落）</div></div></div>`;return;}
 const s=SHOP.find(x=>x.id===it.use)||{name:it.name};
 h+=`<div class="mob"><div><div class="mn">${it.name}${cnt}</div><div class="md">药品</div></div><button class="btn" data-use="${i}">使用</button></div>`;return;}
 const d=ITEMS[it.iid];
-h+=`<div class="mob"><div><div class="mn">${d.tier>=5?godName(d.name):d.name}${d.cls?` <span class="dim">[${d.cls}]</span>`:""}${qualityTag(it)}${it.enh?` <span class="gold">+${it.enh}</span>`:""}${it.expire?` <span class="dim">${expireText(it)}</span>`:""}</div>
+h+=`<div class="mob"><div><div class="mn">${itemNameHTML(it)}${d.cls?` <span class="dim">[${d.cls}]</span>`:""}${qualityTag(it)}${it.enh?` <span class="gold">+${it.enh}</span>`:""}${it.expire?` <span class="dim">${expireText(it)}</span>`:""}</div>
 <div class="md">${SLOTNAME[d.slot]} · ${[d.atk&&"攻"+d.atk,d.def&&"防"+d.def,d.hp&&"血"+d.hp,d.spd&&"速"+d.spd,d.luck&&"幸运+"+d.luck].filter(Boolean).join(" ")}${it.bonus?` <span class="gold">[${bonusText(it.bonus)}]</span>`:""}</div></div>
 ${d.slot==="weapon"?`<button class="btn" data-reroll="${i}">洗炼</button>`:""}<button class="btn" data-eq="${i}">装备</button></div>`;
 });
@@ -1093,19 +1093,19 @@ calcStats();save();render();toast("用药了，效果拔群！");
 $("synth").onclick=()=>synthModal();
 function synthModal(){
  const zrows=[1,2,3,4].map(t=>{
-  const ids=CLASS_WPN[t],uname=ITEMS[ZONE_ULT[t]].name,cost=ZONE_ULT_COST[t];
+  const ids=CLASS_WPN[t],uname=ITEMS[ZONE_ULT[t]].name,utier=ITEMS[ZONE_ULT[t]].tier,cost=ZONE_ULT_COST[t];
   const mat=ids.map(id=>{const has=S.bag.some(x=>x.iid===id);return `<span style="color:${has?"#7dd87d":"#ff8787"}">${ITEMS[id].name}[${ITEMS[id].cls}]</span>`;}).join(" ");
-  return `<div class="tier"><div><div class="gold">${uname}<span class="dim"> · ${ZONES[t-1].name}终极武器</span></div><div class="m">${mat} · ${cost/10000}万铜币（拥有${S.player.coins}）</div></div><button class="btn small" style="width:auto;margin:0" data-zsynth="${t}">合成</button></div>`;
+  return `<div class="tier"><div><div>${utier>=5?tieredName(uname,utier-1):`<span class="gold">${uname}</span>`}<span class="dim"> · ${ZONES[t-1].name}终极武器</span></div><div class="m">${mat} · ${cost/10000}万铜币（拥有${S.player.coins}）</div></div><button class="btn small" style="width:auto;margin:0" data-zsynth="${t}">合成</button></div>`;
  }).join("");
  const xmat=XUANYUAN_NEED.map(id=>{const has=S.bag.some(x=>x.iid===id);return `<span style="color:${has?"#7dd87d":"#ff8787"}">${ITEMS[id].name}</span>`;}).join(" ");
  const arows=ARMOR_SYNTH.map(([slot,xid,xname],idx)=>{
   const needs=[1,2,3,4].map(t=>topItemOfSlot(t,slot));
   const mat=needs.map((iid,ti)=>{const has=S.bag.some(x=>x.iid===iid);return `<span style="color:${has?"#7dd87d":"#ff8787"}">${ITEMS[iid].name}</span><span class="dim">(${BOSS_OF_TIER[ti+1].split("·")[0]})</span>`;}).join(" ");
-  return `<div class="tier"><div><div class="gold">${xname}<span class="dim"> · ${SLOTNAME[slot]} · 终极防具</span></div><div class="m">${mat} · 200万铜币（拥有${S.player.coins}）</div></div><button class="btn small" style="width:auto;margin:0" data-asynth="${idx}">合成</button></div>`;
+  return `<div class="tier"><div><div>${tieredName(xname,5)}<span class="dim"> · ${SLOTNAME[slot]} · 终极防具</span></div><div class="m">${mat} · 200万铜币（拥有${S.player.coins}）</div></div><button class="btn small" style="width:auto;margin:0" data-asynth="${idx}">合成</button></div>`;
  }).join("");
  const hasXj=S.bag.some(x=>x.iid==="w13");
- const zzrows=ZHIZUN_WPN.map(([xid,xname,xcls])=>`<div class="tier"><div><div class="gold">${xname}<span class="dim"> · 至尊终极武器[${xcls}]</span></div><div class="m"><span style="color:${hasXj?"#7dd87d":"#ff8787"}">轩辕神剑×1</span> · 1000万铜币（拥有${S.player.coins}）<br><span class="dim">7阶至尊 · 全游戏最高阶武器</span></div></div><button class="btn small primary" style="width:auto;margin:0" data-zhizun="${xid}">合成</button></div>`).join("");
- modal(`<h3>神兵合成</h3><p class="dim">关卡终极武器：集齐本关战士/法师/射手三职业武器 + 铜币 → 本关终极武器。轩辕神剑：集齐四把关卡终极武器 + 300万铜币。至尊终极武器：轩辕神剑×1 + 1000万铜币（战士斩尤帝剑/法师灭尤帝杖/射手断尤帝弓）。防具：集齐同部位四件BOSS防具 + 200万铜币 → 轩辕防具。材料需放在背包中（已装备的请先卸下）。</p>${zrows}<div class="tier"><div><div class="gold">轩辕神剑<span class="dim"> · 终极武器</span></div><div class="m">${xmat} · 300万铜币（拥有${S.player.coins}）</div></div><button class="btn small primary" style="width:auto;margin:0" id="dosynth">合成</button></div><h3 style="margin-top:8px">至尊终极武器</h3>${zzrows}<h3 style="margin-top:8px">防具合成</h3>${arows}<div class="rowbtns"><button class="btn" onclick="closeModal()">关闭</button></div>`);
+ const zzrows=ZHIZUN_WPN.map(([xid,xname,xcls])=>`<div class="tier"><div><div>${tieredName(xname,6)}<span class="dim"> · 至尊终极武器[${xcls}]</span></div><div class="m"><span style="color:${hasXj?"#7dd87d":"#ff8787"}">轩辕神剑×1</span> · 1000万铜币（拥有${S.player.coins}）<br><span class="dim">7阶至尊 · 全游戏最高阶武器</span></div></div><button class="btn small primary" style="width:auto;margin:0" data-zhizun="${xid}">合成</button></div>`).join("");
+ modal(`<h3>神兵合成</h3><p class="dim">关卡终极武器：集齐本关战士/法师/射手三职业武器 + 铜币 → 本关终极武器。轩辕神剑：集齐四把关卡终极武器 + 300万铜币。至尊终极武器：轩辕神剑×1 + 1000万铜币（战士斩尤帝剑/法师灭尤帝杖/射手断尤帝弓）。防具：集齐同部位四件BOSS防具 + 200万铜币 → 轩辕防具。材料需放在背包中（已装备的请先卸下）。</p>${zrows}<div class="tier"><div><div>${tieredName("轩辕神剑",5)}<span class="dim"> · 终极武器</span></div><div class="m">${xmat} · 300万铜币（拥有${S.player.coins}）</div></div><button class="btn small primary" style="width:auto;margin:0" id="dosynth">合成</button></div><h3 style="margin-top:8px">至尊终极武器</h3>${zzrows}<h3 style="margin-top:8px">防具合成</h3>${arows}<div class="rowbtns"><button class="btn" onclick="closeModal()">关闭</button></div>`);
  $("modalbox").querySelectorAll("[data-asynth]").forEach(b=>b.onclick=()=>{
   const[slot,xid,xname]=ARMOR_SYNTH[+b.dataset.asynth];
   const needs=[1,2,3,4].map(t=>{const iid=topItemOfSlot(t,slot);return[iid,ITEMS[iid].name];});
@@ -1118,7 +1118,7 @@ function synthModal(){
   for(const id of ids){S.bag.splice(S.bag.findIndex(x=>x.iid===id),1);}
   S.player.coins-=cost;
   S.bag.push(mkWeapon(ZONE_ULT[t]));
-  save();closeModal();render();toast(`合成成功！获得${ZONES[t-1].name}终极武器${ITEMS[ZONE_ULT[t]].name}！`);
+  save();closeModal();render();toast(`合成成功！获得${ZONES[t-1].name}终极武器${(()=>{const z=ITEMS[ZONE_ULT[t]];return z.tier>=5?tieredName(z.name,z.tier-1):z.name;})()}！`);
  });
  $("modalbox").querySelectorAll("[data-zhizun]").forEach(b=>b.onclick=()=>{
   const xid=b.dataset.zhizun,xname=ITEMS[xid].name;
@@ -1127,7 +1127,7 @@ function synthModal(){
   S.bag.splice(S.bag.findIndex(x=>x.iid==="w13"),1);
   S.player.coins-=ZHIZUN_WPN_COST;
   S.bag.push(mkWeapon(xid));
-  save();closeModal();render();toast(`合成成功！获得至尊终极武器${xname}！`);
+  save();closeModal();render();toast(`合成成功！获得至尊终极武器${tieredName(xname,6)}！`);
  });
  $("dosynth").onclick=()=>{
   for(const iid of XUANYUAN_NEED){if(!S.bag.some(x=>x.iid===iid)){toast(`缺少${ITEMS[iid].name}，先合成各关卡终极武器！`);return;}}
@@ -1135,7 +1135,7 @@ function synthModal(){
   for(const iid of XUANYUAN_NEED){S.bag.splice(S.bag.findIndex(x=>x.iid===iid),1);}
   S.player.coins-=SYNTH_COST;
   S.bag.push(mkWeapon("w13"));
-  save();closeModal();render();toast("合成成功！获得终极武器轩辕神剑！");
+  save();closeModal();render();toast(`合成成功！获得终极武器${tieredName("轩辕神剑",5)}！`);
  };
 }
 function doReroll(getIt){
@@ -1153,7 +1153,7 @@ $("enhance").onclick=()=>{
 const slots=Object.entries(S.equip).filter(([s,it])=>it&&it.enh<5);
 if(!slots.length){toast("没有可强化的装备（已满级或未装备）");return;}
 modal(`<h3>铁匠铺</h3>${slots.map(([s,it],i)=>{const d=ITEMS[it.iid],cost=50*(it.enh+1)*d.tier;
-return`<div class="tier"><div><div class="gold">${d.tier>=5?godName(d.name):d.name} +${it.enh}→+${it.enh+1}</div><div class="m">花费 ${cost} 铜币</div></div><button class="btn small" style="width:auto;margin:0" data-en="${i}">强化</button></div>`;}).join("")}
+return`<div class="tier"><div><div class="gold">${itemNameHTML(it)} +${it.enh}→+${it.enh+1}</div><div class="m">花费 ${cost} 铜币</div></div><button class="btn small" style="width:auto;margin:0" data-en="${i}">强化</button></div>`;}).join("")}
 <button class="btn small" onclick="closeModal()">关闭</button>`);
 $("modalbox").querySelectorAll("[data-en]").forEach(b=>b.onclick=()=>{
 const[slot,it]=slots[+b.dataset.en],d=ITEMS[it.iid],cost=50*(it.enh+1)*d.tier;
@@ -1237,7 +1237,7 @@ m.querySelectorAll("[data-peq]").forEach(b=>b.onclick=()=>{
  const items=S.bag.map((it,i)=>({it,i})).filter(x=>x.it.iid&&ITEMS[x.it.iid]&&ITEMS[x.it.iid].slot===baseSlot(slot)&&!itemExpired(x.it));
  if(!items.length){toast("背包没有可穿戴的"+SLOTNAME[slot]);return;}
  modal(`<h3>给「${pt.name}」穿戴${SLOTNAME[slot]}</h3>`+items.map(x=>{const d=ITEMS[x.it.iid];
- return`<div class="tier"><div><div class="gold">${d.tier>=5?godName(d.name):d.name}${x.it.enh?` +${x.it.enh}`:""}</div><div class="md">${SLOTNAME[d.slot]} · ${[d.atk&&"攻"+d.atk,d.def&&"防"+d.def,d.hp&&"血"+d.hp,d.spd&&"速"+d.spd,d.luck&&"幸运+"+d.luck].filter(Boolean).join(" ")}</div></div><button class="btn small" style="width:auto;margin:0" data-pick="${x.i}">穿戴</button></div>`;}).join("")+`<button class="btn small" onclick="closeModal()">关闭</button>`);
+ return`<div class="tier"><div><div class="gold">${itemNameHTML(x.it)}${x.it.enh?` +${x.it.enh}`:""}</div><div class="md">${SLOTNAME[d.slot]} · ${[d.atk&&"攻"+d.atk,d.def&&"防"+d.def,d.hp&&"血"+d.hp,d.spd&&"速"+d.spd,d.luck&&"幸运+"+d.luck].filter(Boolean).join(" ")}</div></div><button class="btn small" style="width:auto;margin:0" data-pick="${x.i}">穿戴</button></div>`;}).join("")+`<button class="btn small" onclick="closeModal()">关闭</button>`);
  $("modalbox").querySelectorAll("[data-pick]").forEach(pb=>pb.onclick=()=>{
  const it=S.bag[+pb.dataset.pick],old=pt.equip[slot];
  pt.equip[slot]=it;S.bag.splice(+pb.dataset.pick,1);
@@ -1395,9 +1395,9 @@ h+=`</div><div class="card"><h3>元宝商城</h3><p class="dim">你有元宝 <b 
 <div class="tier"><div><div class="gold">神兵宝箱</div><div class="m">随机开出${tier}阶武器 · 68元宝</div></div><button class="btn small" style="width:auto;margin:0" data-g="box">购买</button></div>
 <div class="tier"><div><div class="gold">灵羽</div><div class="m">翅膀升阶材料 · 10元宝/个</div></div><button class="btn small" style="width:auto;margin:0" data-g="feather">购买</button></div>
 <div class="tier"><div><div class="gold">洗炼石</div><div class="m">重置武器随机属性 · 38元宝</div></div><button class="btn small" style="width:auto;margin:0" data-g="xilian">购买</button></div>
-<div class="tier"><div><div class="gold">神级进化石</div><div class="m">天级宠物合成神级必需 · 1999元宝（世界BOSS也掉落）</div></div><button class="btn small" style="width:auto;margin:0" data-g="evostone">购买</button></div>
-<div class="tier"><div><div class="gold">圣级进化石</div><div class="m">神级宠物合成圣级必需 · 19999元宝（世界BOSS极低概率掉落）</div></div><button class="btn small" style="width:auto;margin:0" data-g="evo_saint">购买</button></div>
-<div class="tier"><div><div class="gold">至尊进化石</div><div class="m">圣级宠物合成至尊级必需 · 29999元宝（世界BOSS极低概率掉落）</div></div><button class="btn small" style="width:auto;margin:0" data-g="evo_zun">购买</button></div>
+<div class="tier"><div><div>${tieredName("神级进化石",4)}</div><div class="m">天级宠物合成神级必需 · 1999元宝（世界BOSS也掉落）</div></div><button class="btn small" style="width:auto;margin:0" data-g="evostone">购买</button></div>
+<div class="tier"><div><div>${tieredName("圣级进化石",5)}</div><div class="m">神级宠物合成圣级必需 · 19999元宝（世界BOSS极低概率掉落）</div></div><button class="btn small" style="width:auto;margin:0" data-g="evo_saint">购买</button></div>
+<div class="tier"><div><div>${tieredName("至尊进化石",6)}</div><div class="m">圣级宠物合成至尊级必需 · 29999元宝（世界BOSS极低概率掉落）</div></div><button class="btn small" style="width:auto;margin:0" data-g="evo_zun">购买</button></div>
 <div class="tier"><div><div class="gold">双倍经验丹</div><div class="m">打怪修为×2，持续30分钟 · 25元宝</div></div><button class="btn small" style="width:auto;margin:0" data-g="exp2">购买</button></div>
 <div class="tier"><div><div class="gold">三倍经验丹</div><div class="m">打怪修为×3，持续30分钟 · 45元宝</div></div><button class="btn small" style="width:auto;margin:0" data-g="exp3">购买</button></div>
 <div class="tier"><div><div class="gold">五倍经验丹</div><div class="m">打怪修为×5，持续30分钟 · 80元宝</div></div><button class="btn small" style="width:auto;margin:0" data-g="exp5">购买</button></div>
@@ -1817,9 +1817,9 @@ function rEvent(){
  <button class="btn small primary" style="width:auto;margin:0" id="evtSGf"${canSGf?"":" disabled"}>${sGfGot?"已领取":(total>=3999?"领取":`差￥${3999-total}`)}</button></div>
  <div class="tier"><div><div class="gold">圣凰降临</div><div class="m">累计充值满￥5999 领取圣级宠物「混沌圣凰」（${total}/5999）<br><span class="dim">圣级圣兽，速度无双</span></div></div>
  <button class="btn small primary" style="width:auto;margin:0" id="evtSHuang"${canSHuang?"":" disabled"}>${sHuangGot?"已领取":(total>=5999?"领取":`差￥${5999-total}`)}</button></div>
- <div class="tier"><div><div class="gold">至尊降临</div><div class="m">累计充值满￥7999 领取<span class="ptier 至尊">至尊终极</span>伙伴「萧炎」/「薰儿」（随机其一）（${total}/7999）<br><span class="dim">全场最强伙伴，七彩流光</span></div></div>
+ <div class="tier"><div><div class="gold">至尊降临</div><div class="m">累计充值满￥7999 领取<span class="ptier 至尊">至尊终极</span>伙伴「${tieredName("萧炎",6)}」/「${tieredName("薰儿",6)}」（随机其一）（${total}/7999）<br><span class="dim">全场最强伙伴，七彩流光</span></div></div>
  <button class="btn small primary" style="width:auto;margin:0" id="evtZZ"${canZZ?"":" disabled"}>${zzGot?"已领取":(total>=7999?"领取":`差￥${7999-total}`)}</button></div>
- <div class="tier"><div><div class="gold">鸿蒙降临</div><div class="m">累计充值满￥9999 领取<span class="ptier 至尊">至尊终极</span>宠物「鸿蒙至尊古龙」/「鸿蒙至尊古凰」（随机其一）+ 至尊终极功法《${tieredName("鸿蒙至尊诀",6)}》（${total}/9999）<br><span class="dim">终极之上的终极，万中无一</span></div></div>
+ <div class="tier"><div><div class="gold">鸿蒙降临</div><div class="m">累计充值满￥9999 领取<span class="ptier 至尊">至尊终极</span>宠物「${tieredName("鸿蒙至尊古龙",6)}」/「${tieredName("鸿蒙至尊古凰",6)}」（随机其一）+ 至尊终极功法《${tieredName("鸿蒙至尊诀",6)}》（${total}/9999）<br><span class="dim">终极之上的终极，万中无一</span></div></div>
  <button class="btn small primary" style="width:auto;margin:0" id="evtHM"${canHm?"":" disabled"}>${hmGot?"已领取":(total>=9999?"领取":`差￥${9999-total}`)}</button></div></div>`;
  // ---- 每日活动 ----
  const wbl=wbLeft();
