@@ -671,12 +671,24 @@ function wbStats(){const lv=S.player.level;
  return{name:"远古魔龙·帝天",lv:lv+5,boss:true,
  hp:999999999,atk:Math.floor(35+lv*14),def:Math.floor(12+lv*6),spd:Math.floor(10+lv*2),
  exp:(500+lv*80)*6,coins:500+lv*100};}
-function wbDay(){const d=new Date().toDateString();if(!S.wbdmg||S.wbdmg.date!==d)S.wbdmg={date:d,dmg:0};return S.wbdmg;}
-function wbRw(){const d=new Date().toDateString();if(!S.wbrw||S.wbrw.date!==d)S.wbrw={date:d,claimed:false};return S.wbrw;}
+function wbDay(){const d=new Date().toDateString();if(!S.wbdmg||S.wbdmg.date!==d){wbSettle();S.wbdmg={date:d,dmg:0};}return S.wbdmg;}
+function wbSettle(){ // 跨天：把上一天的世界BOSS伤害榜奖励发进邮箱
+ const today=new Date().toDateString(),last=S.wbdmg;
+ if(!last||last.date===today||!(last.dmg>0)||last.settled)return;
+ if(S.wbrw&&S.wbrw.date===last.date&&S.wbrw.claimed){last.settled=true;save();return;} // 旧版已手动领取过，不再重复
+ const list=wbNpcDmgs(last.date);list.push({name:S.player.name+"（我）",dmg:last.dmg,me:true});list.sort((a,b)=>b.dmg-a.dmg);
+ let rank=list.length;for(let i=0;i<list.length;i++)if(list[i].me){rank=i+1;break;}
+ const R=WB_REWARDS.find(r=>rank<=r.rank),dd=new Date(last.date);
+ const ds=isNaN(dd)?last.date:((dd.getMonth()+1)+"月"+dd.getDate()+"日");
+ sendMail("世界BOSS每日奖励",`你在${ds}世界BOSS伤害榜（共${list.length}人）排名第${rank}名，奖励已发放至邮箱，请手动领取附件。`,
+  {gold:R.gold,coins:R.coins,feather:R.feather,xilian:R.xilian,evoName:R.evo?R.evoName:null,evoIid:R.evo||null});
+ if(rank===1)pushChat("world",{sys:1,txt:`恭喜「${S.player.name}」${ds}世界BOSS伤害榜夺魁！奖励已发放至邮箱！`,t:Date.now()});
+ last.settled=true;save();
+}
 function hashStr(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
 function mulberry(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
 const WB_DMG_NAMES=["神豪·叶天帝","氪金战神","富可敌国·沈万三","一刀999","仙界首富·王多鱼","氪佬·萧火火","神壕·龙傲天","低调土豪·马腾云","挥金如土·赵公子","土豪·大力哥","剑神·西门无恨","刀圣·傅红雪","枪仙·赵子龙","拳皇·洪七公","腿王·聂风","掌尊·张三丰","指圣·一灯大师","棍僧·慧能","鞭后·九尾狐","暗器王·唐三"];
-function wbNpcDmgs(){const d=new Date().toDateString(),r=mulberry(hashStr("wbdmg"+d));
+function wbNpcDmgs(d){d=d||new Date().toDateString();const r=mulberry(hashStr("wbdmg"+d));
  return WB_DMG_NAMES.map(n=>({name:n,dmg:Math.floor(Math.pow(10,3.5+r()*3.2))}));}
 function wbBoard(){const list=wbNpcDmgs();list.push({name:S.player.name+"（我）",dmg:wbDay().dmg,me:true});list.sort((a,b)=>b.dmg-a.dmg);return list;}
 function wbMyRank(){const b=wbBoard();for(let i=0;i<b.length;i++)if(b[i].me)return i+1;return b.length;}
@@ -685,26 +697,31 @@ const WB_REWARDS=[
  {rank:3,gold:100,evo:"evostone",evoName:"神级进化石",feather:20,coins:500000,xilian:5},
  {rank:10,gold:50,evo:null,feather:10,coins:200000,xilian:3},
  {rank:99,gold:0,evo:null,feather:5,coins:50000,xilian:1}];
-function wbClaim(){
- const day=wbDay(),rw=wbRw(),p=S.player;
- if(day.dmg<=0){toast("今日尚未对世界BOSS造成伤害，先去挑战！");return;}
- if(rw.claimed){toast("今日奖励已领取");return;}
- const rank=wbMyRank(),R=WB_REWARDS.find(r=>rank<=r.rank);
- if(R.gold)p.gold+=R.gold;
- if(R.evo)addConsumable(R.evoName,R.evo);
- p.feather=(p.feather||0)+R.feather;p.coins+=R.coins;
- for(let i=0;i<R.xilian;i++)addConsumable("洗炼石","xilian");
- rw.claimed=true;save();
- toast(`伤害榜第${rank}名，奖励已发放！`);
- if(rank===1)pushChat("world",{sys:1,txt:`恭喜「${p.name}」今日世界BOSS伤害榜夺魁！`,t:Date.now()});
- render();
-}
 function showWbRank(){
- const b=wbBoard(),rank=wbMyRank(),day=wbDay(),rw=wbRw();
+ const b=wbBoard(),rank=wbMyRank(),day=wbDay();
  const rows=b.map((r,i)=>`<div class="mob"${r.me?` style="background:rgba(245,214,123,.12)"`:""}><div><div class="mn">${i+1}. ${r.me?`<b class="gold">${r.name}</b>`:r.name}</div></div><div class="m">${r.dmg} 伤害</div></div>`).join("");
- const can=day.dmg>0&&!rw.claimed;
- modal(`<div class="card"><h3>世界BOSS·今日伤害榜</h3><p class="dim">我今日伤害 <b class="gold">${day.dmg}</b>，当前排名 <b class="gold">第${rank}名</b>（共${b.length}人）</p>${rows}<p class="dim">每日奖励——冠军：200元宝+圣级进化石+灵羽×30+百万铜币+洗炼石×10；第2-3名：100元宝+神级进化石+灵羽×20+五十万铜币+洗炼石×5；第4-10名：50元宝+灵羽×10+二十万铜币+洗炼石×3；参与奖：灵羽×5+五万铜币+洗炼石×1。${rw.claimed?"今日奖励已领取":(day.dmg>0?"<b class='gold'>可领取今日奖励</b>":"今日尚未造成伤害")}</p><div class="rowbtns"><button class="btn small primary" id="wbClaimBtn"${can?"":" disabled"}>领取今日奖励</button><button class="btn small" onclick="closeModal()">关闭</button></div></div>`);
- const cb=$("wbClaimBtn");if(cb)cb.onclick=()=>{closeModal();wbClaim();};
+ modal(`<div class="card"><h3>世界BOSS·今日伤害榜</h3><p class="dim">我今日伤害 <b class="gold">${day.dmg}</b>，当前排名 <b class="gold">第${rank}名</b>（共${b.length}人）</p>${rows}<p class="dim">每日奖励——冠军：200元宝+圣级进化石+灵羽×30+百万铜币+洗炼石×10；第2-3名：100元宝+神级进化石+灵羽×20+五十万铜币+洗炼石×5；第4-10名：50元宝+灵羽×10+二十万铜币+洗炼石×3；参与奖：灵羽×5+五万铜币+洗炼石×1。<b class="gold">每日24点按排名自动发放至邮箱，请手动领取。</b></p><div class="rowbtns"><button class="btn small" onclick="closeModal()">关闭</button></div></div>`);
+}
+/* ============ 邮箱系统 ============ */
+function sendMail(title,txt,rw){S.mail=S.mail||[];S.mail.unshift({id:"m"+Date.now()+Math.floor(Math.random()*1e4),title,txt,t:Date.now(),rw:rw||null,claimed:!rw});if(S.mail.length>30)S.mail.length=30;save();}
+function mailUnread(){return (S.mail||[]).filter(m=>m.rw&&!m.claimed).length;}
+function mailRwDesc(rw){const t=[];if(rw.gold)t.push(rw.gold+"元宝");if(rw.coins)t.push(rw.coins+"铜币");if(rw.feather)t.push("灵羽×"+rw.feather);if(rw.xilian)t.push("洗炼石×"+rw.xilian);if(rw.evoName)t.push(rw.evoName+"×1");return t.join("、");}
+function claimMail(id,silent){const m=(S.mail||[]).find(x=>x.id===id);if(!m||!m.rw||m.claimed)return false;const p=S.player,R=m.rw;
+ if(R.gold)p.gold+=R.gold;if(R.coins)p.coins+=R.coins;if(R.feather)p.feather=(p.feather||0)+R.feather;
+ if(R.evoIid)addConsumable(R.evoName,R.evoIid);for(let i=0;i<(R.xilian||0);i++)addConsumable("洗炼石","xilian");
+ m.claimed=true;save();if(!silent){render();toast("附件已领取！");}return true;}
+function rMail(){
+ const m=$("main"),list=S.mail||[];
+ let h=`<div class="card"><h3>邮箱</h3><p class="dim">系统奖励会在每日24点自动发放至邮箱，请手动领取附件。最多保留30封。</p><div class="rowbtns"><button class="btn small primary" id="mailAll">一键领取</button></div></div>`;
+ if(!list.length)h+=`<div class="card"><p class="dim">邮箱空空如也。</p></div>`;
+ for(const x of list){
+  const rw=x.rw,un=rw&&!x.claimed;
+  h+=`<div class="card"><h3>${escHtml(x.title)}${un?' <b class="gold">未领取</b>':""}</h3><p class="dim">${new Date(x.t).toLocaleString()}</p><p>${escHtml(x.txt)}</p>${rw?`<p class="dim">附件：${mailRwDesc(rw)}</p>`:""}<div class="rowbtns">${un?`<button class="btn small primary" data-claim="${x.id}">领取附件</button>`:""}<button class="btn small" data-del="${x.id}">删除</button></div></div>`;
+ }
+ m.innerHTML=h;
+ $("mailAll").onclick=()=>{let n=0;for(const x of(S.mail||[]))if(claimMail(x.id,true))n++;calcStats();render();toast(n?`已领取${n}封邮件附件！`:"没有可领取的附件");};
+ m.querySelectorAll("[data-claim]").forEach(b=>b.onclick=()=>claimMail(b.dataset.claim));
+ m.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{S.mail=S.mail.filter(x=>x.id!==b.dataset.del);save();render();});
 }
 function startWBattle(){
  const p=S.player;
@@ -951,6 +968,8 @@ function renderTop(){
  <div class="wallet"><span>铜币 <b>${p.coins}</b></span><span>元宝 <b>${p.gold}</b></span><span>体力 <b>${p.stamina}/${p.maxStamina}</b></span><span>幸运 <b>${p.luck||0}</b></span><span>战力 <b>${zhanli()}</b></span></div>`;
  t.innerHTML+=`<button class="btn small primary" id="topPay">充值</button>`;
  $("topPay").onclick=()=>{TAB="pay";B=null;render();window.scrollTo(0,0);};
+ t.innerHTML+=`<button class="btn small" id="topMail">邮箱${mailUnread()?` <b class="gold">(${mailUnread()})</b>`:""}</button>`;
+ $("topMail").onclick=()=>{TAB="mail";B=null;render();window.scrollTo(0,0);};
  const tv=$("topVip");if(tv)tv.onclick=()=>{TAB="vipinfo";B=null;render();window.scrollTo(0,0);};
 }
 const TABS=[["home","江湖"],["bag","背包"],["pet","宠物"],["wing","翅膀"],["partner","伙伴"],["task","任务"],["gongfa","功法"],["skill","技能"],["shop","商店"],["market","交易"],["rank","排行"],["title","称号"],["arena","竞技"],["chat","聊天"],["event","活动"],["more","更多"]];
@@ -960,7 +979,7 @@ function renderTabs(){
  t.querySelectorAll("button").forEach(b=>b.onclick=()=>{TAB=b.dataset.t;B=null;render();});
 }
 function render(){if(S&&S.player&&sweepExpired())setTimeout(()=>toast(" 小红剑已到期，已自动卸下"),50);renderTop();renderTabs();
- ({home:rHome,bag:rBag,pet:rPet,task:rTask,gongfa:rGongfa,skill:rSkill,shop:rShop,pay:rPay,rank:rRank,title:rTitle,arena:rArena,chat:rChat,wing:rWing,partner:rPartner,event:rEvent,more:rMore,vipinfo:rVip,market:rMarket}[TAB])();}
+ ({home:rHome,bag:rBag,pet:rPet,task:rTask,gongfa:rGongfa,skill:rSkill,shop:rShop,pay:rPay,rank:rRank,title:rTitle,arena:rArena,chat:rChat,wing:rWing,partner:rPartner,event:rEvent,more:rMore,vipinfo:rVip,market:rMarket,mail:rMail}[TAB])();}
 /* ============ 创建角色 ============ */
 function rCreate(){
  $("topbar").style.display="none";$("tabbar").style.display="none";
@@ -990,7 +1009,7 @@ function rHome(){
  });
  h+=`<button class="btn small" id="dazuo">打坐调息（+10体力）</button>
  <p class="dim">师门任务：${p.task?("已接取：击败"+p.task.need+"个敌人（"+p.task.done+"/"+p.task.need+"）"+(p.taskDone?" 可领奖":"")):"未接取，去任务页接取"}</p></div>`;
- h+=`<div class="card"><h3>世界BOSS</h3><p class="dim">远古魔龙·帝天降临！血量999999999的伤害试炼——打得越多越好，伤害计入今日伤害榜，每日按排名发放奖励（冠军：200元宝+圣级进化石+灵羽×30+百万铜币+洗炼石×10）。每日可挑战 <b class="gold">${wbLeft()}</b>次，每次消耗10点体力。今日已造成 <b class="gold">${wbDay().dmg}</b> 点伤害。</p>
+ h+=`<div class="card"><h3>世界BOSS</h3><p class="dim">远古魔龙·帝天降临！血量999999999的伤害试炼——打得越多越好，伤害计入今日伤害榜，每日24点按排名自动发放至邮箱（冠军：200元宝+圣级进化石+灵羽×30+百万铜币+洗炼石×10）。每日可挑战 <b class="gold">${wbLeft()}</b>次，每次消耗10点体力。今日已造成 <b class="gold">${wbDay().dmg}</b> 点伤害。</p>
  <div class="rowbtns"><button class="btn primary" id="wbBtn"${wbLeft()>0?"":" disabled"}>挑战世界BOSS</button><button class="btn" id="wbRankBtn">伤害榜</button></div></div>`;
  m.innerHTML=h;
  m.querySelectorAll("[data-z]").forEach(b=>b.onclick=()=>rZone(+b.dataset.z));
@@ -1085,7 +1104,7 @@ function wbSettle(win){
 const p=S.player,f=B.foe,em=expMult();
 const dmg=B.wbdmg||0,day=wbDay();day.dmg+=dmg;
 const ge=Math.floor(Math.min(dmg*0.2,f.exp)*em),gc=Math.floor(Math.min(dmg*0.02,f.coins));
-log(`<span class="sys">世界BOSS战结束！本场造成 ${dmg} 点伤害，今日累计 ${day.dmg} 点。「伤害榜」可查看排名，每日可领取排名奖励</span>`);
+log(`<span class="sys">世界BOSS战结束！本场造成 ${dmg} 点伤害，今日累计 ${day.dmg} 点。「伤害榜」可查看排名，每日24点按排名自动发放至邮箱</span>`);
 if(ge>0){gainExp(ge);p.coins+=gc;gainPetExp(Math.floor(ge/2));gainPartnerExp(Math.floor(ge/2));
 log(`<span class="sys">获得修为 ${ge}${em>1?`（${em}倍经验）`:""}、铜币 ${gc}</span>`);}
 save();
@@ -2374,7 +2393,7 @@ function rEvent(){
  const taskSt=!p.task?"未接取":(p.taskDone?"可领奖":`进行中 ${p.task.done}/${p.task.need}`);
  const al=arenaLeft();
  h+=`<div class="card"><h3>每日活动</h3>
- <div class="tier"><div><div class="gold">世界BOSS</div><div class="m">远古魔龙·帝天（血量9.9亿），伤害榜每日按排名发奖 · 今日剩余 <b class="gold">${wbl}</b>次</div></div>
+ <div class="tier"><div><div class="gold">世界BOSS</div><div class="m">远古魔龙·帝天（血量9.9亿），伤害榜每日24点自动发奖至邮箱 · 今日剩余 <b class="gold">${wbl}</b>次</div></div>
  <button class="btn small" style="width:auto;margin:0" data-go="home">前往</button></div>
  <div class="tier"><div><div class="gold">竞技场</div><div class="m">挑战高手提升排名，前三每日领奖 · 今日剩余 <b class="gold">${al}</b>/5 次</div></div>
  <button class="btn small" style="width:auto;margin:0" data-go="arena">前往</button></div>
@@ -2456,7 +2475,7 @@ function rEvent(){
 function rMore(){
  const m=$("main");
  m.innerHTML=`<div class="card"><h3>玩法说明</h3><p class="dim">
- · 建号三选一：战士（攻击+10%）/ 法师（内力上限+30%）/ 射手（速度+15%）；建号自动生成玩家账号（JH+6位数字），充值兑换要用；建号即得本职业2个入门技能<br>· 去「江湖」挑战敌人，战斗点「攻击」自动施展本职业最强技能（内力不够则普通攻击），升级变强；野怪打到30%血以下可捕捉为宠物；修为按关卡难度递增——青竹林1倍、黑风寨2倍、幽冥谷3.5倍、华山之巅6倍，关卡BOSS再享2.5倍；升级所需修为递增（1→2级需2000，越往后越多）<br>· 技能三职业完全隔离，「技能」页只能学本职业的：战士（罗汉拳/打狗棒法/焰分噬浪尺/帝印诀）、法师（绵掌/弄炎诀/五轮离火法/佛怒火莲）、射手（峨眉刺/三千雷动/风之极·陨杀/大天造化掌）<br>· 12个装备栏：武器/帽子/护甲/裤子/护腕×2/戒指×2/项链/勋章/鞋子/腰带；武器分职业，BOSS掉落本关职业武器（优先掉没有的）；武器共7阶（1黄2玄3地4天5神6圣7至尊），带随机属性，洗炼石可重置，幸运上限9，铁匠铺可强化<br>· 背包「神兵合成」：集齐本关战士/法师/射手三职业武器+铜币→本关终极武器；集齐四把+300万铜币→轩辕神剑（6阶圣）；轩辕神剑×3+1000万铜币→至尊终极武器（7阶至尊·全游戏最高阶：战士斩尤帝剑/法师灭尤帝杖/射手断尤帝弓）；轩辕战甲×3+1000万铜币→至尊终极防具（7阶至尊：战士斩尤帝甲/法师灭尤帝袍/射手断尤帝衣）；同部位四件BOSS防具+200万铜币→轩辕防具<br>· 宠物均为斗罗大陆魂兽，分黄/玄/地/天/神/圣/至尊七级，每级又分低/中/高/终极四档，10级可出战助战；3只同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用）；神级以上需进化石：神级1999/圣级19999/至尊29999元宝，商城有售，世界BOSS也掉落（至尊石概率极低）<br>· 宠物技能（斗罗大陆魂兽技）与伙伴技能（斗破苍穹斗技）：每只/每位初始拥有3个，最高神级，按品级加攻击（黄+3%/玄+5%/地+8%/天+12%/神+18%，可叠加）；出战时有概率施展技能造成额外伤害；宠物/伙伴页点「技能」可花铜币更换领悟（随机同品级及以下新技能，最高神级）；圣级/至尊级技能后续通过限时活动获取<br>· 伙伴均为斗破苍穹人物，5级可出战，出战将其30%属性加给你，只能穿戴武器和护甲，战斗胜利得修为升级；「宠物」页铜币/元宝招募；神级终极：VIP8免费领/「神将降临」（￥1288）/千金募名将；圣级：千金募名将极低概率（3%）；3位同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用；神级以上需进化石）；至尊终极（萧炎/薰儿随机其一）：「至尊降临」（￥7999）或圣级合成（30%，需至尊进化石）<br>· 功法分七级四档，习得后花铜币修炼（最高5重）加属性；神级唯VIP6/限时活动「神功现世」；圣级/至尊级唯限时活动可得<br>· 斗气境界即转生：斗之气/斗者/斗师/大斗师/斗灵/斗王/斗皇/斗宗/斗尊/斗圣/斗帝共十一境，每境有等级上限（3/6/10/14/18/24/30/36/44/99/99级），满级后必须去「功法」页花铜币转生突破才能继续升级，突破还加属性<br>· 翅膀20级激活，灵羽升级，每阶攻击+12/气血+120/速度+3<br>· 充值：游戏内无直接充值，右上角「充值」页凭兑换码兑换——把玩家账号告诉客服，客服后台生成你的专属码后在此输入，一码一用；首充自动赠小红剑（攻击26/幸运9，永久）+首充礼包（288元宝+2万铜币+体力+灵兽蛋）<br>· 累计充值升VIP1-12（6/30/98/198/498/998/1998/2998/4998/7998/12998/19998元），每级攻击/气血+2%、每日VIP礼包、专属称号；VIP6及以上名字彩色显示<br>· 充值豪礼5档（30/98/198/498/998）：启程礼（元宝/洗炼石/经验丹）、天级终极宠物天青牛蟒·大明、神级宠物三眼金猊·王秋儿/冰天雪女、稀有称号神之眷顾——真实充值与红包共同累积，平民打怪攒红包也能领<br>· 累计充值奖励4档（1998/2998/5998/9999，仅真实充值）：元宝+圣级/至尊进化石+限定称号（一代宗师/开宗立派/纵横四海/名扬四海）；打怪掉充值红包（0.5/1/3/5/10元，每日上限100个），红包计入充值豪礼进度但不计VIP等级与累计充值奖励<br>· 限时活动（仅真实充值，每位玩家自建号起3天内有效，过期不可再领）：神功现世（￥498神级大日焚天诀）、神将降临（￥1288神话伙伴）、圣宠降临（￥2998圣级光明圣龙）、圣功现世（￥3999圣级圣心诀）、圣凰降临（￥5999圣级光明凤凰）、至尊降临（￥7999至尊萧炎/薰儿）、鸿蒙降临（￥9999金眼黑龙王·帝天/银龙王·古月娜+鸿蒙至尊诀）<br>· 世界BOSS（活动中心，每日可挑战）：血量999999999，打不死，纯粹比拼伤害，单场30回合封顶；挑战按钮旁「伤害榜」查看今日所有玩家伤害排名；每日按排名领取奖励——冠军200元宝+圣级进化石+灵羽×30+百万铜币+洗炼石×10，第2-3名100元宝+神级进化石+灵羽×20+五十万铜币+洗炼石×5，第4-10名50元宝+灵羽×10+二十万铜币+洗炼石×3，参与奖灵羽×5+五万铜币+洗炼石×1<br>· 竞技场每日5次，挑战更高排名对手，胜则排名上升，前三每日领奖；江湖任务：击败10个敌人，奖300铜币+1200修为<br>· 商店=江湖药铺（铜币）+元宝商城（元宝）+元宝兑换铜币（10元宝→10万/50→55万/100→120万）；经验丹双倍25/三倍45/五倍80元宝，背包使用后30分钟打怪修为加倍<br>· 聊天只有世界频道，5秒发一条，NPC会自动互动；排行榜有战力/充值/宠物/翅膀/等级5榜，前三名得荣誉称号（可佩戴加成）；点击排行/聊天/竞技场中的名字可看档案对比；竞技榜第一、世界BOSS伤害榜第一、等级榜第一、充值榜第一都会世界通报<br>· 交易行（底部导航「交易」）：寄售装备/进化石/宠物卖给土豪NPC（每次进入结算，定价合理卖得快，成交收5%税）；购买区每日刷新他人寄售；玩家交易码可跨设备与真实玩家交易<br>· 称号分VIP称号/限定称号/排行称号，均可佩戴，属性叠加；存档保存在本机，换设备会丢失<br></p></div>
+ · 建号三选一：战士（攻击+10%）/ 法师（内力上限+30%）/ 射手（速度+15%）；建号自动生成玩家账号（JH+6位数字），充值兑换要用；建号即得本职业2个入门技能<br>· 去「江湖」挑战敌人，战斗点「攻击」自动施展本职业最强技能（内力不够则普通攻击），升级变强；野怪打到30%血以下可捕捉为宠物；修为按关卡难度递增——青竹林1倍、黑风寨2倍、幽冥谷3.5倍、华山之巅6倍，关卡BOSS再享2.5倍；升级所需修为递增（1→2级需2000，越往后越多）<br>· 技能三职业完全隔离，「技能」页只能学本职业的：战士（罗汉拳/打狗棒法/焰分噬浪尺/帝印诀）、法师（绵掌/弄炎诀/五轮离火法/佛怒火莲）、射手（峨眉刺/三千雷动/风之极·陨杀/大天造化掌）<br>· 12个装备栏：武器/帽子/护甲/裤子/护腕×2/戒指×2/项链/勋章/鞋子/腰带；武器分职业，BOSS掉落本关职业武器（优先掉没有的）；武器共7阶（1黄2玄3地4天5神6圣7至尊），带随机属性，洗炼石可重置，幸运上限9，铁匠铺可强化<br>· 背包「神兵合成」：集齐本关战士/法师/射手三职业武器+铜币→本关终极武器；集齐四把+300万铜币→轩辕神剑（6阶圣）；轩辕神剑×3+1000万铜币→至尊终极武器（7阶至尊·全游戏最高阶：战士斩尤帝剑/法师灭尤帝杖/射手断尤帝弓）；轩辕战甲×3+1000万铜币→至尊终极防具（7阶至尊：战士斩尤帝甲/法师灭尤帝袍/射手断尤帝衣）；同部位四件BOSS防具+200万铜币→轩辕防具<br>· 宠物均为斗罗大陆魂兽，分黄/玄/地/天/神/圣/至尊七级，每级又分低/中/高/终极四档，10级可出战助战；3只同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用）；神级以上需进化石：神级1999/圣级19999/至尊29999元宝，商城有售，世界BOSS也掉落（至尊石概率极低）<br>· 宠物技能（斗罗大陆魂兽技）与伙伴技能（斗破苍穹斗技）：每只/每位初始拥有3个，最高神级，按品级加攻击（黄+3%/玄+5%/地+8%/天+12%/神+18%，可叠加）；出战时有概率施展技能造成额外伤害；宠物/伙伴页点「技能」可花铜币更换领悟（随机同品级及以下新技能，最高神级）；圣级/至尊级技能后续通过限时活动获取<br>· 伙伴均为斗破苍穹人物，5级可出战，出战将其30%属性加给你，只能穿戴武器和护甲，战斗胜利得修为升级；「宠物」页铜币/元宝招募；神级终极：VIP8免费领/「神将降临」（￥1288）/千金募名将；圣级：千金募名将极低概率（3%）；3位同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用；神级以上需进化石）；至尊终极（萧炎/薰儿随机其一）：「至尊降临」（￥7999）或圣级合成（30%，需至尊进化石）<br>· 功法分七级四档，习得后花铜币修炼（最高5重）加属性；神级唯VIP6/限时活动「神功现世」；圣级/至尊级唯限时活动可得<br>· 斗气境界即转生：斗之气/斗者/斗师/大斗师/斗灵/斗王/斗皇/斗宗/斗尊/斗圣/斗帝共十一境，每境有等级上限（3/6/10/14/18/24/30/36/44/99/99级），满级后必须去「功法」页花铜币转生突破才能继续升级，突破还加属性<br>· 翅膀20级激活，灵羽升级，每阶攻击+12/气血+120/速度+3<br>· 充值：游戏内无直接充值，右上角「充值」页凭兑换码兑换——把玩家账号告诉客服，客服后台生成你的专属码后在此输入，一码一用；首充自动赠小红剑（攻击26/幸运9，永久）+首充礼包（288元宝+2万铜币+体力+灵兽蛋）<br>· 累计充值升VIP1-12（6/30/98/198/498/998/1998/2998/4998/7998/12998/19998元），每级攻击/气血+2%、每日VIP礼包、专属称号；VIP6及以上名字彩色显示<br>· 充值豪礼5档（30/98/198/498/998）：启程礼（元宝/洗炼石/经验丹）、天级终极宠物天青牛蟒·大明、神级宠物三眼金猊·王秋儿/冰天雪女、稀有称号神之眷顾——真实充值与红包共同累积，平民打怪攒红包也能领<br>· 累计充值奖励4档（1998/2998/5998/9999，仅真实充值）：元宝+圣级/至尊进化石+限定称号（一代宗师/开宗立派/纵横四海/名扬四海）；打怪掉充值红包（0.5/1/3/5/10元，每日上限100个），红包计入充值豪礼进度但不计VIP等级与累计充值奖励<br>· 限时活动（仅真实充值，每位玩家自建号起3天内有效，过期不可再领）：神功现世（￥498神级大日焚天诀）、神将降临（￥1288神话伙伴）、圣宠降临（￥2998圣级光明圣龙）、圣功现世（￥3999圣级圣心诀）、圣凰降临（￥5999圣级光明凤凰）、至尊降临（￥7999至尊萧炎/薰儿）、鸿蒙降临（￥9999金眼黑龙王·帝天/银龙王·古月娜+鸿蒙至尊诀）<br>· 世界BOSS（活动中心，每日可挑战）：血量999999999，打不死，纯粹比拼伤害，单场30回合封顶；挑战按钮旁「伤害榜」查看今日所有玩家伤害排名；每日24点按排名自动发放至邮箱（手动领取）——冠军200元宝+圣级进化石+灵羽×30+百万铜币+洗炼石×10，第2-3名100元宝+神级进化石+灵羽×20+五十万铜币+洗炼石×5，第4-10名50元宝+灵羽×10+二十万铜币+洗炼石×3，参与奖灵羽×5+五万铜币+洗炼石×1<br>· 竞技场每日5次，挑战更高排名对手，胜则排名上升，前三每日领奖；江湖任务：击败10个敌人，奖300铜币+1200修为<br>· 商店=江湖药铺（铜币）+元宝商城（元宝）+元宝兑换铜币（10元宝→10万/50→55万/100→120万）；经验丹双倍25/三倍45/五倍80元宝，背包使用后30分钟打怪修为加倍<br>· 聊天只有世界频道，5秒发一条，NPC会自动互动；排行榜有战力/充值/宠物/翅膀/等级5榜，前三名得荣誉称号（可佩戴加成）；点击排行/聊天/竞技场中的名字可看档案对比；竞技榜第一、世界BOSS伤害榜第一、等级榜第一、充值榜第一都会世界通报<br>· 邮箱（右上角）：世界BOSS每日奖励在24点按排名自动发放至邮箱，需手动领取附件；最多保留30封<br>· 交易行（底部导航「交易」）：寄售装备/进化石/宠物卖给土豪NPC（每次进入结算，定价合理卖得快，成交收5%税）；购买区每日刷新他人寄售；玩家交易码可跨设备与真实玩家交易<br>· 称号分VIP称号/限定称号/排行称号，均可佩戴，属性叠加；存档保存在本机，换设备会丢失<br></p></div>
  <div class="card"><h3>存档</h3>
  <button class="btn small" id="resave">手动保存</button>
  <button class="btn small danger" id="reset">删号重来（清空存档）</button></div>`;
@@ -2482,7 +2501,7 @@ if(Array.isArray(S.pets))S.pets.forEach(x=>{if(x.pid==="hongmeng"&&(x.name==="�
  for(const pt of S.partners){if(pt.tier===undefined){pt.tier=[0,1,2,3,4,6][pt.quality||0]||0;pt.sub=1;delete pt.quality;}}
  if(!S.player.prof)S.player.prof="warrior";if(!Array.isArray(S.pets))S.pets=[];if(!Array.isArray(S.eventTitles))S.eventTitles=[];if(!Array.isArray(S.marketMine))S.marketMine=[];if(!Array.isArray(S.marketNpc))S.marketNpc=[];if(!Array.isArray(S.marketLog))S.marketLog=[];if(!Array.isArray(S.usedTradeCodes))S.usedTradeCodes=[];if(typeof S.marketDate!=="string")S.marketDate="";if(!S.chat)S.chat={world:[{sys:1,txt:"欢迎来到江湖世界，谨言慎行，行侠仗义！",t:Date.now()}],sect:[],ch:"world",cd:0};if(Array.isArray(S.pets))S.pets.forEach(ensurePetSkills);if(Array.isArray(S.partners))S.partners.forEach(ensurePartnerSkills);
 if(Array.isArray(S.partners))S.partners.forEach(pt=>{pt.equip=pt.equip||{};for(const k of Object.keys(pt.equip)){if(k!=="weapon"&&k!=="armor"){if(pt.equip[k])S.bag.push(pt.equip[k]);delete pt.equip[k];}}}); // 伙伴装备只保留武器和护甲，其余退回背包migrateTitle();while((S.douqi||0)<DOUQI.length-1&&S.player.level>DQ_MAXLV[S.douqi||0])S.douqi++; // 老存档：斗气境界按等级自动匹配新转生上限
-calcStats();TAB="home";render();}
+if(!Array.isArray(S.mail))S.mail=[];wbSettle();calcStats();TAB="home";render();}
  else{rCreate();}
  setInterval(()=>{ // 每60秒回1点体力
  if(S&&S.player&&S.player.stamina<S.player.maxStamina){S.player.stamina++;save();if(TAB==="home"&&!B)renderTop();}
