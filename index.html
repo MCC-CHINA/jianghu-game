@@ -157,20 +157,21 @@ const PROFS={warrior:{name:"战士",desc:"近战勇猛，冲锋陷阵",bonus:"�
  mage:{name:"法师",desc:"精通内力，法力无边",bonus:"内力上限+30%"},
  archer:{name:"射手",desc:"百步穿杨，身法如风",bonus:"速度+15%"}};
 let selProf="warrior";
-const SKILLS={ // 江湖技能（无门派限制，人人可学）
- luohanquan:{name:"罗汉拳",dj:"黄阶高级",mp:8,mult:1.6,desc:"少林入门拳法，刚猛朴实",},
- mianzhang:{name:"绵掌",dj:"黄阶高级",mp:8,mult:1.6,desc:"武当入门掌法，绵里藏针",},
- emeici:{name:"峨眉刺",dj:"黄阶高级",mp:9,mult:1.7,desc:"峨眉入门刺法，灵动迅捷",},
- dagoubang:{name:"打狗棒法",dj:"黄阶高级",mp:9,mult:1.7,desc:"丐帮入门棒法，专打恶狗",},
- yanzhi:{name:"焰分噬浪尺",dj:"地阶低级",mp:30,mult:2.6,desc:"尺法斗技，焰浪分海",cost:800,lv:10},
- zaohua:{name:"大天造化掌",dj:"天阶低级",mp:60,mult:3.4,desc:"造化圣者绝学，一掌造化",cost:3000,lv:20},
- sanqian:{name:"三千雷动",dj:"地阶低级",mp:28,mult:2.4,desc:"风雷阁镇阁之宝，身如雷动",cost:800,lv:10},
- fengji:{name:"风之极·陨杀",dj:"地阶中级",mp:55,mult:3.2,desc:"风属性斗技，陨杀无形",cost:2500,lv:18},
- nongyan:{name:"弄炎诀",dj:"地阶低级",mp:30,mult:2.6,desc:"控火法门，玩火自如",cost:800,lv:10},
- wulun:{name:"五轮离火法",dj:"地阶高级",mp:65,mult:3.6,desc:"五种兽火凝形，焚天煮海",cost:3000,lv:22},
- diyin:{name:"帝印诀",dj:"天阶低级",mp:70,mult:3.8,desc:"古帝绝学，五印合一",cost:3500,lv:24},
- huolian:{name:"佛怒火莲",dj:"自创斗技",mp:100,mult:5.0,desc:"异火相融，毁天灭地",cost:5000,lv:28}
+const SKILLS={ // 职业技能（各职业只能学习/使用本职业技能）
+ luohanquan:{name:"罗汉拳",dj:"黄阶高级",mp:8,mult:1.6,desc:"战士入门拳法，刚猛朴实",prof:"warrior"},
+ mianzhang:{name:"绵掌",dj:"黄阶高级",mp:8,mult:1.6,desc:"法师入门掌法，绵里藏针",prof:"mage"},
+ emeici:{name:"峨眉刺",dj:"黄阶高级",mp:9,mult:1.7,desc:"射手入门刺法，灵动迅捷",prof:"archer"},
+ dagoubang:{name:"打狗棒法",dj:"黄阶高级",mp:9,mult:1.7,desc:"战士入门棒法，专打恶狗",prof:"warrior"},
+ yanzhi:{name:"焰分噬浪尺",dj:"地阶低级",mp:30,mult:2.6,desc:"尺法斗技，焰浪分海",cost:800,lv:10,prof:"warrior"},
+ zaohua:{name:"大天造化掌",dj:"天阶低级",mp:60,mult:3.4,desc:"造化圣者绝学，一掌造化",cost:3000,lv:20,prof:"archer"},
+ sanqian:{name:"三千雷动",dj:"地阶低级",mp:28,mult:2.4,desc:"风雷阁镇阁之宝，身如雷动",cost:800,lv:10,prof:"archer"},
+ fengji:{name:"风之极·陨杀",dj:"地阶中级",mp:55,mult:3.2,desc:"风属性斗技，陨杀无形",cost:2500,lv:18,prof:"archer"},
+ nongyan:{name:"弄炎诀",dj:"地阶低级",mp:30,mult:2.6,desc:"控火法门，玩火自如",cost:800,lv:10,prof:"mage"},
+ wulun:{name:"五轮离火法",dj:"地阶高级",mp:65,mult:3.6,desc:"五种兽火凝形，焚天煮海",cost:3000,lv:22,prof:"mage"},
+ diyin:{name:"帝印诀",dj:"天阶低级",mp:70,mult:3.8,desc:"古帝绝学，五印合一",cost:3500,lv:24,prof:"warrior"},
+ huolian:{name:"佛怒火莲",dj:"自创斗技",mp:100,mult:5.0,desc:"异火相融，毁天灭地",cost:5000,lv:28,prof:"mage"}
 };
+const PROF_STARTER={warrior:["luohanquan","dagoubang"],mage:["mianzhang","nongyan"],archer:["emeici","sanqian"]};
 const ITEMS={ // iid: {name,slot,atk,def,hp,spd,luck,tier}
  w0:{name:"小红剑·开荒神兵",slot:"weapon",atk:26,luck:9,tier:1,gift:1},
  w1:{name:"桃木剑",slot:"weapon",atk:5,tier:1,cls:"战士"},w2:{name:"精钢长剑",slot:"weapon",atk:12,tier:2,cls:"战士"},
@@ -316,6 +317,16 @@ const TIERS=[
  {money:648,gold:7800,bonus:"多送30%"},
  {money:1980,gold:24800,bonus:"多送40%"}
 ];
+/* ============ 充值兑换码（后台管控） ============
+规则：游戏内不提供直接充值，玩家凭后台生成的兑换码兑换元宝。
+兑换码格式 XXXX-XXXX-XXXX：首字符为档位(A~F对应TIERS 0~5)+5位随机码+6位签名。
+签名密钥写在前端代码中，可防普通玩家伪造；如需银行级安全需后端服务。 */
+const CD_A="ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+const CD_SECRET="jhMcc2026#X7q2";
+function cyrb53(str,seed){seed=seed||0;var h1=0xdeadbeef^seed,h2=0x41c6ce57^seed;for(var i=0,ch;i<str.length;i++){ch=str.charCodeAt(i);h1=Math.imul(h1^ch,2654435761);h2=Math.imul(h2^ch,1597334677);}h1=Math.imul(h1^(h1>>>16),2246822507);h1^=Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507);h2^=Math.imul(h1^(h1>>>13),3266489909);return 4294967296*(2097151&h2)+(h1>>>0);}
+function cdSig(payload){var h=cyrb53(CD_SECRET+"|"+payload),s="";for(var i=0;i<6;i++){s+=CD_A[h%32];h=Math.floor(h/32);}return s;}
+function cdVerify(code){var raw=String(code||"").toUpperCase().replace(/[^A-Z0-9]/g,"");if(raw.length!==12)return -1;var p=raw.slice(0,6);if(cdSig(p)!==raw.slice(6))return -1;var tier=CD_A.indexOf(p[0]);return(tier>=0&&tier<TIERS.length)?tier:-1;}
+function cdNorm(code){return String(code||"").toUpperCase().replace(/[^A-Z0-9]/g,"");}
 const RANKS=[{name:"武林神话·叶孤鸿",zl:99999,vip:12},{name:"剑圣·西门飘雪",zl:52000,vip:10},{name:"魔教教主·任逍遥",zl:38000,vip:9},{name:"丐帮帮主·洪七",zl:26000,vip:8},{name:"武当掌门·张真人",zl:18000,vip:7},{name:"峨眉掌门·灭绝师太",zl:12000,vip:6},{name:"少林方丈·玄慈",zl:9000,vip:5},{name:"黑风寨主·黑风虎",zl:5000,vip:3},{name:"采花大盗·田伯光",zl:2800,vip:2},{name:"江南大侠·江别鹤",zl:1500,vip:1}];
 const RANK_PAY=[{name:"神豪·王多鱼",pay:99999,vip:12},{name:"江南首富·沈万三",pay:52000,vip:11},{name:"西域土豪·金轮法王",pay:26000,vip:10},{name:"盐帮帮主·方中信",pay:12000,vip:8},{name:"总镖头·铁中堂",pay:6000,vip:7},{name:"富商·陶朱公",pay:2600,vip:5},{name:"钱庄掌柜·金算盘",pay:1200,vip:4},{name:"小地主·黄世仁",pay:500,vip:2},{name:"暴发户·苟富贵",pay:150,vip:1}];
 const RANK_PET=[{name:"兽王·蛮吉",pet:"啸天虎",score:8800,vip:8},{name:"毒仙·何仙姑",pet:"碧鳞蛇",score:7200,vip:6},{name:"驭兽斋主·公孙瓒",pet:"金翅雕",score:6100,vip:5},{name:"南疆蛊女·蓝凤凰",pet:"金蚕蛊",score:4800,vip:4},{name:"猎户·石大壮",pet:"苍原狼",score:3500,vip:2},{name:"药农·老蔫",pet:"月影兔",score:2200,vip:1},{name:"顽童·小豆子",pet:"灵羽鸡",score:1200,vip:0}];
@@ -522,14 +533,15 @@ if(ch){calcStats();save();}return ch;}
 function rSkill(){
 const m=$("main"),p=S.player;
 const djc={黄:"黄",玄:"玄",地:"地",天:"天"};
-let h=`<div class="card"><h3>江湖技能</h3><p>已学技能：${p.skills.filter(s=>SKILLS[s]).map(s=>`${SKILLS[s].name}<span class="dim">(耗内${SKILLS[s].mp}·${SKILLS[s].mult}倍)</span>`).join("、")||"无"}</p><p class="dim">战斗中点「攻击」会自动施展已学的最强技能（内力不足时用普通攻击）。所有技能无门派限制，人人可学。</p></div><div class="card"><h3>可学技能</h3>`;
+const pf=p.prof||"warrior";
+let h=`<div class="card"><h3>江湖技能 · ${PROFS[pf].name}专属</h3><p>已学技能：${p.skills.filter(s=>SKILLS[s]).map(s=>`${SKILLS[s].name}<span class="dim">(耗内${SKILLS[s].mp}·${SKILLS[s].mult}倍)</span>`).join("、")||"无"}</p><p class="dim">战斗中点「攻击」会自动施展已学的最强技能（内力不足时用普通攻击）。各职业只能学习本职业技能。</p></div><div class="card"><h3>可学技能</h3>`;
 let any=false;
 Object.entries(SKILLS).forEach(([id,sk])=>{
- if(p.skills.includes(id))return; any=true;
+ if(sk.prof!==pf||p.skills.includes(id))return; any=true;
  const lv=sk.lv||1,cost=sk.cost||0,can=p.level>=lv&&p.coins>=cost;
  h+=`<div class="tier"><div><div class="gold">${sk.name} <span class="ptier ${djc[sk.dj[0]]||"神"}">${sk.dj}</span></div><div class="m">${sk.desc} · 耗内${sk.mp} · 威力${sk.mult}倍 · 需${lv}级 ${cost}铜币</div></div><button class="btn small" style="width:auto;margin:0" ${can?"":"disabled"} data-learn="${id}">${can?"学习":"未达标"}</button></div>`;
 });
-if(!any)h+=`<p class="dim">所有技能已全部学会，勤加修炼吧！</p>`;
+if(!any)h+=`<p class="dim">本职业技能已全部学会，勤加修炼吧！</p>`;
 h+=`</div>`;m.innerHTML=h;
 m.querySelectorAll("[data-learn]").forEach(b=>b.onclick=()=>{
  const sk=SKILLS[b.dataset.learn],lv=sk.lv||1,cost=sk.cost||0;
@@ -727,7 +739,7 @@ function zhanli(){
 }
 function newGame(name,profKey){
  S={player:{name,prof:profKey||"warrior",level:1,exp:0,hp:115,mp:55,coins:100,gold:0,
- stamina:50,maxStamina:50,skills:["luohanquan","mianzhang","emeici","dagoubang"],task:null,taskDone:false,feather:0,
+ stamina:50,maxStamina:50,skills:PROF_STARTER[profKey||"warrior"].slice(),task:null,taskDone:false,feather:0,
  base:{maxhp:115,maxmp:55,atk:14,def:9,spd:9}},
  equip:{weapon:null,armor:null,boots:null,charm:null},bag:[],pets:[],activePet:-1,wing:{tier:0},
  partners:[],activePartner:-1,arena:{rank:1000,date:"",left:5,reward:"",top:ARENA_TOP.map((n,i)=>({name:n,rank:i+1}))},
@@ -1348,7 +1360,7 @@ p.gold-=e.gold;p.coins+=e.coins;save();render();toast(`兑换成功！铜币+${e
 </script>
 <script>
 "use strict";
-/* ============ 模拟充值 ============ */
+/* ============ 充值（兑换码后台管控） ============ */
 /* ============ VIP详情 ============ */
 function rVip(){
  const m=$("main"),v=vipLevel(),total=vipTotal(),next=v<12?VIP_NEED[v+1]:null;
@@ -1384,13 +1396,10 @@ function rPay(){
  <div class="tier"><div><div class="gold">首充大礼包</div><div class="m">288元宝 · 20000铜币 · 体力+90 · 4阶灵兽蛋×1（开出黄~天级宠物）</div></div>
  <button class="btn small primary" id="firstgift" style="width:auto;margin:0" ${(S.orders.length&&!S.firstGift)?"":"disabled"}>${S.firstGift?"已领取":(S.orders.length?"领取":"首充后可领")}</button></div></div>
  <div class="card"><h3>充值元宝</h3>
- <p class="dim">原型演示：模拟支付流程，不产生真实扣款。正式版将接入微信/支付宝。</p>
- <p>当前元宝：<b class="gold">${p.gold}</b></p>`;
- TIERS.forEach((t,i)=>{
- h+=`<div class="tier"><div><div class="gold">${t.gold} 元宝 ${t.bonus?`<span class="dim">${t.bonus}</span>`:""}${i===0&&!S.orders.length?` <span class="dim">首充赠小红剑（限时3天）</span>`:""}</div><div class="m">￥${t.money}</div></div>
- <button class="btn small primary" style="width:auto;margin:0" data-tier="${i}">充值</button></div>`;
- });
- h+=`</div><div class="card"><h3>充值豪礼</h3><p class="dim">神级宠物与稀有称号只能通过充值豪礼或限时活动获得。</p>`;
+ <p class="dim">游戏内不支持直接充值，请联系客服购买兑换码后在此兑换。</p>
+ <p>当前元宝：<b class="gold">${p.gold}</b></p>
+ <div class="rowbtns"><input id="cdinput" placeholder="输入兑换码，如 ABCD-EFGH-IJKL" style="flex:1;padding:10px;border-radius:8px;border:1px solid #444;background:#1a1a22;color:#fff;font-size:15px;letter-spacing:1px"><button class="btn small primary" style="width:auto;margin:0" id="cdgo">兑换</button></div>
+ <p class="dim" style="margin-top:6px">兑换码由客服后台生成，一码一用，区分大小写可忽略，自动忽略空格与横杠。</p></div><div class="card"><h3>充值豪礼</h3><p class="dim">神级宠物与稀有称号只能通过充值豪礼或限时活动获得。</p>`;
  GIFTS.forEach(gf=>{
  const ok=total>=gf.need,got=(S.claimedGifts||{})[gf.id];
  h+=`<div class="tier"><div><div class="gold">${gf.kind==="pet"&&gf.pid&&PETS[gf.pid]?tieredName(gf.name,PETS[gf.pid].tier):(gf.kind==="title"?godName(gf.name):gf.name)}</div><div class="m">${gf.desc} · 累计充值满￥${gf.need}（${total}/${gf.need}）</div></div>
@@ -1434,7 +1443,8 @@ function rPay(){
  save();render();
  toast(` 首充礼包到账：元宝+288，铜币+20000，体力+90，灵兽蛋开出「${PETS[pid].name}」！`);
  };
- m.querySelectorAll("[data-tier]").forEach(b=>b.onclick=()=>payModal(+b.dataset.tier));
+ const cdgo=$("cdgo");if(cdgo)cdgo.onclick=redeemCode;
+ const cdi=$("cdinput");if(cdi)cdi.addEventListener("keydown",e=>{if(e.key==="Enter")redeemCode();});
  m.querySelectorAll("[data-gift]").forEach(b=>b.onclick=()=>{
  const gf=GIFTS.find(x=>x.id===b.dataset.gift);
  const total=S.orders.reduce((a,o)=>a+o.money,0);
@@ -1460,35 +1470,30 @@ function rPay(){
  save();render();toast(`开启${arr.length}个红包，累计充值奖励进度+￥${add}！`);
  };
 }
-function payModal(i){
- const t=TIERS[i],oid="T"+Date.now().toString().slice(-8);
- modal(`<h3>模拟收银台</h3>
- <p class="center">订单 <b class="gold">#${oid}</b></p>
- <p class="center" style="font-size:22px;margin:8px 0">￥${t.money} → <b class="gold">${t.gold}元宝</b></p>
- <div class="qrcode"></div>
- <p class="paynote">原型演示：假装这里有个付款码<br>点击下方按钮模拟"支付成功"</p>
- <div class="rowbtns"><button class="btn primary" id="payok">我已付款</button><button class="btn" id="paycancel">取消</button></div>`);
- $("payok").onclick=()=>{
- $("payok").disabled=true;$("payok").textContent="支付处理中…";
- setTimeout(()=>{
- const oldV=vipLevel(),isFirst=!S.orders.length;
+function grantRecharge(tier,oid){ // 兑换码到账（后台管控，游戏内无直接充值）
+ const t=TIERS[tier],oldV=vipLevel(),isFirst=!S.orders.length;
  S.player.gold+=t.gold;
- S.orders.push({id:oid,money:t.money,gold:t.gold,time:nowStr(),status:"已到账"});
+ S.orders.push({id:oid,money:t.money,gold:t.gold,time:nowStr(),status:"兑换码到账"});
  const newV=vipLevel();
- let msg=` 充值成功！元宝+${t.gold}`;
- if(newV>oldV){msg=` 充值成功！晋升 VIP${newV}！`;S.wornTitle={k:"vip",id:newV};}
+ let msg=`兑换成功！元宝+${t.gold}`;
+ if(newV>oldV){msg=`兑换成功！晋升 VIP${newV}！`;S.wornTitle={k:"vip",id:newV};}
  if(newV>=6&&!((S.gongfaLearned||{}).darin)){S.gongfaLearned=S.gongfaLearned||{};S.gongfaLearned.darin=1;msg+=` 获赠神级功法《大日焚天诀》！`;}
- if(isFirst){ // 首充赠开荒神兵小红剑（限时3天）
- const sword={iid:"w0",enh:0,expire:Date.now()+3*864e5},cur=S.equip.weapon?ITEMS[S.equip.weapon.iid]:null;
- if(!cur||(cur.atk||0)<26){if(S.equip.weapon)S.bag.push(S.equip.weapon);S.equip.weapon=sword;msg+=` 小红剑已穿戴！（限时3天）`;}
- else{S.bag.push(sword);msg+=` 获赠小红剑！（限时3天）`;}
+ if(isFirst){
+  const sword={iid:"w0",enh:0,expire:Date.now()+3*864e5},cur=S.equip.weapon?ITEMS[S.equip.weapon.iid]:null;
+  if(!cur||(cur.atk||0)<26){if(S.equip.weapon)S.bag.push(S.equip.weapon);S.equip.weapon=sword;msg+=` 小红剑已穿戴！（限时3天）`;}
+  else{S.bag.push(sword);msg+=` 获赠小红剑！（限时3天）`;}
  }
- calcStats();
- save();closeModal();render();
- toast(msg);
- },1200);
- };
- $("paycancel").onclick=closeModal;
+ calcStats();save();render();toast(msg);
+}
+function redeemCode(){
+ const inp=$("cdinput"),code=inp?inp.value:"";
+ const tier=cdVerify(code);
+ if(tier<0){toast("兑换码无效，请检查后重试");return;}
+ const raw=cdNorm(code);
+ S.usedCodes=S.usedCodes||[];
+ if(S.usedCodes.includes(raw)){toast("该兑换码已使用过");return;}
+ S.usedCodes.push(raw);
+ grantRecharge(tier,"CD"+raw.slice(0,8));
 }
 /* ============ 排行 ============ */
 function startArenaBattle(rank){
@@ -1821,7 +1826,7 @@ function rMore(){
  <div>建号时间<b style="font-size:11px">${S.created}</b></div></div>
  <p class="dim" style="margin-top:8px">正式版这里会显示所有玩家的订单，并支持订单查询、补发、封号等管理功能。</p></div>
  <div class="card"><h3>玩法说明</h3><p class="dim">
- · 去「江湖」挑战敌人，升级变强<br>· 建号选择职业（战士攻击+10%/法师内力上限+30%/射手速度+15%）；「技能」页可学习全部江湖技能；「聊天」世界频道发言，NPC会互动，VIP6及以上名字彩色显示；12个装备栏位：武器/帽子/护甲/裤子/护腕×2/戒指×2/项链/勋章/鞋子/饰品；建号可选择职业（战士攻击+10%/法师内力上限+30%/射手速度+15%）；BOSS概率掉落本关战士/法师/射手三职业武器（优先掉没有的，概率受爆率加成），集齐本关三职业武器+铜币可在背包「神兵合成」打造本关终极武器，集齐四把关卡终极武器+300万铜币可打造最终武器轩辕神剑；BOSS也掉防具，集齐同部位四件BOSS防具可在「神兵合成」打造轩辕防具；武器带随机属性，洗炼石可重置（爆率加成提升概率）<br>
+ · 去「江湖」挑战敌人，升级变强<br>· 建号选择职业（战士攻击+10%/法师内力上限+30%/射手速度+15%）；「技能」页可学习本职业专属技能；「聊天」世界频道发言，NPC会互动，VIP6及以上名字彩色显示；12个装备栏位：武器/帽子/护甲/裤子/护腕×2/戒指×2/项链/勋章/鞋子/饰品；建号可选择职业（战士攻击+10%/法师内力上限+30%/射手速度+15%）；BOSS概率掉落本关战士/法师/射手三职业武器（优先掉没有的，概率受爆率加成），集齐本关三职业武器+铜币可在背包「神兵合成」打造本关终极武器，集齐四把关卡终极武器+300万铜币可打造最终武器轩辕神剑；BOSS也掉防具，集齐同部位四件BOSS防具可在「神兵合成」打造轩辕防具；武器带随机属性，洗炼石可重置（爆率加成提升概率）<br>
  · 野怪打到30%血可捕捉为宠物，宠物会帮你打架<br>
  · 技能全是斗破斗技：焰分噬浪尺、佛怒火莲、三千雷动、帝印诀等，去「技能」页学习<br>
  · 竞技场：底部「竞技」页，每日5次挑战排名更高的对手，获胜排名上升；前三名每日可领元宝/铜币/灵羽<br>
@@ -1845,9 +1850,11 @@ function rMore(){
 (function init(){
  S=load();
  if(S&&S.player){
+ if(!S.player.prof)S.player.prof="warrior";
+ if(!Array.isArray(S.usedCodes))S.usedCodes=[];
  if(Array.isArray(S.player.skills)){
-  S.player.skills=S.player.skills.filter(s=>s!=="bajibeng"&&s!=="shihuyin");
-  for(const st of["luohanquan","mianzhang","emeici","dagoubang"]){if(!S.player.skills.includes(st))S.player.skills.push(st);}
+  S.player.skills=S.player.skills.filter(s=>s!=="bajibeng"&&s!=="shihuyin"&&(!SKILLS[s]||SKILLS[s].prof===S.player.prof));
+  for(const st of PROF_STARTER[S.player.prof]){if(!S.player.skills.includes(st))S.player.skills.push(st);}
  }
  if(!Array.isArray(S.partners))S.partners=[];if(S.activePartner===undefined)S.activePartner=-1;
  for(const pt of S.partners){if(pt.tier===undefined){pt.tier=[0,1,2,3,4,6][pt.quality||0]||0;pt.sub=1;delete pt.quality;}}
