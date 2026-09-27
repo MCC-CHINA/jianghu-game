@@ -278,57 +278,57 @@ function tierBadge(t,s){ // 品级徽章：神普通，圣彩色，至尊金色
 function petTierMult(b){return TIER_MULT[b.tier]*(1+0.08*(b.sub||0));}
 /* 品级助战倍率见TIER_MULT/petTierMult */
 const PETS={ // pid: {name,hp,atk,def,spd,desc,tier:0黄..6至尊,sub:0低1中2高3终极}
- linghou:{name:"小灵猴",hp:60,atk:10,def:5,spd:12,desc:"青竹林的机灵小猴，动作敏捷",tier:0,sub:0},
- tiedog:{name:"铁背犬",hp:110,atk:16,def:10,spd:8,desc:"黑风寨驯养的獒犬，忠心护主",tier:0,sub:1},
- youmingzhu:{name:"幽冥蛛",hp:150,atk:24,def:14,spd:10,desc:"幽冥谷的毒蛛，獠牙淬毒",tier:0,sub:2},
- xuediao:{name:"雪雕",hp:200,atk:34,def:18,spd:16,desc:"华山之巅的雪雕，翱翔九天",tier:0,sub:3},
- yemao:{name:"野猫",hp:65,atk:12,def:5,spd:13,desc:"荒野流浪猫，出手如电",tier:0,sub:0},
- shantu:{name:"山兔",hp:58,atk:10,def:5,spd:15,desc:"蹦跳如飞的山兔",tier:0,sub:0},
- caogou:{name:"草狗",hp:75,atk:13,def:7,spd:11,desc:"看家护院的土狗，忠诚勇猛",tier:0,sub:0},
- linque:{name:"林雀",hp:52,atk:11,def:4,spd:16,desc:"林间小雀，身法轻灵",tier:0,sub:0},
- hewa:{name:"河蛙",hp:62,atk:12,def:6,spd:12,desc:"荷塘蛙鸣，舌若闪电",tier:0,sub:0},
- tianlu:{name:"田鹿",hp:80,atk:11,def:8,spd:13,desc:"田野间温顺的鹿",tier:0,sub:0},
- mofeng:{name:"墨蜂",hp:50,atk:14,def:3,spd:16,desc:"尾针淬毒的墨蜂",tier:0,sub:0},
- heizhu:{name:"黑猪",hp:120,atk:17,def:11,spd:7,desc:"黑风寨圈养的野猪，皮糙肉厚",tier:0,sub:1},
- cangying:{name:"苍鹰",hp:105,atk:19,def:9,spd:15,desc:"盘旋苍穹的猎手",tier:0,sub:1},
- qingshe:{name:"青蛇",hp:95,atk:20,def:8,spd:14,desc:"竹林青蛇，毒牙致命",tier:0,sub:1},
- huanglang:{name:"荒狼",hp:115,atk:18,def:10,spd:12,desc:"荒原独狼，桀骜不驯",tier:0,sub:1},
- tieshu:{name:"铁鼠",hp:90,atk:16,def:12,spd:10,desc:"牙尖齿利，专啃精铁",tier:0,sub:1},
+ linghou:{name:"风狒狒",hp:60,atk:10,def:5,spd:12,desc:"星斗大森林外围的风狒狒，来去如风",tier:0,sub:0},
+ tiedog:{name:"铁背苍狼",hp:110,atk:16,def:10,spd:8,desc:"背生铁甲的苍狼，性情凶猛",tier:0,sub:1},
+ youmingzhu:{name:"鬼面蛛",hp:150,atk:24,def:14,spd:10,desc:"背生鬼面纹路的毒蛛",tier:0,sub:2},
+ xuediao:{name:"雪羽雕",hp:200,atk:34,def:18,spd:16,desc:"极北之地的雪羽雕，翱翔九天",tier:0,sub:3},
+ yemao:{name:"斑斓猫",hp:65,atk:12,def:5,spd:13,desc:"皮毛斑斓的灵猫，速度极快",tier:0,sub:0},
+ shantu:{name:"风兔",hp:58,atk:10,def:5,spd:15,desc:"擅长奔跑的风兔，形如闪电",tier:0,sub:0},
+ caogou:{name:"疾风犬",hp:75,atk:13,def:7,spd:11,desc:"追风逐电的疾风犬",tier:0,sub:0},
+ linque:{name:"青羽雀",hp:52,atk:11,def:4,spd:16,desc:"青羽小雀，身法轻灵",tier:0,sub:0},
+ hewa:{name:"碧水蛙",hp:62,atk:12,def:6,spd:12,desc:"碧水潭中的毒蛙",tier:0,sub:0},
+ tianlu:{name:"灵鹿",hp:80,atk:11,def:8,spd:13,desc:"林间灵鹿，温顺机警",tier:0,sub:0},
+ mofeng:{name:"毒针蜂",hp:50,atk:14,def:3,spd:16,desc:"尾针淬毒的毒针蜂",tier:0,sub:0},
+ heizhu:{name:"独角野猪",hp:120,atk:17,def:11,spd:7,desc:"头生独角的野猪，横冲直撞",tier:0,sub:1},
+ cangying:{name:"青影鹰",hp:105,atk:19,def:9,spd:15,desc:"青影神鹰，俯冲如电",tier:0,sub:1},
+ qingshe:{name:"曼陀罗蛇",hp:95,atk:20,def:8,spd:14,desc:"百年曼陀罗蛇，毒性猛烈",tier:0,sub:1},
+ huanglang:{name:"疾风魔狼",hp:115,atk:18,def:10,spd:12,desc:"疾风魔狼，桀骜不驯",tier:0,sub:1},
+ tieshu:{name:"噬金鼠",hp:90,atk:16,def:12,spd:10,desc:"以金属为食的噬金鼠",tier:0,sub:1},
  jinchan:{name:"金蟾",hp:140,atk:25,def:15,spd:9,desc:"口吐金气的三足金蟾",tier:0,sub:2},
- huoyunhu:{name:"火云狐",hp:135,atk:27,def:13,spd:14,desc:"尾生火云的灵狐",tier:0,sub:2},
- xuanjiagui:{name:"玄甲龟",hp:170,atk:22,def:20,spd:6,desc:"背负玄甲，防御无双",tier:0,sub:2},
- baihe:{name:"白鹤",hp:190,atk:32,def:17,spd:17,desc:"仙风道骨的白鹤，鹤鸣九皋",tier:0,sub:3},
+ huoyunhu:{name:"火狐",hp:135,atk:27,def:13,spd:14,desc:"尾生火焰的火狐",tier:0,sub:2},
+ xuanjiagui:{name:"石甲龟",hp:170,atk:22,def:20,spd:6,desc:"背负石甲，防御无双",tier:0,sub:2},
+ baihe:{name:"白羽鹤",hp:190,atk:32,def:17,spd:17,desc:"仙风道骨的白羽鹤",tier:0,sub:3},
  rougutu:{name:"柔骨兔·小舞",hp:70,atk:12,def:6,spd:14,desc:"十万年柔骨兔化形，腿法惊人",tier:1,sub:0},
  lanyinhuang:{name:"蓝银皇·阿银",hp:90,atk:8,def:12,spd:6,desc:"蓝银皇血脉，生命力磅礴",tier:1,sub:1},
  guihu:{name:"鬼虎",hp:130,atk:20,def:12,spd:10,desc:"影虎一族，神出鬼没",tier:1,sub:2},
- qingyanlang:{name:"青岩狼",hp:85,atk:15,def:8,spd:12,desc:"青岩山群狼之首",tier:1,sub:0},
- zihu:{name:"紫狐",hp:80,atk:16,def:7,spd:15,desc:"紫尾灵狐，幻术初成",tier:1,sub:0},
- tongbiyuan:{name:"铜臂猿",hp:110,atk:17,def:13,spd:8,desc:"双臂如铜，力能扛鼎",tier:1,sub:0},
- bishuita:{name:"碧水獭",hp:90,atk:14,def:10,spd:13,desc:"碧波戏水的灵獭",tier:1,sub:0},
+ qingyanlang:{name:"啸月狼",hp:85,atk:15,def:8,spd:12,desc:"对月长啸的啸月狼",tier:1,sub:0},
+ zihu:{name:"紫影狐",hp:80,atk:16,def:7,spd:15,desc:"紫影灵狐，幻术初成",tier:1,sub:0},
+ tongbiyuan:{name:"大力猿",hp:110,atk:17,def:13,spd:8,desc:"力大无穷的大力猿",tier:1,sub:0},
+ bishuita:{name:"深水鳄",hp:90,atk:14,def:10,spd:13,desc:"潜伏深水的巨鳄",tier:1,sub:0},
  yexiao:{name:"夜枭",hp:75,atk:17,def:6,spd:16,desc:"暗夜之眼，无声猎杀",tier:1,sub:0},
- leibao:{name:"雷豹",hp:120,atk:22,def:11,spd:16,desc:"足踏雷光的猎豹",tier:1,sub:1},
- yanshishou:{name:"岩石兽",hp:150,atk:18,def:18,spd:6,desc:"山岩成精，坚不可摧",tier:1,sub:1},
- fengdiao:{name:"风雕",hp:115,atk:23,def:10,spd:17,desc:"御风而行的巨雕",tier:1,sub:1},
+ leibao:{name:"闪电豹",hp:120,atk:22,def:11,spd:16,desc:"快如闪电的猎豹",tier:1,sub:1},
+ yanshishou:{name:"岩甲兽",hp:150,atk:18,def:18,spd:6,desc:"身披岩甲，坚不可摧",tier:1,sub:1},
+ fengdiao:{name:"疾风雕",hp:115,atk:23,def:10,spd:17,desc:"御风而行的巨雕",tier:1,sub:1},
  chilian:{name:"赤炼蛇",hp:140,atk:26,def:12,spd:15,desc:"赤鳞如火，毒冠三湘",tier:1,sub:2},
- moxiong:{name:"墨熊",hp:170,atk:24,def:20,spd:7,desc:"黑风岭的熊王",tier:1,sub:2},
+ moxiong:{name:"嗜血魔熊",hp:170,atk:24,def:20,spd:7,desc:"嗜血狂暴的魔熊",tier:1,sub:2},
  xuelangwang:{name:"雪狼王",hp:180,atk:28,def:16,spd:15,desc:"雪原狼群之王",tier:1,sub:3},
  qingluan:{name:"青鸾",hp:160,atk:30,def:14,spd:18,desc:"青羽神鸟，鸣声清越",tier:1,sub:3},
  renmianzhu:{name:"人面魔蛛",hp:140,atk:22,def:10,spd:12,desc:"人面蛛身，剧毒无比",tier:2,sub:0},
  taitan:{name:"泰坦巨猿·二明",hp:220,atk:40,def:24,spd:8,desc:"森林之王，力大无穷",tier:2,sub:1},
  xiemohu:{name:"暗魔邪神虎",hp:200,atk:44,def:18,spd:14,desc:"邪神血脉，风雷双翼",tier:2,sub:2},
- dilong:{name:"地龙",hp:160,atk:26,def:16,spd:9,desc:"潜地而行的龙裔",tier:2,sub:0},
- huoyanshi:{name:"火焰狮",hp:170,atk:28,def:14,spd:12,desc:"鬃毛如火的雄狮",tier:2,sub:0},
- guimianxiao:{name:"鬼面鸮",hp:145,atk:27,def:11,spd:16,desc:"面如鬼魅的夜行者",tier:2,sub:0},
- jinjiaoshou:{name:"金角兽",hp:200,atk:34,def:22,spd:10,desc:"头生金角，刀枪不入",tier:2,sub:1},
- bingyuanlang:{name:"冰原狼",hp:185,atk:32,def:18,spd:14,desc:"极北冰原的孤狼",tier:2,sub:1},
+ dilong:{name:"地行龙",hp:160,atk:26,def:16,spd:9,desc:"潜地而行的亚龙",tier:2,sub:0},
+ huoyanshi:{name:"烈焰雄狮",hp:170,atk:28,def:14,spd:12,desc:"鬃毛如火的雄狮王",tier:2,sub:0},
+ guimianxiao:{name:"鬼面枭",hp:145,atk:27,def:11,spd:16,desc:"面如鬼魅的夜行者",tier:2,sub:0},
+ jinjiaoshou:{name:"独角金犀",hp:200,atk:34,def:22,spd:10,desc:"头生金角，刀枪不入",tier:2,sub:1},
+ bingyuanlang:{name:"冰狼",hp:185,atk:32,def:18,spd:14,desc:"极北冰原的寒冰狼",tier:2,sub:1},
  zidianmang:{name:"紫电蟒",hp:210,atk:38,def:20,spd:13,desc:"身缠紫电的巨蟒",tier:2,sub:2},
- huoyanma:{name:"烈焰马",hp:230,atk:42,def:22,spd:16,desc:"四蹄生焰，日行千里",tier:2,sub:3},
+ huoyanma:{name:"火焰梦魇",hp:230,atk:42,def:22,spd:16,desc:"四蹄生焰的梦魇马",tier:2,sub:3},
  tianqing:{name:"天青牛蟒·大明",hp:300,atk:52,def:30,spd:12,desc:"十万年天青牛蟒，君临星斗",tier:3,sub:0},
  bingdi:{name:"冰碧帝皇蝎",hp:280,atk:58,def:24,spd:18,desc:"极北冰帝，极致之冰",tier:3,sub:1},
  yunhe:{name:"云鹤",hp:310,atk:55,def:32,spd:16,desc:"云端仙鹤，超然物外",tier:3,sub:0},
- leiyihu:{name:"雷翼虎",hp:320,atk:58,def:30,spd:15,desc:"双翼生雷的猛虎",tier:3,sub:0},
+ leiyihu:{name:"雷霆虎",hp:320,atk:58,def:30,spd:15,desc:"掌控雷霆的魔虎",tier:3,sub:0},
  xuanshuijiao:{name:"玄水蛟",hp:340,atk:56,def:34,spd:13,desc:"将化真龙的蛟",tier:3,sub:0},
- fenghuangchu:{name:"凤凰雏",hp:330,atk:62,def:30,spd:20,desc:"初生的凤凰，羽翼渐丰",tier:3,sub:1},
+ fenghuangchu:{name:"凤凰",hp:330,atk:62,def:30,spd:20,desc:"浴火凤凰，百鸟之王",tier:3,sub:1},
  qiongqi:{name:"穷奇",hp:350,atk:64,def:32,spd:16,desc:"上古凶兽，背生双翼",tier:3,sub:1},
  taotie:{name:"饕餮",hp:380,atk:68,def:36,spd:14,desc:"吞天食地的凶兽",tier:3,sub:2},
  jiuying:{name:"九婴",hp:370,atk:70,def:34,spd:18,desc:"九首蛇身的水火之怪",tier:3,sub:2},
@@ -339,14 +339,14 @@ const PETS={ // pid: {name,hp,atk,def,spd,desc,tier:0黄..6至尊,sub:0低1中2�
  yinglong:{name:"应龙",hp:440,atk:80,def:40,spd:22,desc:"上古应龙，兴云布雨",tier:4,sub:1},
  baihu:{name:"白虎",hp:460,atk:85,def:42,spd:24,desc:"西方白虎，杀伐之主",tier:4,sub:2},
  zhuque:{name:"朱雀",hp:480,atk:88,def:40,spd:28,desc:"南方朱雀，浴火神鸟",tier:4,sub:3},
- shenglong:{name:"九天圣龙",hp:650,atk:115,def:58,spd:32,desc:"上古圣龙，凌驾神级之上的圣兽",tier:5,sub:0},
- shenghuang:{name:"混沌圣凰",hp:600,atk:125,def:48,spd:38,desc:"混沌圣凰，浴火重生的圣兽",tier:5,sub:1},
- xuanwushenggui:{name:"玄武圣龟",hp:700,atk:118,def:70,spd:28,desc:"镇守北方的圣龟",tier:5,sub:0},
- qilinshengshou:{name:"麒麟圣兽",hp:670,atk:128,def:62,spd:36,desc:"祥瑞之王，麒麟圣兽",tier:5,sub:1},
- jiuweishenghu:{name:"九尾圣狐",hp:690,atk:132,def:60,spd:40,desc:"九尾天狐，魅惑众生",tier:5,sub:2},
- hongmengshengpeng:{name:"鸿蒙圣鹏",hp:720,atk:138,def:64,spd:44,desc:"扶摇直上的圣鹏",tier:5,sub:3},
- hongmeng:{name:"鸿蒙至尊古龙",hp:950,atk:175,def:88,spd:50,desc:"鸿蒙至尊圣兽，万兽之皇",tier:6,sub:3},
- guhuang:{name:"鸿蒙至尊古凰",hp:900,atk:185,def:82,spd:58,desc:"鸿蒙至尊古凰，万凰之祖，与古龙齐名",tier:6,sub:3}
+ shenglong:{name:"光明圣龙",hp:650,atk:115,def:58,spd:32,desc:"光明圣龙，龙族之光",tier:5,sub:0},
+ shenghuang:{name:"光明凤凰",hp:600,atk:125,def:48,spd:38,desc:"光明凤凰，浴火重生",tier:5,sub:1},
+ xuanwushenggui:{name:"玄武",hp:700,atk:118,def:70,spd:28,desc:"镇守北方的玄武圣兽",tier:5,sub:0},
+ qilinshengshou:{name:"圣麒麟",hp:670,atk:128,def:62,spd:36,desc:"祥瑞之王，圣麒麟",tier:5,sub:1},
+ jiuweishenghu:{name:"九尾妖狐",hp:690,atk:132,def:60,spd:40,desc:"九尾妖狐，魅惑众生",tier:5,sub:2},
+ hongmengshengpeng:{name:"金翅大鹏",hp:720,atk:138,def:64,spd:44,desc:"扶摇直上的金翅大鹏",tier:5,sub:3},
+ hongmeng:{name:"金眼黑龙王·帝天",hp:950,atk:175,def:88,spd:50,desc:"星斗大森林之主，八十万年修为",tier:6,sub:3},
+ guhuang:{name:"银龙王·古月娜",hp:900,atk:185,def:82,spd:58,desc:"银龙王古月娜，魂兽共主",tier:6,sub:3}
 };
 function mkMonster(name,lv,catchPet,boss){return{name,lv,catchPet:catchPet||null,boss:!!boss,
  hp:Math.floor(45+lv*24),atk:Math.floor(8+lv*2.3),def:Math.floor(4+lv*1.3),spd:Math.floor(5+lv*0.9),
@@ -542,7 +542,7 @@ function grantReward(g){
  else if(k==="evostone")addConsumable("神级进化石","evostone",v);
  else if(k==="evo_saint")addConsumable("圣级进化石","evo_saint",v);
  else if(k==="evo_zun")addConsumable("至尊进化石","evo_zun",v);
- else if(k==="partner"){if(!Array.isArray(S.partners))S.partners=[];const used=S.partners.map(x=>x.name);const name=pick(PARTNER_NAMES.filter(n=>!used.includes(n)))||pick(PARTNER_NAMES);S.partners.push({name,quality:v,level:p.level,exp:0,equip:{weapon:null,armor:null,boots:null,charm:null}});if(S.activePartner===-1||S.activePartner===undefined)S.activePartner=0;}
+ else if(k==="partner"){if(!Array.isArray(S.partners))S.partners=[];const e=pickPartner(v,3,S.partners.map(x=>x.pid||x.name));S.partners.push({pid:e.pid,name:e.name,tier:e.tier,sub:e.sub,level:p.level,exp:0,equip:{weapon:null,armor:null,boots:null,charm:null}});if(S.activePartner===-1||S.activePartner===undefined)S.activePartner=0;}
 }
 /* 称号牌渲染：皇冠+翼饰+缎带 */
 function titleBadge(name,cls,hue){return `<span class="rtx ${cls}"${hue==null?"":` style="--h:${hue}"`}><b><em class="tn">${name}</em></b></span>`;}
@@ -704,7 +704,91 @@ function arenaOpp(rank){
 }
 /* ============ 伙伴系统 ============ */
 /* 伙伴品级共用PTIERS/SUBS（黄/玄/地/天/神/圣/至尊 × 低级/中级/高级/终极），徽章用tierBadge */
-const PARTNER_NAMES=["阿飞","沈浪","李寻欢","楚留香","陆小凤","花满楼","西门吹雪","叶孤城","萧峰","段誉","虚竹","令狐冲","杨过","小龙女","郭靖","黄蓉","张无忌","赵敏","韦小宝","双儿","江小鱼","花无缺","楚昭南","练霓裳","卓一航"];
+const PARTNERS={ // pid:{name,tier:0黄..6至尊,sub:0低1中2高3终极,desc} 斗破苍穹人物
+ // 黄20
+ xiaozhan:{name:"萧战",tier:0,sub:0,desc:"萧家家主，乌坦城一方豪强"},
+ xiaoyu:{name:"萧玉",tier:0,sub:0,desc:"萧家天才少女"},
+ xiaoning:{name:"萧宁",tier:0,sub:0,desc:"萧家年轻子弟"},
+ jiabie:{name:"加列毕",tier:0,sub:0,desc:"加列家族族长"},
+ aobapa:{name:"奥巴帕",tier:0,sub:0,desc:"奥巴家族族长"},
+ liuxi:{name:"柳席",tier:0,sub:0,desc:"二品炼药师，心术不正"},
+ luobu:{name:"罗布",tier:0,sub:0,desc:"青山镇佣兵"},
+ gela:{name:"戈剌",tier:0,sub:0,desc:"青山镇佣兵"},
+ xiaoding:{name:"萧鼎",tier:0,sub:1,desc:"漠铁佣兵团团长"},
+ xiaoli:{name:"萧厉",tier:0,sub:1,desc:"漠铁佣兵团二团长"},
+ kagang:{name:"卡岗",tier:0,sub:1,desc:"血战佣兵团团长"},
+ mushe:{name:"穆蛇",tier:0,sub:1,desc:"狼头佣兵团团长"},
+ muli:{name:"穆力",tier:0,sub:1,desc:"狼头佣兵团少团长"},
+ feilei:{name:"费雷",tier:0,sub:1,desc:"漠铁佣兵团好手"},
+ ganmu:{name:"甘穆",tier:0,sub:2,desc:"狼头佣兵团骨干"},
+ hemeng:{name:"赫蒙",tier:0,sub:2,desc:"狼头佣兵团好手"},
+ moli2:{name:"墨黎",tier:0,sub:2,desc:"墨家子弟"},
+ xueni:{name:"雪妮",tier:0,sub:2,desc:"迦南学院学员"},
+ linfei:{name:"琳菲",tier:0,sub:3,desc:"黑岩城炼药师"},
+ xuelan:{name:"雪岚",tier:0,sub:3,desc:"黑岩城炼药师"},
+ // 玄15
+ mocheng:{name:"墨承",tier:1,sub:0,desc:"墨家家主，云岚宗长老"},
+ geye:{name:"葛叶",tier:1,sub:0,desc:"云岚宗长老"},
+ nalanjie:{name:"纳兰桀",tier:1,sub:0,desc:"纳兰家族老爷子"},
+ nalansu:{name:"纳兰肃",tier:1,sub:0,desc:"纳兰家族族长"},
+ muzhan:{name:"木战",tier:1,sub:0,desc:"木家少爷"},
+ mitengshan:{name:"米特尔腾山",tier:1,sub:0,desc:"米特尔家族族长"},
+ guhe:{name:"古河",tier:1,sub:1,desc:"丹王古河，六品炼药师"},
+ liuling:{name:"柳翎",tier:1,sub:1,desc:"丹王亲传弟子"},
+ aotuo:{name:"奥托",tier:1,sub:1,desc:"黑岩城炼药师公会会长"},
+ fulanke:{name:"弗兰克",tier:1,sub:1,desc:"黑岩城炼药师公会副会长"},
+ qiemier:{name:"切米尔",tier:1,sub:2,desc:"炼药师公会副会长"},
+ yaoye:{name:"夭夜",tier:1,sub:2,desc:"加玛皇室长公主"},
+ yaoyue:{name:"夭月",tier:1,sub:2,desc:"加玛皇室小公主"},
+ ruolin:{name:"若琳",tier:1,sub:3,desc:"迦南学院导师"},
+ yunling:{name:"云棱",tier:1,sub:3,desc:"云岚宗大长老"},
+ // 地10
+ jiaxingtian:{name:"加刑天",tier:2,sub:0,desc:"加玛皇室守护者，斗皇强者"},
+ fama:{name:"法犸",tier:2,sub:0,desc:"炼药师公会会长，五品炼药师"},
+ xiebiyan:{name:"蝎毕岩",tier:2,sub:0,desc:"万蝎门门主"},
+ yingshan:{name:"鹰山老人",tier:2,sub:0,desc:"黑皇宗供奉"},
+ haibodong:{name:"海波东",tier:2,sub:1,desc:"冰皇海波东，斗皇强者"},
+ hanfeng:{name:"韩枫",tier:2,sub:1,desc:"药皇韩枫"},
+ motianxing:{name:"莫天行",tier:2,sub:1,desc:"黑皇宗宗主"},
+ sumei:{name:"苏媚",tier:2,sub:2,desc:"魔炎谷长老"},
+ yingulao:{name:"阴骨老",tier:2,sub:2,desc:"魔炎谷长老"},
+ qishan:{name:"齐山",tier:2,sub:3,desc:"万剑阁长老"},
+ // 天10
+ yunshan:{name:"云山",tier:3,sub:0,desc:"云岚宗上代宗主，斗宗强者"},
+ wuhufa:{name:"鹜护法",tier:3,sub:0,desc:"魂殿护法"},
+ tangzhen:{name:"唐震",tier:3,sub:0,desc:"焚炎谷谷主"},
+ binghe:{name:"冰河",tier:3,sub:0,desc:"冰河谷谷主，冰尊者"},
+ yunyun:{name:"云韵",tier:3,sub:1,desc:"云岚宗宗主，后执掌花宗"},
+ feitian:{name:"费天",tier:3,sub:1,desc:"风雷阁阁主"},
+ huangquan:{name:"黄泉尊者",tier:3,sub:1,desc:"黄泉阁阁主"},
+ tianmingzi:{name:"天冥子",tier:3,sub:2,desc:"天冥宗宗主"},
+ yaohuaxiejun:{name:"妖花邪君",tier:3,sub:2,desc:"花宗强者"},
+ fengqinger:{name:"凤清儿",tier:3,sub:3,desc:"天妖凰族天才"},
+ // 神6
+ zhaixing:{name:"摘星老鬼",tier:4,sub:0,desc:"魂殿四天尊"},
+ guyou:{name:"骨幽圣者",tier:4,sub:1,desc:"魂殿大天尊"},
+ heibai:{name:"黑白天尊",tier:4,sub:1,desc:"魂殿天尊"},
+ mugu:{name:"慕骨老人",tier:4,sub:2,desc:"魂殿尊老"},
+ fengxian:{name:"风闲",tier:4,sub:3,desc:"星陨阁阁主，风尊者"},
+ tiejian:{name:"铁剑尊者",tier:4,sub:3,desc:"斗尊强者"},
+ // 圣6
+ yaochen:{name:"药尘",tier:5,sub:0,desc:"药老，萧炎之师"},
+ zhukun:{name:"烛坤",tier:5,sub:0,desc:"太虚古龙老龙皇"},
+ leiying:{name:"雷赢",tier:5,sub:1,desc:"雷族族长"},
+ yanjin:{name:"炎烬",tier:5,sub:1,desc:"炎族族长"},
+ gulie:{name:"古烈",tier:5,sub:2,desc:"古族斗圣强者"},
+ yaoming:{name:"妖瞑",tier:5,sub:3,desc:"九幽地冥蟒族长"},
+ // 至尊2
+ xiaoyan:{name:"萧炎",tier:6,sub:3,desc:"炎帝萧炎"},
+ xuner:{name:"薰儿",tier:6,sub:3,desc:"古薰儿，古族千金"}
+};
+function pickPartner(t,s,used){
+ const match=e=>e.tier===t&&(s===undefined||s===null||e.sub===s);
+ let pool=Object.keys(PARTNERS).filter(pid=>match(PARTNERS[pid])&&!(used||[]).includes(pid));
+ if(!pool.length)pool=Object.keys(PARTNERS).filter(pid=>match(PARTNERS[pid]));
+ if(!pool.length)pool=Object.keys(PARTNERS).filter(pid=>PARTNERS[pid].tier===t);
+ const pid=pick(pool),b=PARTNERS[pid];return{pid,name:b.name,tier:b.tier,sub:b.sub,desc:b.desc};
+}
 function partnerBase(t,s){s=s||0;return{atk:8+t*8+s*2,def:5+t*5+s,hp:120+t*120+s*30,spd:4+t*2+Math.floor(s/2)};}
 function partnerStats(pt){
  const b=partnerBase(pt.tier,pt.sub),lv=pt.level-1;
@@ -723,16 +807,16 @@ function gainPartnerExp(n){
  pt.exp=(pt.exp||0)+n;
  while(pt.exp>=40*pt.level){pt.exp-=40*pt.level;pt.level++;}
 }
-const ZHIZUN_PARTNERS=["萧炎","薰儿"]; // 至尊终极伙伴只有这两人
 function recruitPartner(t,s,fixedName){
  if(!Array.isArray(S.partners))S.partners=[];
  if(S.activePartner===undefined)S.activePartner=-1;
- if(s===undefined)s=Math.floor(Math.random()*4);
- const used=S.partners.map(x=>x.name);
- const name=fixedName||pick(PARTNER_NAMES.filter(n=>!used.includes(n)))||pick(PARTNER_NAMES);
- S.partners.push({name,tier:t,sub:s,level:S.player.level,exp:0,equip:{weapon:null,armor:null,boots:null,charm:null}});
+ const used=S.partners.map(x=>x.pid||x.name);
+ let e=null;
+ if(fixedName){const f=Object.keys(PARTNERS).find(pid=>PARTNERS[pid].name===fixedName);if(f)e={pid:f,...PARTNERS[f]};}
+ if(!e)e=pickPartner(t,s,used);
+ S.partners.push({pid:e.pid,name:e.name,tier:e.tier,sub:e.sub,level:S.player.level,exp:0,equip:{weapon:null,armor:null,boots:null,charm:null}});
  if((S.activePartner===-1||S.activePartner===undefined)&&S.player.level>=5)S.activePartner=0;
- save();render();toast(` ${tieredName(tierName(t,s),t)}伙伴「${tieredName(name,t)}」加入队伍！`);
+ save();render();toast(` ${tieredName(tierName(e.tier,e.sub),e.tier)}伙伴「${tieredName(e.name,e.tier)}」加入队伍！`);
 }
 const VIP_TITLES=[null, // 索引=VIP等级：称号名+属性+爆率
  {name:"初露锋芒",atk:8,hp:80,drop:5},{name:"江湖新秀",atk:16,hp:160,drop:8},{name:"一方豪杰",atk:28,hp:280,drop:12},
@@ -1262,7 +1346,7 @@ if(wu)wu.onclick=()=>{
 function rPartner(){
 const m=$("main"),p=S.player;
 const v=vipLevel(),canMythicVip=v>=8&&!S.claimedMythicVip;
-let h=`<div class="card"><h3>我的伙伴</h3><p class="dim">伙伴可穿戴全部12个装备栏位（武器/帽子/护甲/裤子/护腕×2/戒指×2/项链/勋章/鞋子/饰品）。出战伙伴将其30%属性加给你，战斗胜利出战伙伴获得修为升级。<br>伙伴分黄/玄/地/天/神/圣/至尊七级，每级又分低级/中级/高级/终极四档。神级终极获取：VIP8免费领取 / 限时活动「神将降临」/ 千金募名将（低概率）；圣级：千金募名将（极低概率3%）；至尊终极（萧炎/薰儿）：限时活动「至尊降临」或下方圣级合成。3位同品级伙伴可合成更高品级。</p>`;
+let h=`<div class="card"><h3>我的伙伴</h3><p class="dim">伙伴可穿戴全部12个装备栏位（武器/帽子/护甲/裤子/护腕×2/戒指×2/项链/勋章/鞋子/饰品）。出战伙伴将其30%属性加给你，战斗胜利出战伙伴获得修为升级。<br>伙伴分黄/玄/地/天/神/圣/至尊七级，每级又分低级/中级/高级/终极四档，每位都是斗破苍穹中的人物。神级终极获取：VIP8免费领取 / 限时活动「神将降临」/ 千金募名将（低概率）；圣级：千金募名将（极低概率3%）；至尊终极（萧炎/薰儿）：限时活动「至尊降临」或下方圣级合成。3位同品级伙伴可合成更高品级。</p>`;
 if(canMythicVip)h+=`<div class="tier"><div><div class="gold">VIP8专属神将</div><div class="m">免费招募神话品质伙伴×1</div></div><button class="btn small primary" style="width:auto;margin:0" id="mythicVip">领取</button></div>`;
 else if(v>=8&&S.claimedMythicVip)h+=`<p class="dim">VIP8专属神将已领取。</p>`;
 h+=`<div class="rowbtns"><button class="btn small" id="recC">广发英雄帖<br><span class="dim">5000铜币</span></button><button class="btn small" id="recG">千金募名将<br><span class="dim">88元宝</span></button></div>`;
@@ -1271,6 +1355,7 @@ sortIdxByTier(S.partners||[],pt=>({tier:pt.tier,sub:pt.sub})).forEach(i=>{
  const pt=S.partners[i],st=partnerStats(pt);
  h+=`<div class="tier"><div><div class="mn">${tieredName(pt.name,pt.tier)} ${tierBadge(pt.tier,pt.sub)}<span class="dim">Lv.${pt.level}</span>${i===S.activePartner?' <span class="gold">出战中</span>':""}</div>
  <div class="md">攻击${st.atk} 防御${st.def} 气血${st.hp} 速度${st.spd}${st.luck?` 幸运${st.luck}`:""} · 经验${pt.exp||0}/${40*pt.level}</div>
+ ${(PARTNERS[pt.pid]||{}).desc?`<div class="md">${PARTNERS[pt.pid].desc}</div>`:""}
  <div class="md">`;
  for(const slot of SLOTS){
  const it=pt.equip[slot];
@@ -1352,17 +1437,17 @@ function doPartnerSynth(t){
  let ap=S.activePartner;use.forEach(i=>{S.partners.splice(i,1);if(i<ap)ap--;});
  S.activePartner=ap;
  if(Math.random()<SYNTH_RATE[t]){
-  const tier=t+1,used=S.partners.map(x=>x.name);let name,sub;
-  if(tier===6){name=pick(ZHIZUN_PARTNERS.filter(n=>!used.includes(n)))||pick(ZHIZUN_PARTNERS);sub=3;} // 圣→至尊必出萧炎/薰儿
-  else{name=pick(PARTNER_NAMES.filter(n=>!used.includes(n)))||pick(PARTNER_NAMES);sub=Math.floor(Math.random()*4);}
-  S.partners.push({name,tier,sub,level:S.player.level,exp:0,equip:{weapon:null,armor:null,boots:null,charm:null}});
-  calcStats();save();render();toast(`合成成功！${tieredName(PTIERS[tier]+"终极",tier)}伙伴「${tieredName(name,tier)}」加入队伍！`);
+  const tier=t+1,used=S.partners.map(x=>x.pid||x.name);let e;
+  if(tier===6){const pool=["xiaoyan","xuner"].filter(pid=>!used.includes(pid));const pid=pool.length?pick(pool):pick(["xiaoyan","xuner"]);e={pid,...PARTNERS[pid]};} // 圣→至尊必出萧炎/薰儿
+  else e=pickPartner(tier,null,used);
+  S.partners.push({pid:e.pid,name:e.name,tier:e.tier,sub:e.sub,level:S.player.level,exp:0,equip:{weapon:null,armor:null,boots:null,charm:null}});
+  calcStats();save();render();toast(`合成成功！${tieredName(tierName(e.tier,e.sub),e.tier)}伙伴「${tieredName(e.name,e.tier)}」加入队伍！`);
  }else{calcStats();save();render();toast("合成失败，三位伙伴离队了……");}
 }
 function rPet(){
 const m=$("main"),p=S.player;
-let h=`<div class="card"><h3>我的宠物</h3><p class="dim">宠物分黄/玄/地/天/神/圣/至尊七级，每级又分低级/中级/高级/终极四档，品级越高助战越强。野外把怪物打到30%血以下可捕捉；3只同品级可合成更高品级（神级以上需对应进化石（商城有售，世界BOSS也掉落，至尊石概率极低）；最高「至尊终极」彩色流光，唯限时活动「鸿蒙降临」可得。</p>`;
-if(!S.pets.length)h+=`<p class="dim">还没有宠物，去青竹林捕捉小灵猴吧！</p>`;
+let h=`<div class="card"><h3>我的宠物</h3><p class="dim">宠物均为斗罗大陆魂兽，分黄/玄/地/天/神/圣/至尊七级，每级又分低级/中级/高级/终极四档，品级越高助战越强。野外把怪物打到30%血以下可捕捉；3只同品级可合成更高品级（神级以上需对应进化石（商城有售，世界BOSS也掉落，至尊石概率极低）；最高「至尊终极」彩色流光，唯限时活动「鸿蒙降临」可得。</p>`;
+if(!S.pets.length)h+=`<p class="dim">还没有宠物，去青竹林捕捉风狒狒吧！</p>`;
 sortIdxByTier(S.pets,pet=>{const b=PETS[pet.pid];return{tier:b.tier,sub:b.sub};}).forEach(i=>{
 const pet=S.pets[i],b=PETS[pet.pid];
 const atk=Math.floor(b.atk*(1+0.15*(pet.level-1))),hp=Math.floor(b.hp*(1+0.15*(pet.level-1)));
@@ -1911,7 +1996,7 @@ function rEvent(){
  <button class="btn small primary" style="width:auto;margin:0" id="evtSHuang"${canSHuang?"":" disabled"}>${sHuangGot?"已领取":(total>=5999?"领取":`差￥${5999-total}`)}</button></div>
  <div class="tier"><div><div class="gold">至尊降临</div><div class="m">累计充值满￥7999 领取<span class="ptier 至尊">至尊终极</span>伙伴「${tieredName("萧炎",6)}」/「${tieredName("薰儿",6)}」（随机其一）（${total}/7999）<br><span class="dim">全场最强伙伴，七彩流光</span></div></div>
  <button class="btn small primary" style="width:auto;margin:0" id="evtZZ"${canZZ?"":" disabled"}>${zzGot?"已领取":(total>=7999?"领取":`差￥${7999-total}`)}</button></div>
- <div class="tier"><div><div class="gold">鸿蒙降临</div><div class="m">累计充值满￥9999 领取<span class="ptier 至尊">至尊终极</span>宠物「${tieredName("鸿蒙至尊古龙",6)}」/「${tieredName("鸿蒙至尊古凰",6)}」（随机其一）+ 至尊终极功法《${tieredName("鸿蒙至尊诀",6)}》（${total}/9999）<br><span class="dim">终极之上的终极，万中无一</span></div></div>
+ <div class="tier"><div><div class="gold">鸿蒙降临</div><div class="m">累计充值满￥9999 领取<span class="ptier 至尊">至尊终极</span>宠物「${tieredName("金眼黑龙王·帝天",6)}」/「${tieredName("银龙王·古月娜",6)}」（随机其一）+ 至尊终极功法《${tieredName("鸿蒙至尊诀",6)}》（${total}/9999）<br><span class="dim">终极之上的终极，万中无一</span></div></div>
  <button class="btn small primary" style="width:auto;margin:0" id="evtHM"${canHm?"":" disabled"}>${hmGot?"已领取":(total>=9999?"领取":`差￥${9999-total}`)}</button></div></div>`;
  // ---- 每日活动 ----
  const wbl=wbLeft();
@@ -1971,13 +2056,12 @@ function rEvent(){
  if(esh)esh.onclick=()=>{
  if(vipTotal()<5999||S.claimedSaintHuang)return;
  S.claimedSaintHuang=true;S.pets.push({pid:"shenghuang",name:PETS.shenghuang.name,level:p.level,exp:0});
- if(S.activePet===-1&&S.player.level>=10)S.activePet=0;save();render();toast(" 限时活动：圣级宠物「混沌圣凰」加入队伍！")};
+ if(S.activePet===-1&&S.player.level>=10)S.activePet=0;save();render();toast(" 限时活动：圣级宠物「光明凤凰」加入队伍！")};
  const ezz=$("evtZZ");
  if(ezz)ezz.onclick=()=>{
  if(vipTotal()<7999||S.claimedZhizun)return;
  S.claimedZhizun=true;
- const used=S.partners.map(x=>x.name);
- recruitPartner(6,3,pick(ZHIZUN_PARTNERS.filter(n=>!used.includes(n)))||pick(ZHIZUN_PARTNERS));
+ recruitPartner(6,3);
  toast(" 限时活动：至尊终极伙伴加入队伍！")};
  const ehm=$("evtHM");
  if(ehm)ehm.onclick=()=>{
@@ -1994,7 +2078,7 @@ function rEvent(){
 function rMore(){
  const m=$("main");
  m.innerHTML=`<div class="card"><h3>玩法说明</h3><p class="dim">
- · 建号三选一：战士（攻击+10%）/ 法师（内力上限+30%）/ 射手（速度+15%）；建号自动生成玩家账号（JH+6位数字），充值兑换要用；建号即得本职业2个入门技能<br>· 去「江湖」挑战敌人，战斗点「攻击」自动施展本职业最强技能（内力不够则普通攻击），升级变强；野怪打到30%血以下可捕捉为宠物<br>· 技能三职业完全隔离，「技能」页只能学本职业的：战士（罗汉拳/打狗棒法/焰分噬浪尺/帝印诀）、法师（绵掌/弄炎诀/五轮离火法/佛怒火莲）、射手（峨眉刺/三千雷动/风之极·陨杀/大天造化掌）<br>· 12个装备栏：武器/帽子/护甲/裤子/护腕×2/戒指×2/项链/勋章/鞋子/饰品；武器分职业，BOSS掉落本关职业武器（优先掉没有的）；武器共7阶（1黄2玄3地4天5神6圣7至尊），带随机属性，洗炼石可重置，幸运上限9，铁匠铺可强化<br>· 背包「神兵合成」：集齐本关战士/法师/射手三职业武器+铜币→本关终极武器；集齐四把+300万铜币→轩辕神剑（6阶圣）；轩辕神剑+1000万铜币→至尊终极武器（7阶至尊·全游戏最高阶：战士斩尤帝剑/法师灭尤帝杖/射手断尤帝弓）；同部位四件BOSS防具+200万铜币→轩辕防具<br>· 宠物分黄/玄/地/天/神/圣/至尊七级，每级又分低/中/高/终极四档，10级可出战助战；3只同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用）；神级以上需进化石：神级1999/圣级19999/至尊29999元宝，商城有售，世界BOSS也掉落（至尊石概率极低）<br>· 伙伴5级可出战，出战将其30%属性加给你，可穿全部12栏装备，战斗胜利得修为升级；「宠物」页铜币/元宝招募；神级终极：VIP8免费领/「神将降临」（￥1288）/千金募名将；圣级：千金募名将极低概率（3%）；3位同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用；神级以上需进化石）；至尊终极（萧炎/薰儿随机其一）：「至尊降临」（￥7999）或圣级合成（30%，需至尊进化石）<br>· 功法分七级四档，习得后花铜币修炼（最高5重）加属性；神级唯VIP6/限时活动「神功现世」；圣级/至尊级唯限时活动可得<br>· 翅膀20级激活，灵羽升级，每阶攻击+12/气血+120/速度+3<br>· 充值：游戏内无直接充值，右上角「充值」页凭兑换码兑换——把玩家账号告诉客服，客服后台生成你的专属码后在此输入，一码一用；首充自动赠小红剑（攻击26/幸运9，永久）+首充礼包（288元宝+2万铜币+体力+灵兽蛋）<br>· 累计充值升VIP1-12（6/30/98/198/498/998/1998/2998/4998/7998/12998/19998元），每级攻击/气血+2%、每日VIP礼包、专属称号；VIP6及以上名字彩色显示<br>· 充值豪礼5档（30/98/198/498/998）：启程礼（元宝/洗炼石/经验丹）、天级终极宠物天青牛蟒·大明、神级宠物三眼金猊·王秋儿/冰天雪女、稀有称号神之眷顾——真实充值与红包共同累积，平民打怪攒红包也能领<br>· 累计充值奖励4档（1998/2998/5998/9999，仅真实充值）：元宝+圣级/至尊进化石+限定称号（一代宗师/开宗立派/纵横四海/名扬四海）；打怪掉充值红包（0.5/1/3/5/10元，每日上限100个），红包计入充值豪礼进度但不计VIP等级与累计充值奖励<br>· 限时活动（仅真实充值）：神功现世（￥498神级大日焚天诀）、神将降临（￥1288神话伙伴）、圣宠降临（￥2998圣级九天圣龙）、圣功现世（￥3999圣级圣心诀）、圣凰降临（￥5999圣级混沌圣凰）、至尊降临（￥7999至尊萧炎/薰儿）、鸿蒙降临（￥9999至尊古龙/古凰+鸿蒙至尊诀）<br>· 世界BOSS（活动中心，每日可挑战）：按你造成的伤害比例发奖——击杀/重创（60%）/激战（30%）/参与四档；掉落功法秘籍/异火/灵羽/进化石，神级石（击杀50%/重创30%/激战15%/参与5%）、圣级石（8%/3%/1%）、至尊石（2%/0.8%/0.3%）<br>· 竞技场每日5次，挑战更高排名对手，胜则排名上升，前三每日领奖；江湖任务：击败10个敌人，奖300铜币+200修为<br>· 商店=江湖药铺（铜币）+元宝商城（元宝）+元宝兑换铜币（10元宝→10万/50→55万/100→120万）；经验丹双倍25/三倍45/五倍80元宝，背包使用后30分钟打怪修为加倍<br>· 聊天只有世界频道，5秒发一条，NPC会自动互动；排行榜有战力/充值/宠物/翅膀/等级5榜，前三名得荣誉称号（可佩戴加成）；点击排行/聊天/竞技场中的名字可看档案对比<br>· 称号分VIP称号/限定称号/排行称号，均可佩戴，属性叠加；存档保存在本机，换设备会丢失<br></p></div>
+ · 建号三选一：战士（攻击+10%）/ 法师（内力上限+30%）/ 射手（速度+15%）；建号自动生成玩家账号（JH+6位数字），充值兑换要用；建号即得本职业2个入门技能<br>· 去「江湖」挑战敌人，战斗点「攻击」自动施展本职业最强技能（内力不够则普通攻击），升级变强；野怪打到30%血以下可捕捉为宠物<br>· 技能三职业完全隔离，「技能」页只能学本职业的：战士（罗汉拳/打狗棒法/焰分噬浪尺/帝印诀）、法师（绵掌/弄炎诀/五轮离火法/佛怒火莲）、射手（峨眉刺/三千雷动/风之极·陨杀/大天造化掌）<br>· 12个装备栏：武器/帽子/护甲/裤子/护腕×2/戒指×2/项链/勋章/鞋子/饰品；武器分职业，BOSS掉落本关职业武器（优先掉没有的）；武器共7阶（1黄2玄3地4天5神6圣7至尊），带随机属性，洗炼石可重置，幸运上限9，铁匠铺可强化<br>· 背包「神兵合成」：集齐本关战士/法师/射手三职业武器+铜币→本关终极武器；集齐四把+300万铜币→轩辕神剑（6阶圣）；轩辕神剑+1000万铜币→至尊终极武器（7阶至尊·全游戏最高阶：战士斩尤帝剑/法师灭尤帝杖/射手断尤帝弓）；同部位四件BOSS防具+200万铜币→轩辕防具<br>· 宠物均为斗罗大陆魂兽，分黄/玄/地/天/神/圣/至尊七级，每级又分低/中/高/终极四档，10级可出战助战；3只同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用）；神级以上需进化石：神级1999/圣级19999/至尊29999元宝，商城有售，世界BOSS也掉落（至尊石概率极低）<br>· 伙伴均为斗破苍穹人物，5级可出战，出战将其30%属性加给你，可穿全部12栏装备，战斗胜利得修为升级；「宠物」页铜币/元宝招募；神级终极：VIP8免费领/「神将降临」（￥1288）/千金募名将；圣级：千金募名将极低概率（3%）；3位同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用；神级以上需进化石）；至尊终极（萧炎/薰儿随机其一）：「至尊降临」（￥7999）或圣级合成（30%，需至尊进化石）<br>· 功法分七级四档，习得后花铜币修炼（最高5重）加属性；神级唯VIP6/限时活动「神功现世」；圣级/至尊级唯限时活动可得<br>· 翅膀20级激活，灵羽升级，每阶攻击+12/气血+120/速度+3<br>· 充值：游戏内无直接充值，右上角「充值」页凭兑换码兑换——把玩家账号告诉客服，客服后台生成你的专属码后在此输入，一码一用；首充自动赠小红剑（攻击26/幸运9，永久）+首充礼包（288元宝+2万铜币+体力+灵兽蛋）<br>· 累计充值升VIP1-12（6/30/98/198/498/998/1998/2998/4998/7998/12998/19998元），每级攻击/气血+2%、每日VIP礼包、专属称号；VIP6及以上名字彩色显示<br>· 充值豪礼5档（30/98/198/498/998）：启程礼（元宝/洗炼石/经验丹）、天级终极宠物天青牛蟒·大明、神级宠物三眼金猊·王秋儿/冰天雪女、稀有称号神之眷顾——真实充值与红包共同累积，平民打怪攒红包也能领<br>· 累计充值奖励4档（1998/2998/5998/9999，仅真实充值）：元宝+圣级/至尊进化石+限定称号（一代宗师/开宗立派/纵横四海/名扬四海）；打怪掉充值红包（0.5/1/3/5/10元，每日上限100个），红包计入充值豪礼进度但不计VIP等级与累计充值奖励<br>· 限时活动（仅真实充值）：神功现世（￥498神级大日焚天诀）、神将降临（￥1288神话伙伴）、圣宠降临（￥2998圣级九天圣龙）、圣功现世（￥3999圣级圣心诀）、圣凰降临（￥5999圣级混沌圣凰）、至尊降临（￥7999至尊萧炎/薰儿）、鸿蒙降临（￥9999金眼黑龙王·帝天/银龙王·古月娜+鸿蒙至尊诀）<br>· 世界BOSS（活动中心，每日可挑战）：按你造成的伤害比例发奖——击杀/重创（60%）/激战（30%）/参与四档；掉落功法秘籍/异火/灵羽/进化石，神级石（击杀50%/重创30%/激战15%/参与5%）、圣级石（8%/3%/1%）、至尊石（2%/0.8%/0.3%）<br>· 竞技场每日5次，挑战更高排名对手，胜则排名上升，前三每日领奖；江湖任务：击败10个敌人，奖300铜币+200修为<br>· 商店=江湖药铺（铜币）+元宝商城（元宝）+元宝兑换铜币（10元宝→10万/50→55万/100→120万）；经验丹双倍25/三倍45/五倍80元宝，背包使用后30分钟打怪修为加倍<br>· 聊天只有世界频道，5秒发一条，NPC会自动互动；排行榜有战力/充值/宠物/翅膀/等级5榜，前三名得荣誉称号（可佩戴加成）；点击排行/聊天/竞技场中的名字可看档案对比<br>· 称号分VIP称号/限定称号/排行称号，均可佩戴，属性叠加；存档保存在本机，换设备会丢失<br></p></div>
  <div class="card"><h3>存档</h3>
  <button class="btn small" id="resave">手动保存</button>
  <button class="btn small danger" id="reset">删号重来（清空存档）</button></div>`;
@@ -2010,7 +2094,7 @@ function rMore(){
  if(!S.player.prof)S.player.prof="warrior";
  if(!Array.isArray(S.usedCodes))S.usedCodes=[];
  if(!S.player.account)S.player.account=newAccount();
- if(Array.isArray(S.pets))S.pets.forEach(x=>{if(x.pid==="hongmeng"&&x.name==="鸿蒙至尊龙")x.name="鸿蒙至尊古龙";});
+ if(Array.isArray(S.pets))S.pets.forEach(x=>{if(x.pid==="hongmeng"&&(x.name==="鸿蒙至尊龙"||x.name==="鸿蒙至尊古龙"))x.name="金眼黑龙王·帝天";if(x.pid==="guhuang"&&x.name==="鸿蒙至尊古凰")x.name="银龙王·古月娜";});
  if(Array.isArray(S.player.skills)){
   S.player.skills=S.player.skills.filter(s=>s!=="bajibeng"&&s!=="shihuyin"&&(!SKILLS[s]||SKILLS[s].prof===S.player.prof));
   for(const st of PROF_STARTER[S.player.prof]){if(!S.player.skills.includes(st))S.player.skills.push(st);}
