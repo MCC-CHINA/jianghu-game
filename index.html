@@ -31,7 +31,8 @@ body{background:#141009;color:#e8dcc0;font-family:"Songti SC","STSong","SimSun",
 @keyframes rainbow{to{background-position:300% center}}
 /* 神级物品：七彩流光 */
 .godflow{font-weight:bold;background:linear-gradient(90deg,#ff2d2d,#ff7f00,#ffe600,#2dff2d,#00e5ff,#2d7fff,#a52dff,#ffd700,#ff2d2d);background-size:300% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:rainbow 3s linear infinite}
-.ptier.神{background:linear-gradient(90deg,#ff2d2d,#ff7f00,#ffe600,#2dff2d,#00e5ff,#a52dff,#ffd700);background-size:300% auto;animation:rainbow 3s linear infinite;color:#fff;font-weight:bold;text-shadow:0 1px 2px rgba(0,0,0,.5)}.ptier.圣{background:linear-gradient(135deg,#fffbe8,#ffd700 45%,#fff2b0);color:#7a4a00;font-weight:bold;box-shadow:0 0 8px rgba(255,215,0,.9);border:1px solid #fff2b0}
+.goldflow{font-weight:bold;background:linear-gradient(90deg,#fff3b0,#ffd700,#ff9d00,#ffd700,#fff3b0);background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:rainbow 4s linear infinite}
+.ptier.圣{background:linear-gradient(90deg,#ff2d2d,#ff7f00,#ffe600,#2dff2d,#00e5ff,#a52dff,#ffd700);background-size:300% auto;animation:rainbow 3s linear infinite;color:#fff;font-weight:bold;text-shadow:0 1px 2px rgba(0,0,0,.5)}
 /* 称号页：只显示称号牌；未获得灰色未点亮 */
 .tgrid{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:4px 0}
 .tt{display:inline-block;cursor:default}
@@ -44,7 +45,6 @@ body{background:#141009;color:#e8dcc0;font-family:"Songti SC","STSong","SimSun",
 .ptier.天{background:#5a2a2a;color:#f0a8a8}
 .ptier.神{background:#6a4a00;color:#ffe97b;font-weight:bold}
 .ptier.至尊{background:linear-gradient(135deg,#fff3b0,#ffd700 40%,#ff9d00);color:#5a3000;font-weight:bold;box-shadow:0 0 10px rgba(255,180,0,.9);border:1px solid #ffe97b}
-.ptier.zhizun{background:linear-gradient(90deg,#ff2d2d,#ff7f00,#ffe600,#2dff2d,#00e5ff,#a52dff,#ff2d9d,#ff2d2d);background-size:300% auto;animation:rainbow 3s linear infinite;color:#fff;font-weight:bold;text-shadow:0 1px 2px rgba(0,0,0,.6);border:1px solid #fff}
 /* 称号牌：琉璃透明感（半透紫晶牌+流光羽翼+中央宝石） */
 .rtx{position:relative;display:inline-flex;align-items:center;vertical-align:middle;margin:4px 2px;filter:drop-shadow(0 0 6px rgba(150,130,255,.45))}
 .rtx b{position:relative;overflow:hidden;flex:none;font-size:13px;font-weight:bold;white-space:nowrap;padding:5px 18px 6px;letter-spacing:3px;color:#f5f2ff;background:linear-gradient(180deg,rgba(215,205,255,.34) 0%,rgba(150,135,235,.22) 35%,rgba(96,74,200,.30) 70%,rgba(58,36,150,.38) 100%);border:1px solid rgba(226,216,255,.65);border-radius:6px;text-shadow:0 0 8px rgba(190,170,255,1),0 0 3px #fff,0 1px 3px rgba(40,20,110,.9);box-shadow:0 0 12px rgba(150,130,255,.5),inset 0 1px 2px rgba(255,255,255,.5),inset 0 -3px 6px rgba(90,60,200,.35)}
@@ -151,6 +151,10 @@ function nowStr(){const d=new Date();return d.getFullYear()+"-"+String(d.getMont
 <script>
 "use strict";
 /* ============ 数值表 ============ */
+const PROFS={warrior:{name:"战士",desc:"近战勇猛，冲锋陷阵",bonus:"攻击+10%"},
+ mage:{name:"法师",desc:"精通内力，法力无边",bonus:"内力上限+30%"},
+ archer:{name:"射手",desc:"百步穿杨，身法如风",bonus:"速度+15%"}};
+let selProf="warrior";
 const SECTS={
  shaolin:{name:"少林派",desc:"刚猛无俦，铜皮铁骨。擅长：防御、气血",hp:140,mp:40,atk:12,def:13,spd:6,skill:"luohanquan",trait:"金钟罩体：防御+15%"},
  wudang:{name:"武当派",desc:"以柔克刚，绵里藏针。擅长：内力、均衡",hp:105,mp:80,atk:13,def:8,spd:8,skill:"mianzhang",trait:"太极绵劲：内力上限+40%"},
@@ -174,13 +178,21 @@ const SKILLS={ // 门派技能（每门派专属，互不相同）
 };
 const ITEMS={ // iid: {name,slot,atk,def,hp,spd,luck,tier}
  w0:{name:"小红剑·开荒神兵",slot:"weapon",atk:26,luck:9,tier:1,gift:1},
- w1:{name:"桃木剑",slot:"weapon",atk:5,tier:1},w2:{name:"精钢长剑",slot:"weapon",atk:12,tier:2},
- w3:{name:"寒铁宝刀",slot:"weapon",atk:22,tier:3},w4:{name:"龙泉宝剑",slot:"weapon",atk:36,tier:4},
- w5:{name:"乌木剑",slot:"weapon",atk:8,tier:1},w6:{name:"炼狱战斧",slot:"weapon",atk:16,tier:2},
- w7:{name:"井中月",slot:"weapon",atk:26,tier:3},w8:{name:"裁决之杖",slot:"weapon",atk:44,tier:4},
- w9:{name:"骨玉权杖",slot:"weapon",atk:40,spd:4,tier:4},w10:{name:"龙纹剑",slot:"weapon",atk:48,tier:4},
- w11:{name:"嗜魂法杖",slot:"weapon",atk:54,luck:3,tier:5},w12:{name:"屠龙刀",slot:"weapon",atk:68,luck:5,tier:5},
+ w1:{name:"桃木剑",slot:"weapon",atk:5,tier:1,cls:"战士"},w2:{name:"精钢长剑",slot:"weapon",atk:12,tier:2,cls:"战士"},
+ w3:{name:"寒铁宝刀",slot:"weapon",atk:22,tier:3,cls:"战士"},w4:{name:"龙泉宝剑",slot:"weapon",atk:36,tier:4,cls:"战士"},
+ w5:{name:"乌木剑",slot:"weapon",atk:8,tier:1,cls:"战士"},w6:{name:"炼狱战斧",slot:"weapon",atk:16,tier:2,cls:"战士"},
+ w7:{name:"井中月",slot:"weapon",atk:26,tier:3,cls:"战士"},w8:{name:"裁决之杖",slot:"weapon",atk:44,tier:4,cls:"法师"},
+ w9:{name:"骨玉权杖",slot:"weapon",atk:40,spd:4,tier:4,cls:"法师"},w10:{name:"龙纹剑",slot:"weapon",atk:48,tier:4,cls:"战士"},
+ w11:{name:"嗜魂法杖",slot:"weapon",atk:54,luck:3,tier:5,cls:"法师"},w12:{name:"屠龙刀",slot:"weapon",atk:68,luck:5,tier:5,cls:"战士"},
  w13:{name:"轩辕神剑",slot:"weapon",atk:95,luck:6,spd:6,tier:6,gift:1}, // 终极武器：神兵合成获得
+ w14:{name:"桃木法杖",slot:"weapon",atk:8,tier:1,cls:"法师"},w15:{name:"猎风短弓",slot:"weapon",atk:8,tier:1,cls:"射手"},
+ w16:{name:"烈焰法杖",slot:"weapon",atk:16,tier:2,cls:"法师"},w17:{name:"追风长弓",slot:"weapon",atk:16,tier:2,cls:"射手"},
+ w18:{name:"玄冰法杖",slot:"weapon",atk:26,tier:3,cls:"法师"},w19:{name:"落月神弓",slot:"weapon",atk:26,tier:3,cls:"射手"},
+ w20:{name:"雷狱法杖",slot:"weapon",atk:48,tier:4,cls:"法师"},w21:{name:"龙吟宝弓",slot:"weapon",atk:48,tier:4,cls:"射手"},
+ w22:{name:"青竹圣剑",slot:"weapon",atk:20,tier:2,gift:1,cls:"战士"}, // 青竹林终极：三职业武器合成
+ w23:{name:"黑风魔刃",slot:"weapon",atk:34,tier:3,gift:1,cls:"战士"}, // 黑风寨终极：三职业武器合成
+ w24:{name:"幽冥鬼剑",slot:"weapon",atk:52,tier:4,gift:1,cls:"战士"}, // 幽冥谷终极：三职业武器合成
+ w25:{name:"华山紫青剑",slot:"weapon",atk:75,tier:5,gift:1,cls:"战士"}, // 华山之巅终极：三职业武器合成
  a1:{name:"粗布衣",slot:"armor",def:4,hp:20,tier:1},a2:{name:"镖师劲装",slot:"armor",def:9,hp:50,tier:2},
  a3:{name:"软猬甲",slot:"armor",def:16,hp:100,tier:3},a4:{name:"金丝宝甲",slot:"armor",def:26,hp:180,tier:4},
  b1:{name:"草鞋",slot:"boots",spd:2,def:1,tier:1},b2:{name:"快靴",slot:"boots",spd:4,def:2,tier:2},
@@ -227,9 +239,19 @@ function doSynth(needs,cost,xid,xname){
  S.bag.push({iid:xid,enh:0});
  save();closeModal();render();toast(`合成成功！获得${xname}！`);
 }
-function topWeaponOfTier(t){let best=null;for(const k of Object.keys(ITEMS)){const d=ITEMS[k];if(d.slot!=="weapon"||d.gift||d.tier!==t)continue;if(!best||d.atk>ITEMS[best].atk)best=k;}return best;} // 本关最高级武器
-const SYNTH_NEED=[["w5","乌木剑","青竹林·小头目·赵虎"],["w6","炼狱战斧","黑风寨·寨主·黑风虎"],["w7","井中月","幽冥谷·谷主·幽冥老怪"],["w10","龙纹剑","华山之巅·武林盟主"]];
+const CLASS_WPN={1:["w5","w14","w15"],2:["w6","w16","w17"],3:["w7","w18","w19"],4:["w10","w20","w21"]}; // 每关三职业武器
+const ZONE_ULT={1:"w22",2:"w23",3:"w24",4:"w25"}; // 每关终极武器
+const ZONE_ULT_COST={1:500000,2:1000000,3:2000000,4:4000000};
+const XUANYUAN_NEED=["w22","w23","w24","w25"]; // 轩辕神剑：四把关卡终极武器
 const SYNTH_COST=3000000;
+function zoneClassWeapon(t){ // BOSS掉落：优先掉玩家没有的本关职业武器
+ const ids=CLASS_WPN[t]||[];
+ const owned=new Set();
+ S.bag.forEach(x=>{if(x.iid)owned.add(x.iid);});
+ Object.values(S.equip).forEach(x=>{if(x&&x.iid)owned.add(x.iid);});
+ const miss=ids.filter(id=>!owned.has(id));
+ return pick(miss.length?miss:ids);
+}
 function rollWeaponBonus(tier){ // 武器随机属性（按阶缩放）
  const b={};
  b.atk=Math.floor(tier*(2+Math.random()*4));
@@ -248,9 +270,8 @@ const PTIERS=["黄","玄","地","天","神","圣","至尊"]; // 统一品级（0
 const SUBS=["低级","中级","高级","终极"]; // 品级内四档（0-3）
 const TIER_MULT=[1,1.15,1.3,1.6,2,2.6,3.2]; // 品级助战倍率
 function tierName(t,s){return PTIERS[t]+SUBS[s||0];}
-function tierBadge(t,s){ // 品级徽章：至尊终极为彩色渐变
+function tierBadge(t,s){ // 品级徽章：神普通，圣彩色，至尊金色
  s=s||0;
- if(t===6&&s===3)return `<span class="ptier zhizun">至尊终极</span>`;
  return `<span class="ptier ${PTIERS[t]}">${PTIERS[t]}${SUBS[s]}</span>`;
 }
 function petTierMult(b){return TIER_MULT[b.tier]*(1+0.08*(b.sub||0));}
@@ -468,7 +489,9 @@ function wornTitleInfo(){const w=S.wornTitle;if(!w)return null;
  if(w.k==="ev"){const e=EVENT_TITLES[w.id];return e?{name:e.name,cls:e.cls,hue:e.hue,bonus:e.bonus}:null;}
  if(w.k==="rank"){const bi=String(w.id).split(":"),t=(RANK_TITLES[bi[0]]||[])[+bi[1]];return t?{name:t.name,cls:t.cls,bonus:t.bonus}:null;}
  return null;}
-function godName(n){return `<span class="godflow">${n}</span>`;} // 神级名：七彩流光
+function godName(n){return `<span class="godflow">${n}</span>`;} // 神/圣级名：七彩流光
+function goldName(n){return `<span class="goldflow">${n}</span>`;} // 至尊名：金色
+function tieredName(n,t){if(t===6)return goldName(n);if(t>=4)return godName(n);return n;} // 品级名色
 function itemNameHTML(it){const d=ITEMS[it.iid];return d.tier>=5?godName(d.name):d.name;} // 装备名（5阶神级流光）
 function myRankTitles(){
  const t=[],zl=zhanli();
@@ -681,6 +704,9 @@ function calcStats(){
  else if(p.sect==="wudang")p.maxmp=Math.floor(p.maxmp*1.4);
  else if(p.sect==="emei"){p.spd=Math.floor(p.spd*1.2);p.luck+=3;}
  else if(p.sect==="gaibang")p.atk=Math.floor(p.atk*1.12);
+ if(p.prof==="warrior")p.atk=Math.floor(p.atk*1.1);
+ else if(p.prof==="mage")p.maxmp=Math.floor(p.maxmp*1.3);
+ else if(p.prof==="archer")p.spd=Math.floor(p.spd*1.15);
  const wt0=wornTitleInfo(),wb=wt0?(wt0.bonus||{}):null; // 佩戴称号加成
  if(wb){p.atk+=wb.atk||0;p.maxhp+=wb.hp||0;p.luck+=wb.luck||0;p.spd+=wb.spd||0;}
  for(const[gid,lv]of Object.entries(S.gongfa||{})){const g=GONGFA[gid];if(!g||!lv)continue; // 功法加成
@@ -709,9 +735,9 @@ function zhanli(){
  const pet=S.pets[S.activePet]; if(pet){const b=PETS[pet.pid];z+=(b.atk*(1+0.15*(pet.level-1)))*2*petTierMult(b);}
  return Math.floor(z);
 }
-function newGame(name,sectKey){
+function newGame(name,sectKey,profKey){
  const sc=SECTS[sectKey];
- S={player:{name,sect:sectKey,level:1,exp:0,hp:sc.hp,mp:sc.mp,coins:100,gold:0,
+ S={player:{name,sect:sectKey,prof:profKey||"warrior",level:1,exp:0,hp:sc.hp,mp:sc.mp,coins:100,gold:0,
  stamina:50,maxStamina:50,skills:[sc.skill],task:null,taskDone:false,feather:0,
  base:{maxhp:sc.hp,maxmp:sc.mp,atk:sc.atk,def:sc.def,spd:sc.spd}},
  equip:{weapon:null,armor:null,boots:null,charm:null},bag:[],pets:[],activePet:-1,wing:{tier:0},
@@ -755,12 +781,14 @@ function rCreate(){
  <p class="dim">欢迎来到文字武侠世界。取一个响亮的名号，选择你的门派，开始闯荡江湖吧！</p>
  <input type="text" id="cname" maxlength="8" placeholder="输入你的名字（最多8字）">
  ${Object.entries(SECTS).map(([k,v])=>`<div class="sect ${k===selSect?'sel':''}" data-s="${k}"><h4>${v.name}</h4><p>${v.desc}</p><p class="dim">初始武功：${SKILLS[v.skill].name}</p></div>`).join("")}
+ <p class="dim" style="margin-top:10px">选择你的职业：</p>
+ ${Object.entries(PROFS).map(([k,v])=>`<div class="sect ${k===selProf?'sel':''}" data-p="${k}"><h4>${v.name}</h4><p>${v.desc}</p><p class="dim">职业加成：${v.bonus}</p></div>`).join("")}
  <button class="btn primary" id="gobtn">踏 入 江 湖</button></div>`;
- m.querySelectorAll(".sect").forEach(d=>d.onclick=()=>{selSect=d.dataset.s;rCreate();});
+ m.querySelectorAll(".sect").forEach(d=>d.onclick=()=>{if(d.dataset.s){selSect=d.dataset.s;}else{selProf=d.dataset.p;}rCreate();});
  $("gobtn").onclick=()=>{
  const n=$("cname").value.trim();
  if(!n){toast("请先输入名字");return;}
- newGame(n,selSect);TAB="home";render();toast("欢迎来到江湖，"+n+"！");
+ newGame(n,selSect,selProf);TAB="home";render();toast("欢迎来到江湖，"+n+"！");
  };
 }
 /* ============ 江湖（主界面/战斗）=========== */
@@ -891,8 +919,7 @@ const tier=ZONES[B.zi].tier;
 const pool=Object.keys(ITEMS).filter(k=>ITEMS[k].tier===tier&&!ITEMS[k].gift);
 if(f.boss){
 // BOSS：概率掉落本关最高级武器，概率受爆率加成
-const tw=topWeaponOfTier(tier);
-if(tw&&Math.random()<0.3*(1+vipDrop()/100)){S.bag.push(mkWeapon(tw));log(`<span class="sys">BOSS掉落：${ITEMS[tw].name}！集齐四把BOSS神兵可合成轩辕神剑</span>`);}
+if(Math.random()<0.3*(1+vipDrop()/100)){const cw=zoneClassWeapon(tier);S.bag.push(mkWeapon(cw));log(`<span class="sys">BOSS掉落：${ITEMS[cw].name}（${ITEMS[cw].cls}）！集齐本关三职业武器可合成终极武器</span>`);}
 else{const iid=pick(pool);S.bag.push(mkWeapon(iid));log(`<span class="sys">获得了！</span>`);}
 if(Math.random()<0.2){addConsumable("洗炼石","xilian");log(`<span class="sys">BOSS掉落：洗炼石×1！可在背包洗炼武器属性</span>`);}
 if(Math.random()<0.3*(1+vipDrop()/100)){
@@ -1010,7 +1037,7 @@ if(it.use==="xilian"){h+=`<div class="mob"><div><div class="mn">${it.name}${cnt}
 const s=SHOP.find(x=>x.id===it.use)||{name:it.name};
 h+=`<div class="mob"><div><div class="mn">${it.name}${cnt}</div><div class="md">药品</div></div><button class="btn" data-use="${i}">使用</button></div>`;return;}
 const d=ITEMS[it.iid];
-h+=`<div class="mob"><div><div class="mn">${d.tier>=5?godName(d.name):d.name}${qualityTag(it)}${it.enh?` <span class="gold">+${it.enh}</span>`:""}${it.expire?` <span class="dim">${expireText(it)}</span>`:""}</div>
+h+=`<div class="mob"><div><div class="mn">${d.tier>=5?godName(d.name):d.name}${d.cls?` <span class="dim">[${d.cls}]</span>`:""}${qualityTag(it)}${it.enh?` <span class="gold">+${it.enh}</span>`:""}${it.expire?` <span class="dim">${expireText(it)}</span>`:""}</div>
 <div class="md">${SLOTNAME[d.slot]} · ${[d.atk&&"攻"+d.atk,d.def&&"防"+d.def,d.hp&&"血"+d.hp,d.spd&&"速"+d.spd,d.luck&&"幸运+"+d.luck].filter(Boolean).join(" ")}${it.bonus?` <span class="gold">[${bonusText(it.bonus)}]</span>`:""}</div></div>
 ${d.slot==="weapon"?`<button class="btn" data-reroll="${i}">洗炼</button>`:""}<button class="btn" data-eq="${i}">装备</button></div>`;
 });
@@ -1037,23 +1064,36 @@ calcStats();save();render();toast("用药了，效果拔群！");
 });
 $("synth").onclick=()=>synthModal();
 function synthModal(){
- const rows=SYNTH_NEED.map(([iid,nm,from])=>{const has=S.bag.filter(x=>x.iid===iid).length;
- return `<div class="tier"><div><div class="gold">${nm}</div><div class="m">掉落：${from} · 拥有 ${has}/1</div></div></div>`;}).join("");
+ const zrows=[1,2,3,4].map(t=>{
+  const ids=CLASS_WPN[t],uname=ITEMS[ZONE_ULT[t]].name,cost=ZONE_ULT_COST[t];
+  const mat=ids.map(id=>{const has=S.bag.some(x=>x.iid===id);return `<span style="color:${has?"#7dd87d":"#ff8787"}">${ITEMS[id].name}[${ITEMS[id].cls}]</span>`;}).join(" ");
+  return `<div class="tier"><div><div class="gold">${uname}<span class="dim"> · ${ZONES[t-1].name}终极武器</span></div><div class="m">${mat} · ${cost/10000}万铜币（拥有${S.player.coins}）</div></div><button class="btn small" style="width:auto;margin:0" data-zsynth="${t}">合成</button></div>`;
+ }).join("");
+ const xmat=XUANYUAN_NEED.map(id=>{const has=S.bag.some(x=>x.iid===id);return `<span style="color:${has?"#7dd87d":"#ff8787"}">${ITEMS[id].name}</span>`;}).join(" ");
  const arows=ARMOR_SYNTH.map(([slot,xid,xname],idx)=>{
   const needs=[1,2,3,4].map(t=>topItemOfSlot(t,slot));
   const mat=needs.map((iid,ti)=>{const has=S.bag.some(x=>x.iid===iid);return `<span style="color:${has?"#7dd87d":"#ff8787"}">${ITEMS[iid].name}</span><span class="dim">(${BOSS_OF_TIER[ti+1].split("·")[0]})</span>`;}).join(" ");
   return `<div class="tier"><div><div class="gold">${xname}<span class="dim"> · ${SLOTNAME[slot]} · 终极防具</span></div><div class="m">${mat} · 200万铜币（拥有${S.player.coins}）</div></div><button class="btn small" style="width:auto;margin:0" data-asynth="${idx}">合成</button></div>`;
  }).join("");
- modal(`<h3>神兵合成</h3><p class="dim">武器：集齐四把BOSS神兵 + 300万铜币 → 轩辕神剑。防具：集齐同部位四件BOSS防具 + 200万铜币 → 轩辕防具。材料需放在背包中（已装备的请先卸下）。</p>${rows}<div class="tier"><div><div class="gold">铜币 × 300万</div><div class="m">拥有 ${S.player.coins}</div></div></div><div class="rowbtns"><button class="btn primary" id="dosynth">合成武器</button><button class="btn" onclick="closeModal()">关闭</button></div><h3 style="margin-top:8px">防具合成</h3>${arows}<div class="rowbtns"><button class="btn" onclick="closeModal()">关闭</button></div>`);
+ modal(`<h3>神兵合成</h3><p class="dim">关卡终极武器：集齐本关战士/法师/射手三职业武器 + 铜币 → 本关终极武器。轩辕神剑：集齐四把关卡终极武器 + 300万铜币。防具：集齐同部位四件BOSS防具 + 200万铜币 → 轩辕防具。材料需放在背包中（已装备的请先卸下）。</p>${zrows}<div class="tier"><div><div class="gold">轩辕神剑<span class="dim"> · 最终终极武器</span></div><div class="m">${xmat} · 300万铜币（拥有${S.player.coins}）</div></div><button class="btn small primary" style="width:auto;margin:0" id="dosynth">合成</button></div><h3 style="margin-top:8px">防具合成</h3>${arows}<div class="rowbtns"><button class="btn" onclick="closeModal()">关闭</button></div>`);
  $("modalbox").querySelectorAll("[data-asynth]").forEach(b=>b.onclick=()=>{
   const[slot,xid,xname]=ARMOR_SYNTH[+b.dataset.asynth];
   const needs=[1,2,3,4].map(t=>{const iid=topItemOfSlot(t,slot);return[iid,ITEMS[iid].name];});
   doSynth(needs,ARMOR_SYNTH_COST,xid,xname);
  });
+ $("modalbox").querySelectorAll("[data-zsynth]").forEach(b=>b.onclick=()=>{
+  const t=+b.dataset.zsynth,ids=CLASS_WPN[t],cost=ZONE_ULT_COST[t];
+  for(const id of ids){if(!S.bag.some(x=>x.iid===id)){toast(`缺少${ITEMS[id].name}，去挑战${ZONES[t-1].name}BOSS掉落！`);return;}}
+  if(S.player.coins<cost){toast("铜币不足");return;}
+  for(const id of ids){S.bag.splice(S.bag.findIndex(x=>x.iid===id),1);}
+  S.player.coins-=cost;
+  S.bag.push(mkWeapon(ZONE_ULT[t]));
+  save();closeModal();render();toast(`合成成功！获得${ZONES[t-1].name}终极武器${ITEMS[ZONE_ULT[t]].name}！`);
+ });
  $("dosynth").onclick=()=>{
-  for(const [iid,nm] of SYNTH_NEED){if(!S.bag.some(x=>x.iid===iid)){toast(`缺少${nm}，去挑战对应BOSS掉落！`);return;}}
+  for(const iid of XUANYUAN_NEED){if(!S.bag.some(x=>x.iid===iid)){toast(`缺少${ITEMS[iid].name}，先合成各关卡终极武器！`);return;}}
   if(S.player.coins<SYNTH_COST){toast("铜币不足300万");return;}
-  for(const [iid] of SYNTH_NEED){S.bag.splice(S.bag.findIndex(x=>x.iid===iid),1);}
+  for(const iid of XUANYUAN_NEED){S.bag.splice(S.bag.findIndex(x=>x.iid===iid),1);}
   S.player.coins-=SYNTH_COST;
   S.bag.push(mkWeapon("w13"));
   save();closeModal();render();toast("合成成功！获得终极武器轩辕神剑！");
@@ -1130,7 +1170,7 @@ h+=`<div class="rowbtns"><button class="btn small" id="recC">广发英雄帖<br>
 if(!(S.partners||[]).length)h+=`<p class="dim">还没有伙伴，去招募一位与你并肩闯荡吧！</p>`;
 (S.partners||[]).forEach((pt,i)=>{
  const st=partnerStats(pt);
- h+=`<div class="tier"><div><div class="mn">${pt.tier>=4?godName(pt.name):pt.name} ${tierBadge(pt.tier,pt.sub)}<span class="dim">Lv.${pt.level}</span>${i===S.activePartner?' <span class="gold">出战中</span>':""}</div>
+ h+=`<div class="tier"><div><div class="mn">${tieredName(pt.name,pt.tier)} ${tierBadge(pt.tier,pt.sub)}<span class="dim">Lv.${pt.level}</span>${i===S.activePartner?' <span class="gold">出战中</span>':""}</div>
  <div class="md">攻击${st.atk} 防御${st.def} 气血${st.hp} 速度${st.spd}${st.luck?` 幸运${st.luck}`:""} · 经验${pt.exp||0}/${40*pt.level}</div>
  <div class="md">`;
  for(const slot of SLOTS){
@@ -1173,7 +1213,7 @@ if(!S.pets.length)h+=`<p class="dim">还没有宠物，去青竹林捕捉小灵�
 S.pets.forEach((pet,i)=>{
 const b=PETS[pet.pid];
 const atk=Math.floor(b.atk*(1+0.15*(pet.level-1))),hp=Math.floor(b.hp*(1+0.15*(pet.level-1)));
-h+=`<div class="mob"><div><div class="mn">${b.tier>=4?godName(pet.name):pet.name} ${tierBadge(b.tier,b.sub)}<span class="dim">Lv.${pet.level}</span>${i===S.activePet?'<span class="gold">出战中</span>':""}</div>
+h+=`<div class="mob"><div><div class="mn">${tieredName(pet.name,b.tier)} ${tierBadge(b.tier,b.sub)}<span class="dim">Lv.${pet.level}</span>${i===S.activePet?'<span class="gold">出战中</span>':""}</div>
 <div class="md">${b.desc}</div><div class="md">气血${hp} 攻击${atk} · 经验${pet.exp}/${petExpNeed(pet.level)}</div></div>
 ${i===S.activePet?"":`<button class="btn" data-pet="${i}">出战</button>`}</div>`;
 });
@@ -1224,7 +1264,7 @@ for(const[gid,g]of Object.entries(GONGFA)){
  }else{
  btn=`<button class="btn small primary" style="width:auto;margin:0" data-gf="${gid}"${(maxed||locked)?" disabled":""}>${maxed?"已满重":`修炼·${gfCost(lv)}铜币`}</button>`;
  }
- h+=`<div class="tier"><div><div class="gold">《${g.tier>=4?godName(g.name):g.name}》 ${tierBadge(g.tier,g.sub)}<span class="dim">${lv}/${g.max}重</span></div>
+ h+=`<div class="tier"><div><div class="gold">《${tieredName(g.name,g.tier)}》 ${tierBadge(g.tier,g.sub)}<span class="dim">${lv}/${g.max}重</span></div>
  <div class="m">${g.desc}</div><div class="m">每重：${per}</div>${sub}
  ${learned&&locked?`<div class="m" style="color:#e08a8a">需要 ${g.req} 级修炼</div>`:""}
  </div>${btn}</div>`;
@@ -1359,7 +1399,7 @@ function rPay(){
  h+=`</div><div class="card"><h3>充值豪礼</h3><p class="dim">神级宠物与稀有称号只能通过充值豪礼或限时活动获得。</p>`;
  GIFTS.forEach(gf=>{
  const ok=total>=gf.need,got=(S.claimedGifts||{})[gf.id];
- h+=`<div class="tier"><div><div class="gold">${(gf.kind==="pet"||gf.kind==="title")?godName(gf.name):gf.name}</div><div class="m">${gf.desc} · 累计充值满￥${gf.need}（${total}/${gf.need}）</div></div>
+ h+=`<div class="tier"><div><div class="gold">${gf.kind==="pet"&&gf.pid&&PETS[gf.pid]?tieredName(gf.name,PETS[gf.pid].tier):(gf.kind==="title"?godName(gf.name):gf.name)}</div><div class="m">${gf.desc} · 累计充值满￥${gf.need}（${total}/${gf.need}）</div></div>
  <button class="btn small primary" style="width:auto;margin:0" data-gift="${gf.id}"${(ok&&!got)?"":" disabled"}>${got?"已领取":(ok?"领取":"未达成")}</button></div>`;
  });
  h+=`</div><div class="card"><h3>累计充值奖励</h3>
@@ -1538,8 +1578,8 @@ const NPC_EQN={weapon:"剑",hat:"盔",armor:"甲",pants:"裤",bracer:"护腕",ri
 function npcProfile(name,ref){
  ref=ref||{};const h=hashStr(name);
  const power=ref.zl||(ref.pay||0)*1.2||(ref.score||0)*10||((ref.tier||1)*9000)||(ref.lv||20)*900||8000;
- const f=0.9+(h%20)/100,sects=Object.keys(SECTS);
- return {name,vip:ref.vip||(h%6),lv:ref.lv||(20+h%70),sect:sects[h%4],
+ const f=0.9+(h%20)/100,sects=Object.keys(SECTS),profs=Object.keys(PROFS);
+ return {name,vip:ref.vip||(h%6),lv:ref.lv||(20+h%70),sect:sects[h%4],prof:profs[h%3],
   zl:Math.round(ref.zl||power),
   atk:Math.round(power*0.016*f),def:Math.round(power*0.011*f),
   maxhp:Math.round(power*0.85*f),spd:Math.round(power*0.007*f),
@@ -1583,13 +1623,13 @@ function viewProfile(r){
  const myVip=vipLevel(),myZl=zhanli();
  let h=`<div class="card"><h3>${me?"我的档案":"玩家档案"}</h3>`;
  if(me){
-  h+=`<p>名字：${vipName(p.name,myVip)} <span class="dim">VIP${myVip}</span></p><p class="dim">${SECTS[p.sect].name} · Lv.${p.level}</p>`;
+  h+=`<p>名字：${vipName(p.name,myVip)} <span class="dim">VIP${myVip}</span></p><p class="dim">${SECTS[p.sect].name} · ${PROFS[p.prof||"warrior"].name} · Lv.${p.level}</p>`;
   h+=cmpRow("战力",myZl,myZl)+cmpRow("攻击",p.atk,p.atk)+cmpRow("防御",p.def,p.def)+cmpRow("气血",p.maxhp,p.maxhp)+cmpRow("速度",p.spd,p.spd);
   h+=`<div class="tier"><div><div class="m">装备</div><div class="gold" style="font-size:13px;line-height:1.7">${myEquipStr()}</div></div></div>`
    +`<div class="tier"><div><div class="m">功法</div><div class="gold" style="font-size:13px;line-height:1.7">${myGongfaStr()}</div></div></div>`;
  }else{
   const ratio=np.zl/Math.max(1,myZl);
-  h+=`<p>名字：${vipName(np.name,np.vip)} <span class="dim">VIP${np.vip}</span></p><p class="dim">${SECTS[np.sect].name} · Lv.${np.lv} · 称号${escHtml(np.title)}</p>`;
+  h+=`<p>名字：${vipName(np.name,np.vip)} <span class="dim">VIP${np.vip}</span></p><p class="dim">${SECTS[np.sect].name} · ${PROFS[np.prof].name} · Lv.${np.lv} · 称号${escHtml(np.title)}</p>`;
   h+=`<p>${ratio>=1?`对方战力约为你的 <b class="bad">${ratio.toFixed(1)}</b> 倍，再接再厉！`:`你的战力已是对方的 <b class="good">${(1/ratio).toFixed(1)}</b> 倍！`}</p>`;
   h+=cmpRow("战力",np.zl,myZl)+cmpRow("等级",np.lv,p.level)+cmpRow("攻击",np.atk,p.atk)+cmpRow("防御",np.def,p.def)+cmpRow("气血",np.maxhp,p.maxhp)+cmpRow("速度",np.spd,p.spd);
   h+=`<div class="tier"><div><div class="m">宠物 / 翅膀</div><div class="gold">${escHtml(np.pet)} <span class="dim">vs</span> ${escHtml(myBestPetName())}</div><div class="m dim">${WING_NAMES[np.wingT]} <span class="dim">vs</span> ${(S.wing&&S.wing.tier)?WING_NAMES[S.wing.tier]:"未激活"}</div></div></div>`;
@@ -1707,9 +1747,9 @@ function rEvent(){
  <button class="btn small primary" style="width:auto;margin:0" id="evtSGf"${canSGf?"":" disabled"}>${sGfGot?"已领取":(total>=3999?"领取":`差￥${3999-total}`)}</button></div>
  <div class="tier"><div><div class="gold">圣凰降临</div><div class="m">累计充值满￥5999 领取圣级宠物「混沌圣凰」（${total}/5999）<br><span class="dim">圣级圣兽，速度无双</span></div></div>
  <button class="btn small primary" style="width:auto;margin:0" id="evtSHuang"${canSHuang?"":" disabled"}>${sHuangGot?"已领取":(total>=5999?"领取":`差￥${5999-total}`)}</button></div>
- <div class="tier"><div><div class="gold">至尊降临</div><div class="m">累计充值满￥7999 领取<span class="ptier zhizun">至尊终极</span>伙伴×1（${total}/7999）<br><span class="dim">全场最强伙伴，彩色流光</span></div></div>
+ <div class="tier"><div><div class="gold">至尊降临</div><div class="m">累计充值满￥7999 领取<span class="ptier 至尊">至尊终极</span>伙伴×1（${total}/7999）<br><span class="dim">全场最强伙伴，金色品质</span></div></div>
  <button class="btn small primary" style="width:auto;margin:0" id="evtZZ"${canZZ?"":" disabled"}>${zzGot?"已领取":(total>=7999?"领取":`差￥${7999-total}`)}</button></div>
- <div class="tier"><div><div class="gold">鸿蒙降临</div><div class="m">累计充值满￥9999 领取<span class="ptier zhizun">至尊终极</span>宠物「鸿蒙至尊龙」+ 至尊终极功法《<span class="godflow">鸿蒙至尊诀</span>》（${total}/9999）<br><span class="dim">终极之上的终极，万中无一</span></div></div>
+ <div class="tier"><div><div class="gold">鸿蒙降临</div><div class="m">累计充值满￥9999 领取<span class="ptier 至尊">至尊终极</span>宠物「${goldName("鸿蒙至尊龙")}」+ 至尊终极功法《${goldName("鸿蒙至尊诀")}》（${total}/9999）<br><span class="dim">终极之上的终极，万中无一</span></div></div>
  <button class="btn small primary" style="width:auto;margin:0" id="evtHM"${canHm?"":" disabled"}>${hmGot?"已领取":(total>=9999?"领取":`差￥${9999-total}`)}</button></div></div>`;
  // ---- 每日活动 ----
  const wbl=wbLeft();
@@ -1793,7 +1833,7 @@ function rMore(){
  <div>建号时间<b style="font-size:11px">${S.created}</b></div></div>
  <p class="dim" style="margin-top:8px">正式版这里会显示所有玩家的订单，并支持订单查询、补发、封号等管理功能。</p></div>
  <div class="card"><h3>玩法说明</h3><p class="dim">
- · 去「江湖」挑战敌人，升级变强<br>· 四门派属性/特性/技能各不相同（少林防御、武当内力、峨眉速度暴击、丐帮攻击），「技能」页可学习本门专属技能；「聊天」可世界/门派频道发言，NPC会互动，VIP6及以上名字彩色显示；12个装备栏位：武器/帽子/护甲/裤子/护腕×2/戒指×2/项链/勋章/鞋子/饰品；BOSS概率掉落本关最高级武器和防具（概率受爆率加成），集齐BOSS装备可在背包「神兵合成」打造轩辕系列终极装备；武器带随机属性，洗炼石可重置（爆率加成提升概率），集齐四把BOSS神兵+300万铜币可在背包「神兵合成」打造终极武器轩辕神剑<br>
+ · 去「江湖」挑战敌人，升级变强<br>· 四门派属性/特性/技能各不相同（少林防御、武当内力、峨眉速度暴击、丐帮攻击），「技能」页可学习本门专属技能；「聊天」可世界/门派频道发言，NPC会互动，VIP6及以上名字彩色显示；12个装备栏位：武器/帽子/护甲/裤子/护腕×2/戒指×2/项链/勋章/鞋子/饰品；建号可选择职业（战士攻击+10%/法师内力上限+30%/射手速度+15%）；BOSS概率掉落本关战士/法师/射手三职业武器（优先掉没有的，概率受爆率加成），集齐本关三职业武器+铜币可在背包「神兵合成」打造本关终极武器，集齐四把关卡终极武器+300万铜币可打造最终武器轩辕神剑；BOSS也掉防具，集齐同部位四件BOSS防具可在「神兵合成」打造轩辕防具；武器带随机属性，洗炼石可重置（爆率加成提升概率）<br>
  · 野怪打到30%血可捕捉为宠物，宠物会帮你打架<br>
  · 技能全是斗破斗技：八极崩、焰分噬浪尺、佛怒火莲、三千雷动、帝印诀等，去「门派」学习<br>
  · 竞技场：底部「竞技」页，每日5次挑战排名更高的对手，获胜排名上升；前三名每日可领元宝/铜币/灵羽<br>
@@ -1822,7 +1862,8 @@ function rMore(){
   const st=SECT_STARTER[S.player.sect];if(st&&!S.player.skills.includes(st))S.player.skills.push(st);
  }
  if(!Array.isArray(S.partners))S.partners=[];if(S.activePartner===undefined)S.activePartner=-1;
- for(const pt of S.partners){if(pt.tier===undefined){pt.tier=[0,1,2,3,4,6][pt.quality||0]||0;pt.sub=1;delete pt.quality;}}if(!Array.isArray(S.pets))S.pets=[];if(!Array.isArray(S.eventTitles))S.eventTitles=[];if(!S.chat)S.chat={world:[{sys:1,txt:"欢迎来到江湖世界，谨言慎行，行侠仗义！",t:Date.now()}],sect:[],ch:"world",cd:0};migrateTitle();calcStats();TAB="home";render();}
+ for(const pt of S.partners){if(pt.tier===undefined){pt.tier=[0,1,2,3,4,6][pt.quality||0]||0;pt.sub=1;delete pt.quality;}}
+ if(!S.player.prof)S.player.prof="warrior";if(!Array.isArray(S.pets))S.pets=[];if(!Array.isArray(S.eventTitles))S.eventTitles=[];if(!S.chat)S.chat={world:[{sys:1,txt:"欢迎来到江湖世界，谨言慎行，行侠仗义！",t:Date.now()}],sect:[],ch:"world",cd:0};migrateTitle();calcStats();TAB="home";render();}
  else{rCreate();}
  setInterval(()=>{ // 每60秒回1点体力
  if(S&&S.player&&S.player.stamina<S.player.maxStamina){S.player.stamina++;save();if(TAB==="home"&&!B)renderTop();}
