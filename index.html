@@ -157,26 +157,19 @@ const PROFS={warrior:{name:"战士",desc:"近战勇猛，冲锋陷阵",bonus:"�
  mage:{name:"法师",desc:"精通内力，法力无边",bonus:"内力上限+30%"},
  archer:{name:"射手",desc:"百步穿杨，身法如风",bonus:"速度+15%"}};
 let selProf="warrior";
-const SECTS={
- shaolin:{name:"少林派",desc:"刚猛无俦，铜皮铁骨。擅长：防御、气血",hp:140,mp:40,atk:12,def:13,spd:6,skill:"luohanquan",trait:"金钟罩体：防御+15%"},
- wudang:{name:"武当派",desc:"以柔克刚，绵里藏针。擅长：内力、均衡",hp:105,mp:80,atk:13,def:8,spd:8,skill:"mianzhang",trait:"太极绵劲：内力上限+40%"},
- emei:{name:"峨眉派",desc:"身法灵动，出手如电。擅长：速度、暴击",hp:95,mp:55,atk:14,def:7,spd:14,skill:"emeici",trait:"凌波微步：速度+20%，幸运+3"},
- gaibang:{name:"丐帮",desc:"豪气干云，掌力雄浑。擅长：攻击、爆发",hp:115,mp:45,atk:18,def:7,spd:9,skill:"dagoubang",trait:"降龙之力：攻击+12%"}
-};
-const SECT_STARTER={shaolin:"luohanquan",wudang:"mianzhang",emei:"emeici",gaibang:"dagoubang"};
-const SKILLS={ // 门派技能（每门派专属，互不相同）
- luohanquan:{name:"罗汉拳",dj:"黄阶高级",mp:8,mult:1.6,desc:"少林入门拳法，刚猛朴实",sect:"shaolin"},
- mianzhang:{name:"绵掌",dj:"黄阶高级",mp:8,mult:1.6,desc:"武当入门掌法，绵里藏针",sect:"wudang"},
- emeici:{name:"峨眉刺",dj:"黄阶高级",mp:9,mult:1.7,desc:"峨眉入门刺法，灵动迅捷",sect:"emei"},
- dagoubang:{name:"打狗棒法",dj:"黄阶高级",mp:9,mult:1.7,desc:"丐帮入门棒法，专打恶狗",sect:"gaibang"},
- yanzhi:{name:"焰分噬浪尺",dj:"地阶低级",mp:30,mult:2.6,desc:"尺法斗技，焰浪分海",sect:"shaolin",cost:800,lv:10},
- zaohua:{name:"大天造化掌",dj:"天阶低级",mp:60,mult:3.4,desc:"造化圣者绝学，一掌造化",sect:"shaolin",cost:3000,lv:20},
- sanqian:{name:"三千雷动",dj:"地阶低级",mp:28,mult:2.4,desc:"风雷阁镇阁之宝，身如雷动",sect:"wudang",cost:800,lv:10},
- fengji:{name:"风之极·陨杀",dj:"地阶中级",mp:55,mult:3.2,desc:"风属性斗技，陨杀无形",sect:"wudang",cost:2500,lv:18},
- nongyan:{name:"弄炎诀",dj:"地阶低级",mp:30,mult:2.6,desc:"控火法门，玩火自如",sect:"emei",cost:800,lv:10},
- wulun:{name:"五轮离火法",dj:"地阶高级",mp:65,mult:3.6,desc:"五种兽火凝形，焚天煮海",sect:"emei",cost:3000,lv:22},
- diyin:{name:"帝印诀",dj:"天阶低级",mp:70,mult:3.8,desc:"古帝绝学，五印合一",sect:"gaibang",cost:3500,lv:24},
- huolian:{name:"佛怒火莲",dj:"自创斗技",mp:100,mult:5.0,desc:"异火相融，毁天灭地",sect:"gaibang",cost:5000,lv:28}
+const SKILLS={ // 江湖技能（无门派限制，人人可学）
+ luohanquan:{name:"罗汉拳",dj:"黄阶高级",mp:8,mult:1.6,desc:"少林入门拳法，刚猛朴实",},
+ mianzhang:{name:"绵掌",dj:"黄阶高级",mp:8,mult:1.6,desc:"武当入门掌法，绵里藏针",},
+ emeici:{name:"峨眉刺",dj:"黄阶高级",mp:9,mult:1.7,desc:"峨眉入门刺法，灵动迅捷",},
+ dagoubang:{name:"打狗棒法",dj:"黄阶高级",mp:9,mult:1.7,desc:"丐帮入门棒法，专打恶狗",},
+ yanzhi:{name:"焰分噬浪尺",dj:"地阶低级",mp:30,mult:2.6,desc:"尺法斗技，焰浪分海",cost:800,lv:10},
+ zaohua:{name:"大天造化掌",dj:"天阶低级",mp:60,mult:3.4,desc:"造化圣者绝学，一掌造化",cost:3000,lv:20},
+ sanqian:{name:"三千雷动",dj:"地阶低级",mp:28,mult:2.4,desc:"风雷阁镇阁之宝，身如雷动",cost:800,lv:10},
+ fengji:{name:"风之极·陨杀",dj:"地阶中级",mp:55,mult:3.2,desc:"风属性斗技，陨杀无形",cost:2500,lv:18},
+ nongyan:{name:"弄炎诀",dj:"地阶低级",mp:30,mult:2.6,desc:"控火法门，玩火自如",cost:800,lv:10},
+ wulun:{name:"五轮离火法",dj:"地阶高级",mp:65,mult:3.6,desc:"五种兽火凝形，焚天煮海",cost:3000,lv:22},
+ diyin:{name:"帝印诀",dj:"天阶低级",mp:70,mult:3.8,desc:"古帝绝学，五印合一",cost:3500,lv:24},
+ huolian:{name:"佛怒火莲",dj:"自创斗技",mp:100,mult:5.0,desc:"异火相融，毁天灭地",cost:5000,lv:28}
 };
 const ITEMS={ // iid: {name,slot,atk,def,hp,spd,luck,tier}
  w0:{name:"小红剑·开荒神兵",slot:"weapon",atk:26,luck:9,tier:1,gift:1},
@@ -527,16 +520,16 @@ if(itemExpired(it)){S.bag.push(it);S.equip[s]=null;ch=true;}}
 if(ch){calcStats();save();}return ch;}
 /* ============ 技能 ============ */
 function rSkill(){
-const m=$("main"),p=S.player,sc=SECTS[p.sect];
+const m=$("main"),p=S.player;
 const djc={黄:"黄",玄:"玄",地:"地",天:"天"};
-let h=`<div class="card"><h3>门派技能 · ${sc.name}</h3><p class="dim">${sc.desc}</p><p class="dim">门派特性：<b class="gold">${sc.trait}</b></p><p>已学技能：${p.skills.filter(s=>SKILLS[s]).map(s=>`${SKILLS[s].name}<span class="dim">(耗内${SKILLS[s].mp}·${SKILLS[s].mult}倍)</span>`).join("、")||"无"}</p><p class="dim">战斗中点「攻击」会自动施展已学的最强技能（内力不足时用普通攻击）。各门派技能完全不同。</p></div><div class="card"><h3>可学技能</h3>`;
+let h=`<div class="card"><h3>江湖技能</h3><p>已学技能：${p.skills.filter(s=>SKILLS[s]).map(s=>`${SKILLS[s].name}<span class="dim">(耗内${SKILLS[s].mp}·${SKILLS[s].mult}倍)</span>`).join("、")||"无"}</p><p class="dim">战斗中点「攻击」会自动施展已学的最强技能（内力不足时用普通攻击）。所有技能无门派限制，人人可学。</p></div><div class="card"><h3>可学技能</h3>`;
 let any=false;
 Object.entries(SKILLS).forEach(([id,sk])=>{
- if(sk.sect!==p.sect||p.skills.includes(id))return; any=true;
+ if(p.skills.includes(id))return; any=true;
  const lv=sk.lv||1,cost=sk.cost||0,can=p.level>=lv&&p.coins>=cost;
  h+=`<div class="tier"><div><div class="gold">${sk.name} <span class="ptier ${djc[sk.dj[0]]||"神"}">${sk.dj}</span></div><div class="m">${sk.desc} · 耗内${sk.mp} · 威力${sk.mult}倍 · 需${lv}级 ${cost}铜币</div></div><button class="btn small" style="width:auto;margin:0" ${can?"":"disabled"} data-learn="${id}">${can?"学习":"未达标"}</button></div>`;
 });
-if(!any)h+=`<p class="dim">本门技能已全部学会，勤加修炼吧！</p>`;
+if(!any)h+=`<p class="dim">所有技能已全部学会，勤加修炼吧！</p>`;
 h+=`</div>`;m.innerHTML=h;
 m.querySelectorAll("[data-learn]").forEach(b=>b.onclick=()=>{
  const sk=SKILLS[b.dataset.learn],lv=sk.lv||1,cost=sk.cost||0;
@@ -701,11 +694,6 @@ function calcStats(){
  else if(bs==="pants")p.maxhp+=e*10; else if(bs==="bracer"||bs==="ring"||bs==="necklace")p.atk+=e*1;
  else if(bs==="medal")p.def+=e*1; else if(bs==="boots")p.spd+=e*1; else if(bs==="charm")p.maxhp+=e*15;
  }
- const sc0=SECTS[p.sect]; // 门派特性（各门派不同）
- if(p.sect==="shaolin")p.def=Math.floor(p.def*1.15);
- else if(p.sect==="wudang")p.maxmp=Math.floor(p.maxmp*1.4);
- else if(p.sect==="emei"){p.spd=Math.floor(p.spd*1.2);p.luck+=3;}
- else if(p.sect==="gaibang")p.atk=Math.floor(p.atk*1.12);
  if(p.prof==="warrior")p.atk=Math.floor(p.atk*1.1);
  else if(p.prof==="mage")p.maxmp=Math.floor(p.maxmp*1.3);
  else if(p.prof==="archer")p.spd=Math.floor(p.spd*1.15);
@@ -737,11 +725,10 @@ function zhanli(){
  const pet=S.player.level>=10?S.pets[S.activePet]:undefined; if(pet){const b=PETS[pet.pid];z+=(b.atk*(1+0.15*(pet.level-1)))*2*petTierMult(b);}
  return Math.floor(z);
 }
-function newGame(name,sectKey,profKey){
- const sc=SECTS[sectKey];
- S={player:{name,sect:sectKey,prof:profKey||"warrior",level:1,exp:0,hp:sc.hp,mp:sc.mp,coins:100,gold:0,
- stamina:50,maxStamina:50,skills:[sc.skill],task:null,taskDone:false,feather:0,
- base:{maxhp:sc.hp,maxmp:sc.mp,atk:sc.atk,def:sc.def,spd:sc.spd}},
+function newGame(name,profKey){
+ S={player:{name,prof:profKey||"warrior",level:1,exp:0,hp:115,mp:55,coins:100,gold:0,
+ stamina:50,maxStamina:50,skills:["luohanquan","mianzhang","emeici","dagoubang"],task:null,taskDone:false,feather:0,
+ base:{maxhp:115,maxmp:55,atk:14,def:9,spd:9}},
  equip:{weapon:null,armor:null,boots:null,charm:null},bag:[],pets:[],activePet:-1,wing:{tier:0},
  partners:[],activePartner:-1,arena:{rank:1000,date:"",left:5,reward:"",top:ARENA_TOP.map((n,i)=>({name:n,rank:i+1}))},
  orders:[],zone:0,created:nowStr(),wornTitle:null,expBuff:null,gongfa:{},gongfaLearned:{},claimedGifts:{},douqi:0,yihuo:[],fenjue:{lv:0},eventTitles:[],chat:{world:[{sys:1,txt:"欢迎来到江湖世界，谨言慎行，行侠仗义！",t:Date.now()}],sect:[],ch:"world",cd:0}};
@@ -754,7 +741,7 @@ function renderTop(){
  const p=S.player,t=$("topbar");t.style.display="block";
  const v=vipLevel();
  const wt=wornTitleInfo();
- t.innerHTML=`<div class="pname">${wt?titleBadge(wt.name,wt.cls,wt.hue):""}<span class="${v>=6?"vipn"+Math.min(v,12):""}">${p.name}</span><span class="lv">Lv.${p.level} ${SECTS[p.sect].name}</span>${v?`<span class="vip" id="topVip" title="查看VIP详情">VIP${v}</span>`:""}</div>
+ t.innerHTML=`<div class="pname">${wt?titleBadge(wt.name,wt.cls,wt.hue):""}<span class="${v>=6?"vipn"+Math.min(v,12):""}">${p.name}</span><span class="lv">Lv.${p.level} ${PROFS[p.prof||"warrior"].name}</span>${v?`<span class="vip" id="topVip" title="查看VIP详情">VIP${v}</span>`:""}</div>
  <div class="bars">
  <div class="bar hp"><i style="width:${p.hp/p.maxhp*100}%"></i><span>气血 ${p.hp}/${p.maxhp}</span></div>
  <div class="bar mp"><i style="width:${p.mp/p.maxmp*100}%"></i><span>内力 ${p.mp}/${p.maxmp}</span></div>
@@ -766,31 +753,29 @@ function renderTop(){
  $("topPay").onclick=()=>{TAB="pay";B=null;render();window.scrollTo(0,0);};
  const tv=$("topVip");if(tv)tv.onclick=()=>{TAB="vipinfo";B=null;render();window.scrollTo(0,0);};
 }
-const TABS=[["home","江湖"],["bag","背包"],["pet","宠物"],["wing","翅膀"],["partner","伙伴"],["sect","门派"],["gongfa","功法"],["skill","技能"],["shop","商店"],["rank","排行"],["title","称号"],["arena","竞技"],["chat","聊天"],["event","活动"],["more","更多"]];
+const TABS=[["home","江湖"],["bag","背包"],["pet","宠物"],["wing","翅膀"],["partner","伙伴"],["task","任务"],["gongfa","功法"],["skill","技能"],["shop","商店"],["rank","排行"],["title","称号"],["arena","竞技"],["chat","聊天"],["event","活动"],["more","更多"]];
 function renderTabs(){
  const t=$("tabbar");t.style.display="flex";
  t.innerHTML=TABS.map(([k,n])=>`<button class="${TAB===k?'on':''}" data-t="${k}">${n}</button>`).join("");
  t.querySelectorAll("button").forEach(b=>b.onclick=()=>{TAB=b.dataset.t;B=null;render();});
 }
 function render(){if(S&&S.player&&sweepExpired())setTimeout(()=>toast(" 小红剑已到期，已自动卸下"),50);renderTop();renderTabs();
- ({home:rHome,bag:rBag,pet:rPet,sect:rSect,gongfa:rGongfa,skill:rSkill,shop:rShop,pay:rPay,rank:rRank,title:rTitle,arena:rArena,chat:rChat,wing:rWing,partner:rPartner,event:rEvent,more:rMore,vipinfo:rVip}[TAB])();}
+ ({home:rHome,bag:rBag,pet:rPet,task:rTask,gongfa:rGongfa,skill:rSkill,shop:rShop,pay:rPay,rank:rRank,title:rTitle,arena:rArena,chat:rChat,wing:rWing,partner:rPartner,event:rEvent,more:rMore,vipinfo:rVip}[TAB])();}
 /* ============ 创建角色 ============ */
-let selSect="shaolin";
 function rCreate(){
  $("topbar").style.display="none";$("tabbar").style.display="none";
  const m=$("main");
  m.innerHTML=`<div class="card"><h3>初入江湖</h3>
- <p class="dim">欢迎来到文字武侠世界。取一个响亮的名号，选择你的门派，开始闯荡江湖吧！</p>
+ <p class="dim">欢迎来到文字武侠世界。取一个响亮的名号，选择你的职业，开始闯荡江湖吧！</p>
  <input type="text" id="cname" maxlength="8" placeholder="输入你的名字（最多8字）">
- ${Object.entries(SECTS).map(([k,v])=>`<div class="sect ${k===selSect?'sel':''}" data-s="${k}"><h4>${v.name}</h4><p>${v.desc}</p><p class="dim">初始武功：${SKILLS[v.skill].name}</p></div>`).join("")}
- <p class="dim" style="margin-top:10px">选择你的职业：</p>
+ <p class="dim">选择你的职业：</p>
  ${Object.entries(PROFS).map(([k,v])=>`<div class="sect ${k===selProf?'sel':''}" data-p="${k}"><h4>${v.name}</h4><p>${v.desc}</p><p class="dim">职业加成：${v.bonus}</p></div>`).join("")}
  <button class="btn primary" id="gobtn">踏 入 江 湖</button></div>`;
- m.querySelectorAll(".sect").forEach(d=>d.onclick=()=>{if(d.dataset.s){selSect=d.dataset.s;}else{selProf=d.dataset.p;}rCreate();});
+ m.querySelectorAll(".sect").forEach(d=>d.onclick=()=>{selProf=d.dataset.p;rCreate();});
  $("gobtn").onclick=()=>{
  const n=$("cname").value.trim();
  if(!n){toast("请先输入名字");return;}
- newGame(n,selSect,selProf);TAB="home";render();toast("欢迎来到江湖，"+n+"！");
+ newGame(n,selProf);TAB="home";render();toast("欢迎来到江湖，"+n+"！");
  };
 }
 /* ============ 江湖（主界面/战斗）=========== */
@@ -804,7 +789,7 @@ function rHome(){
  <button class="btn" ${lock?'disabled':''} data-z="${i}">${lock?z.req+'级':"前往"}</button></div>`;
  });
  h+=`<button class="btn small" id="dazuo">打坐调息（+10体力）</button>
- <p class="dim">师门任务：${p.task?("已接取：击败"+p.task.need+"个敌人（"+p.task.done+"/"+p.task.need+"）"+(p.taskDone?" 可领奖":"")):"未接取，去门派接取"}</p></div>`;
+ <p class="dim">师门任务：${p.task?("已接取：击败"+p.task.need+"个敌人（"+p.task.done+"/"+p.task.need+"）"+(p.taskDone?" 可领奖":"")):"未接取，去任务页接取"}</p></div>`;
  h+=`<div class="card"><h3>世界BOSS</h3><p class="dim">远古魔龙·帝天降临！战胜掉落功法秘籍（神级以下）。每日可挑战 <b class="gold">${wbLeft()}</b>次，每次消耗10点体力。</p>
  <button class="btn primary" id="wbBtn"${wbLeft()>0?"":" disabled"}>挑战世界BOSS</button></div>`;
  m.innerHTML=h;
@@ -943,7 +928,7 @@ if((S.rpDayCount||0)<100&&Math.random()<rpRate){
  rpList().push(amt);S.rpDayCount=(S.rpDayCount||0)+1;
  log(`<span class="sys">获得${amt}元充值红包×1！去充值页开启，可计入累计充值奖励</span>`);
 }
-if(p.task&&!p.taskDone){p.task.done++;if(p.task.done>=p.task.need){p.taskDone=true;log(`<span class="sys">师门任务完成，可回门派领奖！</span>`);}}
+if(p.task&&!p.taskDone){p.task.done++;if(p.task.done>=p.task.need){p.taskDone=true;log(`<span class="sys">江湖任务完成，可回任务页领奖！</span>`);}}
 }else{
 log(`<span class="sys">你败下阵来，被好心人救回，气血恢复…</span>`);
 p.hp=1;
@@ -1223,13 +1208,11 @@ ${i===S.activePet?"":`<button class="btn" data-pet="${i}"${p.level<10?" disabled
 h+=`</div>`;m.innerHTML=h;
 m.querySelectorAll("[data-pet]").forEach(b=>b.onclick=()=>{if(p.level<10){toast("需10级才能召唤宠物出战");return;}S.activePet=+b.dataset.pet;save();render();toast("宠物出战！");});
 }
-/* ============ 门派 ============ */
-function rSect(){
-const m=$("main"),p=S.player,sc=SECTS[p.sect];
-let h=`<div class="card"><h3>${sc.name}</h3><p class="dim">${sc.desc}</p><p class="dim">门派特性：<b class="gold">${sc.trait}</b></p><p>已学技能：${p.skills.filter(s=>SKILLS[s]).map(s=>SKILLS[s].name).join("、")||"无"}</p>
-<p class="dim">技能品阶：黄阶→玄阶→地阶→天阶，品阶越高威力越强。去「技能」页学习本门新技能。</p>`;
-h+=`</div><div class="card"><h3>师门任务</h3>`;
-if(!p.task){h+=`<p class="dim">掌门有任务交给你：击败10个敌人，奖励300铜币+200修为。</p><button class="btn" id="taskget">接取任务</button>`;}
+/* ============ 江湖任务 ============ */
+function rTask(){
+const m=$("main"),p=S.player;
+let h=`<div class="card"><h3>江湖任务</h3>`;
+if(!p.task){h+=`<p class="dim">江湖告急：击败10个敌人，奖励300铜币+200修为。</p><button class="btn" id="taskget">接取任务</button>`;}
 else if(p.taskDone){h+=`<p>任务完成！</p><button class="btn primary" id="taskdone">领取奖励</button>`;}
 else{h+=`<p>进行中：击败敌人 ${p.task.done}/${p.task.need}</p>`;}
 h+=`</div>`;m.innerHTML=h;
@@ -1547,7 +1530,7 @@ function rArena(){
  m.querySelectorAll("[data-ch]").forEach(b=>b.onclick=()=>startArenaBattle(+b.dataset.ch));
  m.querySelectorAll("[data-opp]").forEach(el=>el.onclick=()=>{
   const f=ARENA_OPPS[+el.dataset.opp];
-  viewProfile({_prof:{name:f.name,vip:Math.min(12,Math.floor(f.lv/8)),lv:f.lv,sect:Object.keys(SECTS)[hashStr(f.name)%4],zl:Math.floor(f.atk*3+f.def*2+f.hp*0.5+f.spd*2),atk:f.atk,def:f.def,maxhp:f.hp,spd:f.spd,pet:"?",wingT:1,title:"竞技高手"}});
+  viewProfile({_prof:{name:f.name,vip:Math.min(12,Math.floor(f.lv/8)),lv:f.lv,zl:Math.floor(f.atk*3+f.def*2+f.hp*0.5+f.spd*2),atk:f.atk,def:f.def,maxhp:f.hp,spd:f.spd,pet:"?",wingT:1,title:"竞技高手"}});
  });
  m.querySelectorAll("[data-top]").forEach(el=>el.onclick=()=>{const r=window._atop[+el.dataset.top];viewProfile(r.me?{me:1}:{name:r.name.replace(/（我）$/,""),vip:0,lv:Math.max(1,105-r.rank)});});
  const ar=$("arenaReward");
@@ -1589,8 +1572,8 @@ const NPC_EQN={weapon:"剑",hat:"盔",armor:"甲",pants:"裤",bracer:"护腕",ri
 function npcProfile(name,ref){
  ref=ref||{};const h=hashStr(name);
  const power=ref.zl||(ref.pay||0)*1.2||(ref.score||0)*10||((ref.tier||1)*9000)||(ref.lv||20)*900||8000;
- const f=0.9+(h%20)/100,sects=Object.keys(SECTS),profs=Object.keys(PROFS);
- return {name,vip:ref.vip||(h%6),lv:ref.lv||(20+h%70),sect:sects[h%4],prof:profs[h%3],
+ const f=0.9+(h%20)/100,profs=Object.keys(PROFS);
+ return {name,vip:ref.vip||(h%6),lv:ref.lv||(20+h%70),prof:profs[h%3],
   zl:Math.round(ref.zl||power),
   atk:Math.round(power*0.016*f),def:Math.round(power*0.011*f),
   maxhp:Math.round(power*0.85*f),spd:Math.round(power*0.007*f),
@@ -1634,13 +1617,13 @@ function viewProfile(r){
  const myVip=vipLevel(),myZl=zhanli();
  let h=`<div class="card"><h3>${me?"我的档案":"玩家档案"}</h3>`;
  if(me){
-  h+=`<p>名字：${vipName(p.name,myVip)} <span class="dim">VIP${myVip}</span></p><p class="dim">${SECTS[p.sect].name} · ${PROFS[p.prof||"warrior"].name} · Lv.${p.level}</p>`;
+  h+=`<p>名字：${vipName(p.name,myVip)} <span class="dim">VIP${myVip}</span></p><p class="dim">${PROFS[p.prof||"warrior"].name} · Lv.${p.level}</p>`;
   h+=cmpRow("战力",myZl,myZl)+cmpRow("攻击",p.atk,p.atk)+cmpRow("防御",p.def,p.def)+cmpRow("气血",p.maxhp,p.maxhp)+cmpRow("速度",p.spd,p.spd);
   h+=`<div class="tier"><div><div class="m">装备</div><div class="gold" style="font-size:13px;line-height:1.7">${myEquipStr()}</div></div></div>`
    +`<div class="tier"><div><div class="m">功法</div><div class="gold" style="font-size:13px;line-height:1.7">${myGongfaStr()}</div></div></div>`;
  }else{
   const ratio=np.zl/Math.max(1,myZl);
-  h+=`<p>名字：${vipName(np.name,np.vip)} <span class="dim">VIP${np.vip}</span></p><p class="dim">${SECTS[np.sect].name} · ${PROFS[np.prof].name} · Lv.${np.lv} · 称号${escHtml(np.title)}</p>`;
+  h+=`<p>名字：${vipName(np.name,np.vip)} <span class="dim">VIP${np.vip}</span></p><p class="dim">${PROFS[np.prof].name} · Lv.${np.lv} · 称号${escHtml(np.title)}</p>`;
   h+=`<p>${ratio>=1?`对方战力约为你的 <b class="bad">${ratio.toFixed(1)}</b> 倍，再接再厉！`:`你的战力已是对方的 <b class="good">${(1/ratio).toFixed(1)}</b> 倍！`}</p>`;
   h+=cmpRow("战力",np.zl,myZl)+cmpRow("等级",np.lv,p.level)+cmpRow("攻击",np.atk,p.atk)+cmpRow("防御",np.def,p.def)+cmpRow("气血",np.maxhp,p.maxhp)+cmpRow("速度",np.spd,p.spd);
   h+=`<div class="tier"><div><div class="m">宠物 / 翅膀</div><div class="gold">${escHtml(np.pet)} <span class="dim">vs</span> ${escHtml(myBestPetName())}</div><div class="m dim">${WING_NAMES[np.wingT]} <span class="dim">vs</span> ${(S.wing&&S.wing.tier)?WING_NAMES[S.wing.tier]:"未激活"}</div></div></div>`;
@@ -1681,11 +1664,6 @@ function rRank(){
 /* ============ 聊天系统 ============ */
 const CHAT_NPCS=[{n:"剑圣·西门飘雪",vip:10},{n:"总镖头·铁中堂",vip:7},{n:"云游僧·慧远",vip:5},{n:"猎户·石大壮",vip:2},{n:"苗疆翼女·阿幼",vip:2},{n:"采花大盗·田伯光",vip:2},{n:"江南大侠·江别鹤",vip:1},{n:"药农·老蔫",vip:1},{n:"顽童·小豆子",vip:0},{n:"送信小厮·阿毛",vip:0}];
 const CHAT_WORLD=["今日华山之巅又有人比剑，听说打得天昏地暗","求组队刷幽冥谷，来个高战力的","刚开出洗炼石，有人要收吗","萌新求问，峨眉派厉害吗","世界BOSS快刷新了，蹲一波","轩辕神剑太难合了，四把神兵遥遥无期","出售金疮药大还丹，价格公道","有没有丐帮的兄弟，交流下打狗棒法心得","昨晚竞技场被一个高VIP大佬虐了","宠物榜第一的啸天虎真威风","刚升20级，终于能学地阶技能了","少林防御是真的硬，站着让你打","武当内力多，技能随便放","凌晨在线的都是夜猫子吧","求个大佬带刷黑风寨","刚合出轩辕战甲，防御直接起飞","有人知道圣级宠物怎么得吗","每日礼包别忘了领","十二个装备栏终于凑齐了","红包掉率还行，今天掉了三个"];
-const CHAT_SECT={
- shaolin:["阿弥陀佛，今日早课可曾修炼","罗汉拳练到第几重了","师兄弟们，组队去青竹林刷怪","方丈说心静自然强","防御就是硬道理"],
- wudang:["太极绵劲，以柔克刚","今日论道，谁来切磋","内力又涨了，技能随便甩","张真人讲道，受益匪浅","绵掌看似柔，实则刚"],
- emei:["姐妹们，峨眉刺练起来","速度即是正义","今日采药，顺便练级","灭绝师太巡查，都认真点","身法灵动，来无影去无踪"],
- gaibang:["兄弟们，喝酒去啊","打狗棒法专打恶人","降龙之力，一掌定乾坤","今日化缘收获不错","丐帮弟子，遍布天下"]};
 function pushChat(ch,msg){
  const c=S.chat||(S.chat={world:[],sect:[],ch:"world",cd:0});
  (c[ch]=c[ch]||[]).push(msg);
@@ -1693,7 +1671,7 @@ function pushChat(ch,msg){
  save();
 }
 function npcChat(ch){
- const pool=ch==="sect"?(CHAT_SECT[S.player.sect]||CHAT_WORLD):CHAT_WORLD;
+ const pool=CHAT_WORLD;
  const npc=pick(CHAT_NPCS);
  pushChat(ch,{n:npc.n,vip:npc.vip,t:Date.now(),txt:pick(pool)});
 }
@@ -1717,11 +1695,10 @@ function rChat(){
  const m=$("main"),p=S.player,c=S.chat;
  if(Math.random()<0.45)npcChat(c.ch||"world");
  const ch=c.ch||"world",msgs=c[ch]||[];
- let h=`<div class="card"><h3>江湖聊天</h3><div class="rowbtns"><button class="btn small ${ch==="world"?"primary":""}" id="chW">世界</button><button class="btn small ${ch==="sect"?"primary":""}" id="chS">门派·${SECTS[p.sect].name}</button></div><div class="chatbox" id="chatbox">${msgs.map(chatLine).join("")||'<p class="dim">暂无消息，来说第一句吧</p>'}</div><div class="chatinput"><input id="chatIn" maxlength="60" placeholder="说点什么…（5秒一条）"><button class="btn primary" id="chatSend" style="width:auto">发送</button></div><p class="dim">世界频道畅所欲言，门派频道只和同门交流。VIP名字会显示专属颜色；点击排行榜/聊天/竞技场中的玩家名字可查看档案，直观对比差距；</p></div>`;
+ let h=`<div class="card"><h3>江湖聊天</h3><div class="rowbtns"><button class="btn small primary" id="chW">世界</button></div><div class="chatbox" id="chatbox">${msgs.map(chatLine).join("")||'<p class="dim">暂无消息，来说第一句吧</p>'}</div><div class="chatinput"><input id="chatIn" maxlength="60" placeholder="说点什么…（5秒一条）"><button class="btn primary" id="chatSend" style="width:auto">发送</button></div><p class="dim">世界频道畅所欲言。VIP名字会显示专属颜色；点击排行榜/聊天/竞技场中的玩家名字可查看档案，直观对比差距；</p></div>`;
  m.innerHTML=h;
  const box=$("chatbox");box.scrollTop=box.scrollHeight;
  $("chW").onclick=()=>{c.ch="world";save();render();};
- $("chS").onclick=()=>{c.ch="sect";save();render();};
  m.querySelectorAll("[data-cn]").forEach(el=>el.onclick=()=>viewProfile({name:el.dataset.cn,vip:+el.dataset.cv||0,me:el.dataset.me==="1"}));
  $("chatSend").onclick=sendChat;
  $("chatIn").onkeydown=e=>{if(e.key==="Enter")sendChat();};
@@ -1771,8 +1748,8 @@ function rEvent(){
  <button class="btn small" style="width:auto;margin:0" data-go="home">前往</button></div>
  <div class="tier"><div><div class="gold">竞技场</div><div class="m">挑战高手提升排名，前三每日领奖 · 今日剩余 <b class="gold">${al}</b>/5 次</div></div>
  <button class="btn small" style="width:auto;margin:0" data-go="arena">前往</button></div>
- <div class="tier"><div><div class="gold">师门任务</div><div class="m">击败10个敌人，奖300铜币+200修为 · ${taskSt}</div></div>
- <button class="btn small" style="width:auto;margin:0" data-go="sect">前往</button></div></div>`;
+ <div class="tier"><div><div class="gold">江湖任务</div><div class="m">击败10个敌人，奖300铜币+200修为 · ${taskSt}</div></div>
+ <button class="btn small" style="width:auto;margin:0" data-go="task">前往</button></div></div>`;
  // ---- 福利领取 ----
  const v=vipLevel(),vclaimed=S.vipClaim===today;
  const vSt=!v?"VIP1开启":(vclaimed?"今日已领取":"可领取");
@@ -1844,9 +1821,9 @@ function rMore(){
  <div>建号时间<b style="font-size:11px">${S.created}</b></div></div>
  <p class="dim" style="margin-top:8px">正式版这里会显示所有玩家的订单，并支持订单查询、补发、封号等管理功能。</p></div>
  <div class="card"><h3>玩法说明</h3><p class="dim">
- · 去「江湖」挑战敌人，升级变强<br>· 四门派属性/特性/技能各不相同（少林防御、武当内力、峨眉速度暴击、丐帮攻击），「技能」页可学习本门专属技能；「聊天」可世界/门派频道发言，NPC会互动，VIP6及以上名字彩色显示；12个装备栏位：武器/帽子/护甲/裤子/护腕×2/戒指×2/项链/勋章/鞋子/饰品；建号可选择职业（战士攻击+10%/法师内力上限+30%/射手速度+15%）；BOSS概率掉落本关战士/法师/射手三职业武器（优先掉没有的，概率受爆率加成），集齐本关三职业武器+铜币可在背包「神兵合成」打造本关终极武器，集齐四把关卡终极武器+300万铜币可打造最终武器轩辕神剑；BOSS也掉防具，集齐同部位四件BOSS防具可在「神兵合成」打造轩辕防具；武器带随机属性，洗炼石可重置（爆率加成提升概率）<br>
+ · 去「江湖」挑战敌人，升级变强<br>· 建号选择职业（战士攻击+10%/法师内力上限+30%/射手速度+15%）；「技能」页可学习全部江湖技能；「聊天」世界频道发言，NPC会互动，VIP6及以上名字彩色显示；12个装备栏位：武器/帽子/护甲/裤子/护腕×2/戒指×2/项链/勋章/鞋子/饰品；建号可选择职业（战士攻击+10%/法师内力上限+30%/射手速度+15%）；BOSS概率掉落本关战士/法师/射手三职业武器（优先掉没有的，概率受爆率加成），集齐本关三职业武器+铜币可在背包「神兵合成」打造本关终极武器，集齐四把关卡终极武器+300万铜币可打造最终武器轩辕神剑；BOSS也掉防具，集齐同部位四件BOSS防具可在「神兵合成」打造轩辕防具；武器带随机属性，洗炼石可重置（爆率加成提升概率）<br>
  · 野怪打到30%血可捕捉为宠物，宠物会帮你打架<br>
- · 技能全是斗破斗技：八极崩、焰分噬浪尺、佛怒火莲、三千雷动、帝印诀等，去「门派」学习<br>
+ · 技能全是斗破斗技：焰分噬浪尺、佛怒火莲、三千雷动、帝印诀等，去「技能」页学习<br>
  · 竞技场：底部「竞技」页，每日5次挑战排名更高的对手，获胜排名上升；前三名每日可领元宝/铜币/灵羽<br>
  · 伙伴：在「宠物」页招募（铜币/元宝），可穿戴武器护甲靴子饰品，出战后30%属性加给你，战斗胜利获得修为升级<br>
  · 排行新增宠物榜、翅膀榜、等级榜，前三名同样获得可叠加荣誉称号<br>
@@ -1868,9 +1845,9 @@ function rMore(){
 (function init(){
  S=load();
  if(S&&S.player){
- if(Array.isArray(S.player.skills)&&S.player.skills.some(s=>s==="bajibeng"||s==="shihuyin")){
+ if(Array.isArray(S.player.skills)){
   S.player.skills=S.player.skills.filter(s=>s!=="bajibeng"&&s!=="shihuyin");
-  const st=SECT_STARTER[S.player.sect];if(st&&!S.player.skills.includes(st))S.player.skills.push(st);
+  for(const st of["luohanquan","mianzhang","emeici","dagoubang"]){if(!S.player.skills.includes(st))S.player.skills.push(st);}
  }
  if(!Array.isArray(S.partners))S.partners=[];if(S.activePartner===undefined)S.activePartner=-1;
  for(const pt of S.partners){if(pt.tier===undefined){pt.tier=[0,1,2,3,4,6][pt.quality||0]||0;pt.sub=1;delete pt.quality;}}
