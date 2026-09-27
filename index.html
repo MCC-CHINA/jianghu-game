@@ -350,15 +350,15 @@ const PETS={ // pid: {name,hp,atk,def,spd,desc,tier:0黄..6至尊,sub:0低1中2�
 };
 function mkMonster(name,lv,catchPet,boss){return{name,lv,catchPet:catchPet||null,boss:!!boss,
  hp:Math.floor(45+lv*24),atk:Math.floor(8+lv*2.3),def:Math.floor(4+lv*1.3),spd:Math.floor(5+lv*0.9),
- exp:Math.floor(22+lv*13),coins:rnd(10+lv*5,16+lv*8)};}
+ exp:Math.floor((22+lv*13)*6),coins:rnd(10+lv*5,16+lv*8)};}
 const ZONES=[
  {name:"青竹林",req:1,desc:"新手历练之地，竹影婆娑",tier:1,
  mobs:[()=>mkMonster("野猴",1,"linghou"),()=>mkMonster("青竹蛇",2,"linghou"),()=>mkMonster("魂兽·柔骨兔",2,"rougutu"),()=>mkMonster("山贼喽啰",3),()=>mkMonster("小头目·赵虎",5,null,true)]},
- {name:"黑风寨",req:6,desc:"贼寇盘踞的山寨，危机四伏",tier:2,
+ {name:"黑风寨",req:4,desc:"贼寇盘踞的山寨，危机四伏",tier:2,
  mobs:[()=>mkMonster("寨丁",6,"tiedog"),()=>mkMonster("巡山刀客",7,"tiedog"),()=>mkMonster("魂兽·鬼虎",8,"guihu"),()=>mkMonster("黑风双煞",9),()=>mkMonster("寨主·黑风虎",11,null,true)]},
- {name:"幽冥谷",req:12,desc:"瘴气弥漫的险谷，毒物横行",tier:3,
+ {name:"幽冥谷",req:8,desc:"瘴气弥漫的险谷，毒物横行",tier:3,
  mobs:[()=>mkMonster("毒蛛",12,"youmingzhu"),()=>mkMonster("尸煞",13,"youmingzhu"),()=>mkMonster("魂兽·泰坦巨猿",14,"taitan"),()=>mkMonster("谷主亲卫",15),()=>mkMonster("谷主·幽冥老怪",17,null,true)]},
- {name:"华山之巅",req:18,desc:"武林圣地，高手如云",tier:4,
+ {name:"华山之巅",req:12,desc:"武林圣地，高手如云",tier:4,
  mobs:[()=>mkMonster("各派弟子",18,"xuediao"),()=>mkMonster("武林长老",20,"xuediao"),()=>mkMonster("魂兽·天青牛蟒",20,"tianqing"),()=>mkMonster("退隐高手",21),()=>mkMonster("武林盟主",23,null,true)]}
 ];
 const ZONE_EXP_MULT=[1,2,3.5,6]; // 关卡越难经验越高：青竹林1倍、黑风寨2倍、幽冥谷3.5倍、华山之巅6倍
@@ -641,6 +641,8 @@ const DOUQI=[
  {name:"斗帝",bonus:{atk:520,hp:5200,def:100,spd:28}}
 ];
 const DQ_REQLV=[0,3,6,10,14,18,24,30,36,44,99];
+const DQ_MAXLV=[3,6,10,14,18,24,30,36,44,99,99]; // 每重斗气境界的等级上限（相当于转生）：满级后必须突破境界才能继续升级
+function douqiMaxLv(){return DQ_MAXLV[S.douqi||0]||99;}
 function dqCost(idx){return 800*Math.pow(2,idx);}
 /* 异火榜 */
 const YIHUO=[
@@ -664,7 +666,7 @@ function wbLeft(){const d=new Date().toDateString();if(!S.wboss||S.wboss.date!==
 function wbStats(){const lv=S.player.level;
  return{name:"远古魔龙·帝天",lv:lv+5,boss:true,
  hp:Math.floor(2500+lv*1200),atk:Math.floor(35+lv*14),def:Math.floor(12+lv*6),spd:Math.floor(10+lv*2),
- exp:500+lv*80,coins:500+lv*100};}
+ exp:(500+lv*80)*6,coins:500+lv*100};}
 function startWBattle(){
  const p=S.player;
  if(wbLeft()<=0){toast("今日挑战次数已用完，明日再战");return;}
@@ -703,7 +705,7 @@ function arenaOpp(rank){
  return{name:npc?npc.name:pick(ARENA_NAMES),rank,lv:p.level,
  atk:Math.max(1,Math.floor(p.atk*f)),def:Math.max(1,Math.floor(p.def*f)),
  hp:Math.max(10,Math.floor(p.maxhp*f)),spd:Math.max(1,Math.floor(p.spd*f)),
- exp:60+p.level*12,coins:150+p.level*25};
+ exp:(60+p.level*12)*6,coins:150+p.level*25};
 }
 /* ============ 伙伴系统 ============ */
 /* 伙伴品级共用PTIERS/SUBS（黄/玄/地/天/神/圣/至尊 × 低级/中级/高级/终极），徽章用tierBadge */
@@ -808,7 +810,7 @@ function partnerStats(pt){
 function gainPartnerExp(n){
  const pt=(S.partners||[])[S.activePartner];if(!pt)return;
  pt.exp=(pt.exp||0)+n;
- while(pt.exp>=40*pt.level){pt.exp-=40*pt.level;pt.level++;}
+ while(pt.exp>=240*pt.level){pt.exp-=240*pt.level;pt.level++;}
 }
 function recruitPartner(t,s,fixedName){
  if(!Array.isArray(S.partners))S.partners=[];
@@ -836,8 +838,8 @@ const SAVE_KEY="jhx_save_v1";
 let S=null, TAB="home", B=null;
 function save(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(S));}catch(e){}}
 function load(){try{const t=localStorage.getItem(SAVE_KEY);return t?JSON.parse(t):null;}catch(e){return null;}}
-function expNeed(lv){return Math.floor(80*Math.pow(lv,1.6));}
-function petExpNeed(lv){return 40*lv;}
+function expNeed(lv){return Math.floor(1000*(lv+1)+300*lv*(lv-1));} // 升级经验递增：1→2级需2000修为，等级越高所需越多
+function petExpNeed(lv){return 240*lv;} // 怪物修为整体提高6倍，宠物升级需求同步
 function calcStats(){
  const p=S.player;
  p.maxhp=p.base.maxhp+(p.level-1)*18; p.maxmp=p.base.maxmp+(p.level-1)*8;
@@ -904,7 +906,7 @@ function renderTop(){
  <div class="bars">
  <div class="bar hp"><i style="width:${p.hp/p.maxhp*100}%"></i><span>气血 ${p.hp}/${p.maxhp}</span></div>
  <div class="bar mp"><i style="width:${p.mp/p.maxmp*100}%"></i><span>内力 ${p.mp}/${p.maxmp}</span></div>
- <div class="bar exp"><i style="width:${p.exp/expNeed(p.level)*100}%"></i><span>修为 ${p.exp}/${expNeed(p.level)}</span></div>
+ <div class="bar exp"><i style="width:${Math.min(100,p.exp/expNeed(p.level)*100)}%"></i><span>修为 ${p.exp}/${expNeed(p.level)} · ${DOUQI[S.douqi||0].name}上限${douqiMaxLv()}级</span></div>
  </div>
  ${expMult()>1?`<div class="expbuff">${expMult()}倍经验 · 剩余${expBuffLeft()}分</div>`:""}
  <div class="wallet"><span>铜币 <b>${p.coins}</b></span><span>元宝 <b>${p.gold}</b></span><span>体力 <b>${p.stamina}/${p.maxStamina}</b></span><span>幸运 <b>${p.luck||0}</b></span><span>战力 <b>${zhanli()}</b></span></div>`;
@@ -1023,10 +1025,12 @@ const EXPDAN={exp2:{name:"双倍经验丹",mult:2,price:25},exp3:{name:"三倍�
 function expMult(){const b=S.expBuff;if(b&&Date.now()<b.until)return b.mult;return 1;}
 function expBuffLeft(){const b=S.expBuff;if(b&&Date.now()<b.until)return Math.ceil((b.until-Date.now())/60000);return 0;}
 function gainExp(n){
-const p=S.player;p.exp+=n;
+const p=S.player,maxLv=douqiMaxLv(),wasCap=p.level>=maxLv;
+p.exp+=n;
 let ups=0;
-while(p.exp>=expNeed(p.level)){p.exp-=expNeed(p.level);p.level++;ups++;}
+while(p.exp>=expNeed(p.level)&&p.level<maxLv){p.exp-=expNeed(p.level);p.level++;ups++;}
 if(ups>0){calcStats();p.hp=p.maxhp;p.mp=p.maxmp;log(`<span class="sys">升级了！当前 ${p.level} 级，气血内力回满！</span>`);}
+if(!wasCap&&p.level>=maxLv&&DOUQI[(S.douqi||0)+1])log(`<span class="sys">已达【${DOUQI[S.douqi||0].name}】等级上限（${maxLv}级）！去「功法」页转生突破至【${DOUQI[(S.douqi||0)+1].name}】后可继续升级</span>`);
 }
 function gainPetExp(n){
 const pet=S.pets[S.activePet];if(!pet)return;
@@ -1499,18 +1503,19 @@ else if(p.taskDone){h+=`<p>任务完成！</p><button class="btn primary" id="ta
 else{h+=`<p>进行中：击败敌人 ${p.task.done}/${p.task.need}</p>`;}
 h+=`</div>`;m.innerHTML=h;
 const tg=$("taskget");if(tg)tg.onclick=()=>{p.task={need:10,done:0};p.taskDone=false;save();render();};
-const td=$("taskdone");if(td)td.onclick=()=>{p.coins+=300;gainExpSilent(200);p.task=null;p.taskDone=false;save();render();toast("领取了任务奖励！");};
+const td=$("taskdone");if(td)td.onclick=()=>{p.coins+=300;gainExpSilent(1200);p.task=null;p.taskDone=false;save();render();toast("领取了任务奖励！");};
 }
-function gainExpSilent(n){const p=S.player;p.exp+=n;while(p.exp>=expNeed(p.level)){p.exp-=expNeed(p.level);p.level++;}calcStats();}
+function gainExpSilent(n){const p=S.player,maxLv=douqiMaxLv();p.exp+=n;while(p.exp>=expNeed(p.level)&&p.level<maxLv){p.exp-=expNeed(p.level);p.level++;}calcStats();}
 /* ============ 功法 ============ */
 function rGongfa(){
 const m=$("main"),p=S.player;
 const di=S.douqi||0,dq=DOUQI[di],nd=DOUQI[di+1];
-const bcost=dqCost(di),breq=DQ_REQLV[di+1],canB=!!(nd&&p.level>=breq);
-let h=`<div class="card"><h3>斗气境界</h3>
+const bcost=dqCost(di),breq=DQ_MAXLV[di],canB=!!(nd&&p.level>=breq);
+let h=`<div class="card"><h3>斗气境界（转生）</h3>
 <div class="tier"><div><div class="gold">${dq.name}</div><div class="m">${bonusStr(dq.bonus)||"初入斗气，仍需修炼"}</div>
-${nd?`<div class="m">下一境：${nd.name}（需${breq}级）</div>`:`<div class="m">已至斗帝巅峰，睥睨天下！</div>`}</div>
-${nd?`<button class="btn small primary" style="width:auto;margin:0" id="dqB"${canB?"":" disabled"}>突破·${bcost}铜币</button>`:""}</div></div>`;
+<div class="m">本境界等级上限：${breq}级，满级后必须转生突破才能继续升级</div>
+${nd?`<div class="m">下一境：${nd.name}（达到${breq}级可转生，上限提升至${DQ_MAXLV[di+1]}级）</div>`:`<div class="m">已至斗帝巅峰，睥睨天下！</div>`}</div>
+${nd?`<button class="btn small primary" style="width:auto;margin:0" id="dqB"${canB?"":" disabled"}>转生突破·${bcost}铜币</button>`:""}</div></div>`;
 h+=`<div class="card"><h3>功法修炼</h3><p class="dim">功法分黄/玄/地/天/神/圣/至尊七级，每级又分低级/中级/高级/终极四档。天级以下可元宝购买或挑战世界BOSS掉落，神级唯VIP6可得；圣级以上唯限时活动可得，最高「至尊终极」彩色流光；习得后花费铜币修炼，每本最高5重。</p>`;
 for(const[gid,g]of Object.entries(GONGFA)){
  const lv=gfLv(gid),learned=gfLearned(gid),maxed=lv>=g.max,locked=p.level<g.req;
@@ -1554,7 +1559,7 @@ for(const f of YIHUO){
 h+=`</div>`;m.innerHTML=h;
 const bb=$("dqB");
 if(bb)bb.onclick=()=>{if(!canB)return;if(p.coins<bcost){toast("铜币不足");return;}
- p.coins-=bcost;S.douqi=di+1;calcStats();save();render();toast(`突破成功！踏入${DOUQI[di+1].name}！`);};
+ p.coins-=bcost;S.douqi=di+1;calcStats();save();render();toast(`转生突破成功！踏入${DOUQI[di+1].name}，等级上限提升至${DQ_MAXLV[di+1]}级！`);};
 const fb=$("fenjueB");
 if(fb)fb.onclick=()=>{if(fmaxed)return;if(p.coins<fcost){toast("铜币不足");return;}
  p.coins-=fcost;S.fenjue=S.fenjue||{lv:0};S.fenjue.lv=flv+1;calcStats();save();render();toast(`《焚诀》突破至第${flv+1}重！`);};
@@ -2427,7 +2432,7 @@ function rEvent(){
 function rMore(){
  const m=$("main");
  m.innerHTML=`<div class="card"><h3>玩法说明</h3><p class="dim">
- · 建号三选一：战士（攻击+10%）/ 法师（内力上限+30%）/ 射手（速度+15%）；建号自动生成玩家账号（JH+6位数字），充值兑换要用；建号即得本职业2个入门技能<br>· 去「江湖」挑战敌人，战斗点「攻击」自动施展本职业最强技能（内力不够则普通攻击），升级变强；野怪打到30%血以下可捕捉为宠物；修为按关卡难度递增——青竹林1倍、黑风寨2倍、幽冥谷3.5倍、华山之巅6倍，关卡BOSS再享2.5倍<br>· 技能三职业完全隔离，「技能」页只能学本职业的：战士（罗汉拳/打狗棒法/焰分噬浪尺/帝印诀）、法师（绵掌/弄炎诀/五轮离火法/佛怒火莲）、射手（峨眉刺/三千雷动/风之极·陨杀/大天造化掌）<br>· 12个装备栏：武器/帽子/护甲/裤子/护腕×2/戒指×2/项链/勋章/鞋子/饰品；武器分职业，BOSS掉落本关职业武器（优先掉没有的）；武器共7阶（1黄2玄3地4天5神6圣7至尊），带随机属性，洗炼石可重置，幸运上限9，铁匠铺可强化<br>· 背包「神兵合成」：集齐本关战士/法师/射手三职业武器+铜币→本关终极武器；集齐四把+300万铜币→轩辕神剑（6阶圣）；轩辕神剑+1000万铜币→至尊终极武器（7阶至尊·全游戏最高阶：战士斩尤帝剑/法师灭尤帝杖/射手断尤帝弓）；同部位四件BOSS防具+200万铜币→轩辕防具<br>· 宠物均为斗罗大陆魂兽，分黄/玄/地/天/神/圣/至尊七级，每级又分低/中/高/终极四档，10级可出战助战；3只同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用）；神级以上需进化石：神级1999/圣级19999/至尊29999元宝，商城有售，世界BOSS也掉落（至尊石概率极低）<br>· 宠物技能（斗罗大陆魂兽技）与伙伴技能（斗破苍穹斗技）：每只/每位初始拥有3个，最高神级，按品级加攻击（黄+3%/玄+5%/地+8%/天+12%/神+18%，可叠加）；出战时有概率施展技能造成额外伤害；宠物/伙伴页点「技能」可花铜币更换领悟（随机同品级及以下新技能，最高神级）；圣级/至尊级技能后续通过限时活动获取<br>· 伙伴均为斗破苍穹人物，5级可出战，出战将其30%属性加给你，可穿全部12栏装备，战斗胜利得修为升级；「宠物」页铜币/元宝招募；神级终极：VIP8免费领/「神将降临」（￥1288）/千金募名将；圣级：千金募名将极低概率（3%）；3位同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用；神级以上需进化石）；至尊终极（萧炎/薰儿随机其一）：「至尊降临」（￥7999）或圣级合成（30%，需至尊进化石）<br>· 功法分七级四档，习得后花铜币修炼（最高5重）加属性；神级唯VIP6/限时活动「神功现世」；圣级/至尊级唯限时活动可得<br>· 翅膀20级激活，灵羽升级，每阶攻击+12/气血+120/速度+3<br>· 充值：游戏内无直接充值，右上角「充值」页凭兑换码兑换——把玩家账号告诉客服，客服后台生成你的专属码后在此输入，一码一用；首充自动赠小红剑（攻击26/幸运9，永久）+首充礼包（288元宝+2万铜币+体力+灵兽蛋）<br>· 累计充值升VIP1-12（6/30/98/198/498/998/1998/2998/4998/7998/12998/19998元），每级攻击/气血+2%、每日VIP礼包、专属称号；VIP6及以上名字彩色显示<br>· 充值豪礼5档（30/98/198/498/998）：启程礼（元宝/洗炼石/经验丹）、天级终极宠物天青牛蟒·大明、神级宠物三眼金猊·王秋儿/冰天雪女、稀有称号神之眷顾——真实充值与红包共同累积，平民打怪攒红包也能领<br>· 累计充值奖励4档（1998/2998/5998/9999，仅真实充值）：元宝+圣级/至尊进化石+限定称号（一代宗师/开宗立派/纵横四海/名扬四海）；打怪掉充值红包（0.5/1/3/5/10元，每日上限100个），红包计入充值豪礼进度但不计VIP等级与累计充值奖励<br>· 限时活动（仅真实充值，每位玩家自建号起3天内有效，过期不可再领）：神功现世（￥498神级大日焚天诀）、神将降临（￥1288神话伙伴）、圣宠降临（￥2998圣级光明圣龙）、圣功现世（￥3999圣级圣心诀）、圣凰降临（￥5999圣级光明凤凰）、至尊降临（￥7999至尊萧炎/薰儿）、鸿蒙降临（￥9999金眼黑龙王·帝天/银龙王·古月娜+鸿蒙至尊诀）<br>· 世界BOSS（活动中心，每日可挑战）：按你造成的伤害比例发奖——击杀/重创（60%）/激战（30%）/参与四档；掉落功法秘籍/异火/灵羽/进化石，神级石（击杀50%/重创30%/激战15%/参与5%）、圣级石（8%/3%/1%）、至尊石（2%/0.8%/0.3%）<br>· 竞技场每日5次，挑战更高排名对手，胜则排名上升，前三每日领奖；江湖任务：击败10个敌人，奖300铜币+200修为<br>· 商店=江湖药铺（铜币）+元宝商城（元宝）+元宝兑换铜币（10元宝→10万/50→55万/100→120万）；经验丹双倍25/三倍45/五倍80元宝，背包使用后30分钟打怪修为加倍<br>· 聊天只有世界频道，5秒发一条，NPC会自动互动；排行榜有战力/充值/宠物/翅膀/等级5榜，前三名得荣誉称号（可佩戴加成）；点击排行/聊天/竞技场中的名字可看档案对比<br>· 交易行（底部导航「交易」）：寄售装备/进化石/宠物卖给土豪NPC（每次进入结算，定价合理卖得快，成交收5%税）；购买区每日刷新他人寄售；玩家交易码可跨设备与真实玩家交易<br>· 称号分VIP称号/限定称号/排行称号，均可佩戴，属性叠加；存档保存在本机，换设备会丢失<br></p></div>
+ · 建号三选一：战士（攻击+10%）/ 法师（内力上限+30%）/ 射手（速度+15%）；建号自动生成玩家账号（JH+6位数字），充值兑换要用；建号即得本职业2个入门技能<br>· 去「江湖」挑战敌人，战斗点「攻击」自动施展本职业最强技能（内力不够则普通攻击），升级变强；野怪打到30%血以下可捕捉为宠物；修为按关卡难度递增——青竹林1倍、黑风寨2倍、幽冥谷3.5倍、华山之巅6倍，关卡BOSS再享2.5倍；升级所需修为递增（1→2级需2000，越往后越多）<br>· 技能三职业完全隔离，「技能」页只能学本职业的：战士（罗汉拳/打狗棒法/焰分噬浪尺/帝印诀）、法师（绵掌/弄炎诀/五轮离火法/佛怒火莲）、射手（峨眉刺/三千雷动/风之极·陨杀/大天造化掌）<br>· 12个装备栏：武器/帽子/护甲/裤子/护腕×2/戒指×2/项链/勋章/鞋子/饰品；武器分职业，BOSS掉落本关职业武器（优先掉没有的）；武器共7阶（1黄2玄3地4天5神6圣7至尊），带随机属性，洗炼石可重置，幸运上限9，铁匠铺可强化<br>· 背包「神兵合成」：集齐本关战士/法师/射手三职业武器+铜币→本关终极武器；集齐四把+300万铜币→轩辕神剑（6阶圣）；轩辕神剑+1000万铜币→至尊终极武器（7阶至尊·全游戏最高阶：战士斩尤帝剑/法师灭尤帝杖/射手断尤帝弓）；同部位四件BOSS防具+200万铜币→轩辕防具<br>· 宠物均为斗罗大陆魂兽，分黄/玄/地/天/神/圣/至尊七级，每级又分低/中/高/终极四档，10级可出战助战；3只同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用）；神级以上需进化石：神级1999/圣级19999/至尊29999元宝，商城有售，世界BOSS也掉落（至尊石概率极低）<br>· 宠物技能（斗罗大陆魂兽技）与伙伴技能（斗破苍穹斗技）：每只/每位初始拥有3个，最高神级，按品级加攻击（黄+3%/玄+5%/地+8%/天+12%/神+18%，可叠加）；出战时有概率施展技能造成额外伤害；宠物/伙伴页点「技能」可花铜币更换领悟（随机同品级及以下新技能，最高神级）；圣级/至尊级技能后续通过限时活动获取<br>· 伙伴均为斗破苍穹人物，5级可出战，出战将其30%属性加给你，可穿全部12栏装备，战斗胜利得修为升级；「宠物」页铜币/元宝招募；神级终极：VIP8免费领/「神将降临」（￥1288）/千金募名将；圣级：千金募名将极低概率（3%）；3位同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用；神级以上需进化石）；至尊终极（萧炎/薰儿随机其一）：「至尊降临」（￥7999）或圣级合成（30%，需至尊进化石）<br>· 功法分七级四档，习得后花铜币修炼（最高5重）加属性；神级唯VIP6/限时活动「神功现世」；圣级/至尊级唯限时活动可得<br>· 斗气境界即转生：斗之气/斗者/斗师/大斗师/斗灵/斗王/斗皇/斗宗/斗尊/斗圣/斗帝共十一境，每境有等级上限（3/6/10/14/18/24/30/36/44/99/99级），满级后必须去「功法」页花铜币转生突破才能继续升级，突破还加属性<br>· 翅膀20级激活，灵羽升级，每阶攻击+12/气血+120/速度+3<br>· 充值：游戏内无直接充值，右上角「充值」页凭兑换码兑换——把玩家账号告诉客服，客服后台生成你的专属码后在此输入，一码一用；首充自动赠小红剑（攻击26/幸运9，永久）+首充礼包（288元宝+2万铜币+体力+灵兽蛋）<br>· 累计充值升VIP1-12（6/30/98/198/498/998/1998/2998/4998/7998/12998/19998元），每级攻击/气血+2%、每日VIP礼包、专属称号；VIP6及以上名字彩色显示<br>· 充值豪礼5档（30/98/198/498/998）：启程礼（元宝/洗炼石/经验丹）、天级终极宠物天青牛蟒·大明、神级宠物三眼金猊·王秋儿/冰天雪女、稀有称号神之眷顾——真实充值与红包共同累积，平民打怪攒红包也能领<br>· 累计充值奖励4档（1998/2998/5998/9999，仅真实充值）：元宝+圣级/至尊进化石+限定称号（一代宗师/开宗立派/纵横四海/名扬四海）；打怪掉充值红包（0.5/1/3/5/10元，每日上限100个），红包计入充值豪礼进度但不计VIP等级与累计充值奖励<br>· 限时活动（仅真实充值，每位玩家自建号起3天内有效，过期不可再领）：神功现世（￥498神级大日焚天诀）、神将降临（￥1288神话伙伴）、圣宠降临（￥2998圣级光明圣龙）、圣功现世（￥3999圣级圣心诀）、圣凰降临（￥5999圣级光明凤凰）、至尊降临（￥7999至尊萧炎/薰儿）、鸿蒙降临（￥9999金眼黑龙王·帝天/银龙王·古月娜+鸿蒙至尊诀）<br>· 世界BOSS（活动中心，每日可挑战）：按你造成的伤害比例发奖——击杀/重创（60%）/激战（30%）/参与四档；掉落功法秘籍/异火/灵羽/进化石，神级石（击杀50%/重创30%/激战15%/参与5%）、圣级石（8%/3%/1%）、至尊石（2%/0.8%/0.3%）<br>· 竞技场每日5次，挑战更高排名对手，胜则排名上升，前三每日领奖；江湖任务：击败10个敌人，奖300铜币+1200修为<br>· 商店=江湖药铺（铜币）+元宝商城（元宝）+元宝兑换铜币（10元宝→10万/50→55万/100→120万）；经验丹双倍25/三倍45/五倍80元宝，背包使用后30分钟打怪修为加倍<br>· 聊天只有世界频道，5秒发一条，NPC会自动互动；排行榜有战力/充值/宠物/翅膀/等级5榜，前三名得荣誉称号（可佩戴加成）；点击排行/聊天/竞技场中的名字可看档案对比<br>· 交易行（底部导航「交易」）：寄售装备/进化石/宠物卖给土豪NPC（每次进入结算，定价合理卖得快，成交收5%税）；购买区每日刷新他人寄售；玩家交易码可跨设备与真实玩家交易<br>· 称号分VIP称号/限定称号/排行称号，均可佩戴，属性叠加；存档保存在本机，换设备会丢失<br></p></div>
  <div class="card"><h3>存档</h3>
  <button class="btn small" id="resave">手动保存</button>
  <button class="btn small danger" id="reset">删号重来（清空存档）</button></div>`;
@@ -2451,7 +2456,8 @@ if(Array.isArray(S.pets))S.pets.forEach(x=>{if(x.pid==="hongmeng"&&(x.name==="�
  }
  if(!Array.isArray(S.partners))S.partners=[];if(S.activePartner===undefined)S.activePartner=-1;
  for(const pt of S.partners){if(pt.tier===undefined){pt.tier=[0,1,2,3,4,6][pt.quality||0]||0;pt.sub=1;delete pt.quality;}}
- if(!S.player.prof)S.player.prof="warrior";if(!Array.isArray(S.pets))S.pets=[];if(!Array.isArray(S.eventTitles))S.eventTitles=[];if(!Array.isArray(S.marketMine))S.marketMine=[];if(!Array.isArray(S.marketNpc))S.marketNpc=[];if(!Array.isArray(S.marketLog))S.marketLog=[];if(!Array.isArray(S.usedTradeCodes))S.usedTradeCodes=[];if(typeof S.marketDate!=="string")S.marketDate="";if(!S.chat)S.chat={world:[{sys:1,txt:"欢迎来到江湖世界，谨言慎行，行侠仗义！",t:Date.now()}],sect:[],ch:"world",cd:0};if(Array.isArray(S.pets))S.pets.forEach(ensurePetSkills);if(Array.isArray(S.partners))S.partners.forEach(ensurePartnerSkills);migrateTitle();calcStats();TAB="home";render();}
+ if(!S.player.prof)S.player.prof="warrior";if(!Array.isArray(S.pets))S.pets=[];if(!Array.isArray(S.eventTitles))S.eventTitles=[];if(!Array.isArray(S.marketMine))S.marketMine=[];if(!Array.isArray(S.marketNpc))S.marketNpc=[];if(!Array.isArray(S.marketLog))S.marketLog=[];if(!Array.isArray(S.usedTradeCodes))S.usedTradeCodes=[];if(typeof S.marketDate!=="string")S.marketDate="";if(!S.chat)S.chat={world:[{sys:1,txt:"欢迎来到江湖世界，谨言慎行，行侠仗义！",t:Date.now()}],sect:[],ch:"world",cd:0};if(Array.isArray(S.pets))S.pets.forEach(ensurePetSkills);if(Array.isArray(S.partners))S.partners.forEach(ensurePartnerSkills);migrateTitle();while((S.douqi||0)<DOUQI.length-1&&S.player.level>DQ_MAXLV[S.douqi||0])S.douqi++; // 老存档：斗气境界按等级自动匹配新转生上限
+calcStats();TAB="home";render();}
  else{rCreate();}
  setInterval(()=>{ // 每60秒回1点体力
  if(S&&S.player&&S.player.stamina<S.player.maxStamina){S.player.stamina++;save();if(TAB==="home"&&!B)renderTop();}
