@@ -196,7 +196,7 @@ const SKILLS={ // 职业技能（各职业只能学习/使用本职业技能）
 };
 const PROF_STARTER={warrior:["luohanquan","dagoubang"],mage:["mianzhang","nongyan"],archer:["emeici","sanqian"]};
 const ITEMS={ // iid: {name,slot,atk,def,hp,spd,luck,tier}
- w0:{name:"小红剑·开荒神兵",slot:"weapon",atk:26,luck:9,tier:1,gift:1},
+ w0:{name:"小红剑·开荒神兵",slot:"weapon",atk:26,luck:7,tier:1,gift:1},
  w1:{name:"桃木剑",slot:"weapon",atk:5,tier:1,cls:"战士"},w2:{name:"精钢长剑",slot:"weapon",atk:12,tier:2,cls:"战士"},
  w3:{name:"寒铁宝刀",slot:"weapon",atk:22,tier:3,cls:"战士"},w4:{name:"龙泉宝剑",slot:"weapon",atk:36,tier:4,cls:"战士"},
  w5:{name:"乌木剑",slot:"weapon",atk:8,tier:1,cls:"战士"},w6:{name:"炼狱战斧",slot:"weapon",atk:16,tier:2,cls:"战士"},
@@ -237,11 +237,11 @@ const ITEMS={ // iid: {name,slot,atk,def,hp,spd,luck,tier}
  md1:{name:"铜勋章",slot:"medal",atk:2,def:2,hp:10,tier:1},md2:{name:"铁勋章",slot:"medal",atk:4,def:4,hp:25,tier:2},
  md3:{name:"银勋章",slot:"medal",atk:6,def:6,hp:50,tier:3},md4:{name:"金勋章",slot:"medal",atk:9,def:9,hp:90,tier:4},md5:{name:"圣龙勋章",slot:"medal",atk:13,def:13,hp:150,tier:5,set:"圣龙"},
  r1:{name:"铜戒",slot:"ring",atk:3,tier:1},r2:{name:"铁戒",slot:"ring",atk:5,tier:2},
- r3:{name:"银戒",slot:"ring",atk:7,tier:3},r4:{name:"金戒",slot:"ring",atk:9,tier:4},r5:{name:"圣龙戒",slot:"ring",atk:12,luck:1,tier:5,set:"圣龙"},
+ r3:{name:"银戒",slot:"ring",atk:7,tier:3},r4:{name:"金戒",slot:"ring",atk:9,tier:4},r5:{name:"圣龙戒",slot:"ring",atk:12,tier:5,set:"圣龙"},
  xh:{name:"轩辕盔",slot:"hat",def:45,hp:900,tier:6,gift:1,set:"轩辕"},xa:{name:"轩辕战甲",slot:"armor",def:65,hp:1400,tier:6,gift:1,set:"轩辕"},
  xk:{name:"轩辕战裤",slot:"pants",def:40,hp:1000,tier:6,gift:1,set:"轩辕"},xb:{name:"轩辕护腕",slot:"bracer",atk:32,spd:9,tier:6,gift:1,set:"轩辕"},
- xn:{name:"轩辕项链",slot:"necklace",atk:38,luck:3,tier:6,gift:1,set:"轩辕"},xm:{name:"轩辕勋章",slot:"medal",atk:22,def:22,hp:600,tier:6,gift:1,set:"轩辕"},
- xt:{name:"轩辕战靴",slot:"boots",spd:14,def:28,tier:6,gift:1,set:"轩辕"},xr:{name:"轩辕戒指",slot:"ring",atk:34,luck:2,tier:6,gift:1,set:"轩辕"},
+ xn:{name:"轩辕项链",slot:"necklace",atk:38,luck:2,tier:6,gift:1,set:"轩辕"},xm:{name:"轩辕勋章",slot:"medal",atk:22,def:22,hp:600,tier:6,gift:1,set:"轩辕"},
+ xt:{name:"轩辕战靴",slot:"boots",spd:14,def:28,tier:6,gift:1,set:"轩辕"},xr:{name:"轩辕戒指",slot:"ring",atk:34,tier:6,gift:1,set:"轩辕"},
  // ===== 5-8关职业武器（BOSS掉落，集齐可合成关卡终极武器）=====
  w29:{name:"烈焰战刀",slot:"weapon",atk:72,tier:5,cls:"战士"},w30:{name:"烈焰法杖",slot:"weapon",atk:70,tier:5,cls:"法师"},w31:{name:"烈焰长弓",slot:"weapon",atk:70,tier:5,cls:"射手"},
  w32:{name:"寒冰战斧",slot:"weapon",atk:88,tier:6,cls:"战士"},w33:{name:"寒冰法杖",slot:"weapon",atk:85,tier:6,cls:"法师"},w34:{name:"寒冰神弓",slot:"weapon",atk:85,tier:6,cls:"射手"},
@@ -252,24 +252,24 @@ const ITEMS={ // iid: {name,slot,atk,def,hp,spd,luck,tier}
  w42:{name:"冰原帝戟",slot:"weapon",atk:105,luck:6,tier:6,gift:1,cls:"战士"}, // 极北冰原终极
  w43:{name:"云梦仙剑",slot:"weapon",atk:122,luck:7,tier:7,gift:1,cls:"战士"}, // 云梦仙泽终极
  w44:{name:"九幽帝刃",slot:"weapon",atk:128,luck:7,tier:7,gift:1,cls:"战士"}, // 九幽魔域终极
- w45:{name:"鸿蒙神剑",slot:"weapon",atk:125,luck:8,spd:8,tier:7,gift:1}, // 鸿蒙神剑：集齐w41-w44+800万铜币，无职业限制
+ w45:{name:"鸿蒙神剑",slot:"weapon",atk:125,luck:7,spd:8,tier:7,gift:1}, // 鸿蒙神剑：集齐w41-w44+800万铜币，无职业限制
  // ===== 6阶圣级常规防具·冰火套（极北冰原/云梦仙泽掉落）=====
  a6:{name:"熔岩战甲",slot:"armor",def:50,hp:500,tier:6,set:"冰火"},h6:{name:"熔岩头盔",slot:"hat",def:30,hp:320,tier:6,set:"冰火"},
  k6:{name:"熔岩战裤",slot:"pants",def:28,hp:350,tier:6,set:"冰火"},b6:{name:"熔岩战靴",slot:"boots",spd:18,def:12,tier:6,set:"冰火"},
  c6:{name:"熔岩腰带",slot:"charm",atk:24,def:14,hp:340,tier:6,set:"冰火"},br6:{name:"熔岩护腕",slot:"bracer",atk:14,spd:8,tier:6,set:"冰火"},
- nl6:{name:"熔岩项链",slot:"necklace",atk:20,luck:3,tier:6,set:"冰火"},md6:{name:"熔岩勋章",slot:"medal",atk:16,def:16,hp:220,tier:6,set:"冰火"},
- r6:{name:"熔岩戒指",slot:"ring",atk:15,luck:2,tier:6,set:"冰火"},
+ nl6:{name:"熔岩项链",slot:"necklace",atk:20,luck:2,tier:6,set:"冰火"},md6:{name:"熔岩勋章",slot:"medal",atk:16,def:16,hp:220,tier:6,set:"冰火"},
+ r6:{name:"熔岩戒指",slot:"ring",atk:15,tier:6,set:"冰火"},
  // ===== 7阶至尊常规防具·九幽套（九幽魔域掉落）=====
  a7:{name:"九幽战甲",slot:"armor",def:68,hp:900,tier:7,set:"九幽"},h7:{name:"九幽头盔",slot:"hat",def:42,hp:600,tier:7,set:"九幽"},
  k7:{name:"九幽战裤",slot:"pants",def:38,hp:650,tier:7,set:"九幽"},b7:{name:"九幽战靴",slot:"boots",spd:24,def:18,tier:7,set:"九幽"},
  c7:{name:"九幽腰带",slot:"charm",atk:34,def:20,hp:600,tier:7,set:"九幽"},br7:{name:"九幽护腕",slot:"bracer",atk:20,spd:11,tier:7,set:"九幽"},
- nl7:{name:"九幽项链",slot:"necklace",atk:28,luck:4,tier:7,set:"九幽"},md7:{name:"九幽勋章",slot:"medal",atk:22,def:22,hp:380,tier:7,set:"九幽"},
- r7:{name:"九幽戒指",slot:"ring",atk:21,luck:3,tier:7,set:"九幽"},
+ nl7:{name:"九幽项链",slot:"necklace",atk:28,luck:2,tier:7,set:"九幽"},md7:{name:"九幽勋章",slot:"medal",atk:22,def:22,hp:380,tier:7,set:"九幽"},
+ r7:{name:"九幽戒指",slot:"ring",atk:21,tier:7,set:"九幽"},
  // ===== 鸿蒙防具（7阶，5/6/7阶BOSS防具合成）=====
  hm_h:{name:"鸿蒙盔",slot:"hat",def:55,hp:1200,tier:7,gift:1},hm_a:{name:"鸿蒙战甲",slot:"armor",def:80,hp:2000,tier:7,gift:1},
  hm_k:{name:"鸿蒙战裤",slot:"pants",def:50,hp:1400,tier:7,gift:1},hm_br:{name:"鸿蒙护腕",slot:"bracer",atk:40,spd:12,tier:7,gift:1},
- hm_nl:{name:"鸿蒙项链",slot:"necklace",atk:46,luck:4,tier:7,gift:1},hm_md:{name:"鸿蒙勋章",slot:"medal",atk:28,def:28,hp:800,tier:7,gift:1},
- hm_b:{name:"鸿蒙战靴",slot:"boots",spd:18,def:36,tier:7,gift:1},hm_r:{name:"鸿蒙戒指",slot:"ring",atk:42,luck:3,tier:7,gift:1}
+ hm_nl:{name:"鸿蒙项链",slot:"necklace",atk:46,luck:2,tier:7,gift:1},hm_md:{name:"鸿蒙勋章",slot:"medal",atk:28,def:28,hp:800,tier:7,gift:1},
+ hm_b:{name:"鸿蒙战靴",slot:"boots",spd:18,def:36,tier:7,gift:1},hm_r:{name:"鸿蒙戒指",slot:"ring",atk:42,tier:7,gift:1}
 };
 const SLOTNAME={weapon:"武器",hat:"帽子",armor:"护甲",pants:"裤子",bracer:"护腕",bracer1:"护腕·左",bracer2:"护腕·右",ring:"戒指",ring1:"戒指·左",ring2:"戒指·右",necklace:"项链",medal:"勋章",boots:"鞋子",charm:"腰带"};
 const SLOTS=["weapon","hat","armor","pants","bracer1","bracer2","ring1","ring2","necklace","medal","boots","charm"];
@@ -492,7 +492,7 @@ const RANK_LV=[{name:"武林神话·叶孤鸿",lv:99,vip:12},{name:"剑圣·西�
 /* 排行榜称号：前三名自动获得，属性可叠加 */
 const RANK_TITLES={
  zl:[{name:"战力之巅",cls:"rt1",bonus:{atk:30,hp:300}},{name:"武林传奇",cls:"rt2",bonus:{atk:20,hp:200}},{name:"江湖豪杰",cls:"rt3",bonus:{atk:10,hp:100}}],
- pay:[{name:"神豪无双",cls:"rt1",bonus:{atk:25,hp:250,luck:2}},{name:"富甲天下",cls:"rt2",bonus:{atk:15,hp:150,luck:1}},{name:"一掷千金",cls:"rt3",bonus:{atk:8,hp:80}}],
+ pay:[{name:"神豪无双",cls:"rt1",bonus:{atk:25,hp:250}},{name:"富甲天下",cls:"rt2",bonus:{atk:15,hp:150}},{name:"一掷千金",cls:"rt3",bonus:{atk:8,hp:80}}],
  pet:[{name:"灵兽之主",cls:"rt1",bonus:{atk:20,hp:200}},{name:"兽语者",cls:"rt2",bonus:{atk:12,hp:120}},{name:"驯兽师",cls:"rt3",bonus:{atk:6,hp:60}}],
  wing:[{name:"九天神皇",cls:"rt0",bonus:{atk:25,hp:250,spd:3}},{name:"凌云之志",cls:"rt2",bonus:{atk:15,hp:150,spd:2}},{name:"风行者",cls:"rt3",bonus:{atk:8,hp:80,spd:1}}],
  lv:[{name:"登峰造极",cls:"rt1",bonus:{atk:20,hp:200}},{name:"后来居上",cls:"rt2",bonus:{atk:12,hp:120}},{name:"初露头角",cls:"rt3",bonus:{atk:6,hp:60}}]
@@ -500,7 +500,7 @@ const RANK_TITLES={
 /* 节日限定称号 */
 const EVENT_TITLES={
  midautumn:{name:"中秋快乐",cls:"rtcust",hue:315,bonus:{atk:15,hp:150},desc:"2026中秋限定"},
- shenzhi:{name:"神之眷顾",cls:"rtcust",hue:48,bonus:{atk:50,hp:500,luck:3},desc:"充值豪礼·稀有称号"},
+ shenzhi:{name:"神之眷顾",cls:"rtcust",hue:48,bonus:{atk:50,hp:500},desc:"充值豪礼·稀有称号"},
  springfest:{name:"新春大吉",cls:"rtcust",hue:355,bonus:{atk:20,hp:200},desc:"春节限定"},
  yuanxiao:{name:"元宵灯会",cls:"rtcust",hue:210,bonus:{atk:15,hp:150},desc:"元宵节限定"},
  longtaitou:{name:"龙抬头",cls:"rtcust",hue:357,bonus:{atk:12,hp:120},desc:"二月二限定"},
@@ -509,7 +509,7 @@ const EVENT_TITLES={
  huazhao:{name:"花朝绽放",cls:"rtcust",hue:0,bonus:{atk:10,hp:100},desc:"花朝节限定"},
  qingmingfest:{name:"清明踏青",cls:"rtcust",hue:2,bonus:{atk:10,hp:100},desc:"清明节限定"},
  duanwu:{name:"端午安康",cls:"rtcust",hue:3,bonus:{atk:18,hp:180},desc:"端午节限定"},
- qixi:{name:"七夕鹊桥",cls:"rtcust",hue:300,bonus:{atk:15,hp:150,luck:1},desc:"七夕节限定"},
+ qixi:{name:"七夕鹊桥",cls:"rtcust",hue:300,bonus:{atk:15,hp:150},desc:"七夕节限定"},
  zhongyuan:{name:"中元夜行",cls:"rtcust",hue:270,bonus:{atk:12,hp:120},desc:"中元节限定"},
  qiushe:{name:"秋社丰收",cls:"rtcust",hue:6,bonus:{atk:10,hp:100},desc:"社日限定"},
  chongyang:{name:"重阳登高",cls:"rtcust",hue:7,bonus:{atk:15,hp:150},desc:"重阳节限定"},
@@ -519,10 +519,10 @@ const EVENT_TITLES={
  chuxi:{name:"除夕守岁",cls:"rtcust",hue:12,bonus:{atk:25,hp:250},desc:"除夕限定"},
  yuandan:{name:"元旦迎新",cls:"rtcust",hue:13,bonus:{atk:12,hp:120},desc:"元旦限定"},
  guoqing:{name:"国庆华诞",cls:"rtcust",hue:15,bonus:{atk:25,hp:250},desc:"国庆节限定"},
- valentine:{name:"情定终身",cls:"rtcust",hue:290,bonus:{atk:15,hp:150,luck:1},desc:"情人节限定"},
+ valentine:{name:"情定终身",cls:"rtcust",hue:290,bonus:{atk:15,hp:150},desc:"情人节限定"},
  whiteval:{name:"白色约定",cls:"rtcust",hue:292,bonus:{atk:10,hp:100},desc:"白色情人节限定"},
  womensday:{name:"巾帼英豪",cls:"rtcust",hue:294,bonus:{atk:15,hp:150},desc:"妇女节限定"},
- fools:{name:"愚人乐翻天",cls:"rtcust",hue:297,bonus:{atk:8,hp:80,luck:2},desc:"愚人节限定"},
+ fools:{name:"愚人乐翻天",cls:"rtcust",hue:297,bonus:{atk:8,hp:80},desc:"愚人节限定"},
  labour:{name:"劳动光荣",cls:"rtcust",hue:299,bonus:{atk:15,hp:150},desc:"劳动节限定"},
  children:{name:"童心未泯",cls:"rtcust",hue:301,bonus:{atk:10,hp:100},desc:"儿童节限定"},
  mothers:{name:"慈母情深",cls:"rtcust",hue:304,bonus:{atk:12,hp:120},desc:"母亲节限定"},
@@ -532,7 +532,7 @@ const EVENT_TITLES={
  thanks:{name:"感恩有你",cls:"rtcust",hue:313,bonus:{atk:12,hp:120},desc:"感恩节限定"},
  xmasave:{name:"平安喜乐",cls:"rtcust",hue:315,bonus:{atk:15,hp:150},desc:"平安夜限定"},
  xmas:{name:"圣诞狂欢",cls:"rtcust",hue:318,bonus:{atk:20,hp:200},desc:"圣诞节限定"},
- singles:{name:"单身贵族",cls:"rtcust",hue:320,bonus:{atk:10,hp:100,luck:1},desc:"光棍节限定"},
+ singles:{name:"单身贵族",cls:"rtcust",hue:320,bonus:{atk:10,hp:100},desc:"光棍节限定"},
  double11:{name:"剁手之王",cls:"rtcust",hue:322,bonus:{atk:12,hp:120},desc:"双十一限定"},
  double12:{name:"年终盛典",cls:"rtcust",hue:325,bonus:{atk:12,hp:120},desc:"双十二限定"},
  lichun:{name:"立春迎春",cls:"rtcust",hue:115,bonus:{atk:8,hp:80},desc:"二十四节气·立春"},
@@ -578,7 +578,7 @@ const EVENT_TITLES={
  xajh:{name:"笑傲江湖",cls:"rtcust",hue:25,bonus:{atk:30,hp:300},desc:"游历江湖可得"},
  yijian:{name:"一剑西来",cls:"rtcust",hue:26,bonus:{atk:30,hp:300,spd:1},desc:"游历江湖可得"},
  jiandan:{name:"剑胆琴心",cls:"rtcust",hue:27,bonus:{atk:15,hp:150},desc:"游历江湖可得"},
- xiagu:{name:"侠骨柔情",cls:"rtcust",hue:28,bonus:{atk:15,hp:150,luck:1},desc:"游历江湖可得"},
+ xiagu:{name:"侠骨柔情",cls:"rtcust",hue:28,bonus:{atk:15,hp:150},desc:"游历江湖可得"},
  zuiwo:{name:"醉卧沙场",cls:"rtcust",hue:28,bonus:{atk:20,hp:200},desc:"游历江湖可得"},
  zongheng:{name:"纵横四海",cls:"rtcust",hue:29,bonus:{atk:25,hp:250},desc:"游历江湖可得"},
  taxue:{name:"踏雪寻梅",cls:"rtcust",hue:30,bonus:{atk:12,hp:120},desc:"游历江湖可得"},
@@ -593,12 +593,12 @@ const EVENT_TITLES={
  kaizong:{name:"开宗立派",cls:"rtcust",hue:38,bonus:{atk:35,hp:350},desc:"游历江湖可得"},
  taoli:{name:"桃李满园",cls:"rtcust",hue:39,bonus:{atk:15,hp:150},desc:"游历江湖可得"},
  miaoshou:{name:"妙手仁心",cls:"rtcust",hue:40,bonus:{atk:18,hp:180},desc:"游历江湖可得"},
- shenji:{name:"神机妙算",cls:"rtcust",hue:40,bonus:{atk:20,hp:200,luck:1},desc:"游历江湖可得"},
+ shenji:{name:"神机妙算",cls:"rtcust",hue:40,bonus:{atk:20,hp:200},desc:"游历江湖可得"},
  tiemian:{name:"铁面无私",cls:"rtcust",hue:41,bonus:{atk:18,hp:180},desc:"游历江湖可得"},
  jiemian:{name:"嫉恶如仇",cls:"rtcust",hue:42,bonus:{atk:20,hp:200},desc:"游历江湖可得"},
  lujian:{name:"路见不平",cls:"rtcust",hue:43,bonus:{atk:15,hp:150},desc:"游历江湖可得"},
  badao:{name:"拔刀相助",cls:"rtcust",hue:44,bonus:{atk:20,hp:200},desc:"游历江湖可得"},
- pingshui:{name:"萍水相逢",cls:"rtcust",hue:45,bonus:{atk:10,hp:100,luck:1},desc:"游历江湖可得"},
+ pingshui:{name:"萍水相逢",cls:"rtcust",hue:45,bonus:{atk:10,hp:100},desc:"游历江湖可得"},
  yijianrugu:{name:"一见如故",cls:"rtcust",hue:46,bonus:{atk:12,hp:120},desc:"游历江湖可得"},
  gandan:{name:"肝胆相照",cls:"rtcust",hue:47,bonus:{atk:25,hp:250},desc:"游历江湖可得"},
 };
@@ -608,7 +608,7 @@ const GIFTS=[
  {id:"gift_98",need:98,kind:"pet",pid:"tianqing",name:"天级终极宠物「天青牛蟒·大明」",desc:"天级终极魂兽，君临星斗",give:[["pet","tianqing"]]},
  {id:"pet_sanyan",need:198,kind:"pet",pid:"sanyan",name:"神级宠物「三眼金猊·王秋儿」",desc:"神级魂兽，帝皇瑞兽",give:[["pet","sanyan"]]},
  {id:"pet_xuenv",need:498,kind:"pet",pid:"xuenv",name:"神级宠物「冰天雪女」",desc:"神级魂兽，极北天王",give:[["pet","xuenv"]]},
- {id:"title_shenzhi",need:998,kind:"title",eid:"shenzhi",name:"稀有称号「神之眷顾」",desc:"攻击+50 气血+500 幸运+3，可叠加",give:[["title","shenzhi"]]}
+ {id:"title_shenzhi",need:998,kind:"title",eid:"shenzhi",name:"稀有称号「神之眷顾」",desc:"攻击+50 气血+500，可叠加",give:[["title","shenzhi"]]}
 ];
 /* 累计充值奖励：4档（仅真实充值，红包不计入；中氪/土豪线；奖励不与豪礼/限时活动重复） */
 const RECHARGE_REWARDS=[
@@ -759,7 +759,7 @@ const GONGFA={
  taijishengong:{name:"太极神功",tier:1,sub:1,price:150,desc:"武当镇派心法，以柔克刚",max:5,req:8,bonus:{def:3,spd:2,hp:30}},
  jiuyang:{name:"九阳神功",tier:2,sub:0,price:400,desc:"至阳至刚，内力生生不息",max:5,req:10,bonus:{atk:5,hp:60,mp:12}},
  kuihua:{name:"葵花宝典",tier:2,sub:1,price:400,desc:"天下武功，唯快不破",max:5,req:12,bonus:{spd:4,atk:4}},
- dugujiujian:{name:"独孤九剑",tier:3,sub:0,price:880,desc:"剑魔独孤求败绝学，无招胜有招",max:5,req:15,bonus:{atk:8,luck:1}},
+ dugujiujian:{name:"独孤九剑",tier:3,sub:0,price:880,desc:"剑魔独孤求败绝学，无招胜有招",max:5,req:15,bonus:{atk:8}},
  darin:{name:"大日焚天诀",tier:4,sub:0,vip6:1,desc:"上古神诀，大日焚天，唯VIP6可得",max:5,req:20,bonus:{atk:15,hp:150,mp:30}},
  shengxinjue:{name:"圣心诀",tier:5,sub:0,desc:"圣境无上心法，圣威浩荡，唯限时活动可得",max:5,req:25,bonus:{atk:20,hp:250,mp:40}},
  jiutianlong:{name:"九天圣龙诀",tier:5,sub:1,desc:"圣龙传承，九天十地唯我独尊，唯限时活动可得",max:5,req:30,bonus:{atk:25,hp:300,def:20}},
@@ -791,7 +791,7 @@ const YIHUO=[
  {name:"陨落心炎",rank:14,req:2,price:15000,coin:1,bonus:{atk:14,hp:140,mp:30}},
  {name:"骨灵冷火",rank:11,req:3,price:30000,coin:1,bonus:{atk:22,hp:220,def:8}},
  {name:"三千焱炎火",rank:9,req:4,price:120,gold:1,bonus:{atk:32,hp:320,spd:4}},
- {name:"净莲妖火",rank:3,req:5,price:300,gold:1,bonus:{atk:50,hp:500,luck:3}},
+ {name:"净莲妖火",rank:3,req:5,price:300,gold:1,bonus:{atk:50,hp:500}},
  {name:"帝炎",rank:1,req:6,price:880,gold:1,bonus:{atk:90,hp:900,def:20}}
 ];
 function fenjueTier(){return Math.min(4,(S.yihuo||[]).length);}
@@ -1073,11 +1073,14 @@ function calcStats(){
  const p=S.player;
  p.maxhp=p.base.maxhp+(p.level-1)*18; p.maxmp=p.base.maxmp+(p.level-1)*8;
  p.atk=p.base.atk+(p.level-1)*3; p.def=p.base.def+(p.level-1)*2; p.spd=p.base.spd+(p.level-1)*1;
- p.luck=0;
+ p.luck=0;p.luckW=0;p.luckN=0; // 幸运只来自武器(最高7)与项链(最高2)
  for(const slot of SLOTS){
  const it=S.equip[slot]; if(!it)continue; const d=ITEMS[it.iid],e=it.enh||0;
- p.atk+=d.atk||0; p.def+=d.def||0; p.hp0=(p.hp0||0); p.spd+=d.spd||0; p.luck+=(slot==="weapon"?Math.min(9,d.luck||0):(d.luck||0)); // 武器幸运最高为9
- const bo=it.bonus||{};p.atk+=bo.atk||0;p.def+=bo.def||0;p.spd+=bo.spd||0;p.luck+=bo.luck||0;if(bo.hp)p.maxhp+=bo.hp; // 武器随机属性
+ p.atk+=d.atk||0; p.def+=d.def||0; p.hp0=(p.hp0||0); p.spd+=d.spd||0;
+ const bo=it.bonus||{};
+ if(slot==="weapon"){p.luckW=Math.min(7,(d.luck||0)+(bo.luck||0));p.luck+=p.luckW;} // 武器幸运最高7（含洗炼随机属性）
+ else if(slot==="necklace"){p.luckN=Math.min(2,d.luck||0);p.luck+=p.luckN;} // 项链幸运最高2，其余部位不加幸运
+ p.atk+=bo.atk||0;p.def+=bo.def||0;p.spd+=bo.spd||0;if(bo.hp)p.maxhp+=bo.hp; // 武器随机属性（幸运已在上方计入封顶）
  if(d.hp)p.maxhp+=d.hp;
  const bs=baseSlot(slot); // 强化加成（按部位）
  if(bs==="weapon")p.atk+=e*2; else if(bs==="armor"||bs==="hat")p.def+=e*2;
@@ -1100,27 +1103,27 @@ function calcStats(){
  if(sDef)p.def=Math.floor(p.def*(1+sDef));
  p.setDesc=sNames.length?`套装[${sNames.join("] [")}]生效中`:"";
  const wt0=wornTitleInfo(),wb=wt0?(wt0.bonus||{}):null; // 佩戴称号加成
- if(wb){p.atk+=wb.atk||0;p.maxhp+=wb.hp||0;p.luck+=wb.luck||0;p.spd+=wb.spd||0;}
+ if(wb){p.atk+=wb.atk||0;p.maxhp+=wb.hp||0;p.spd+=wb.spd||0;} // 称号不加幸运
  for(const[gid,lv]of Object.entries(S.gongfa||{})){const g=GONGFA[gid];if(!g||!lv)continue; // 功法加成
  for(const[k,v]of Object.entries(g.bonus)){
- if(k==="hp")p.maxhp+=v*lv;else if(k==="mp")p.maxmp+=v*lv;else p[k]=(p[k]||0)+v*lv;}}
+ if(k==="hp")p.maxhp+=v*lv;else if(k==="mp")p.maxmp+=v*lv;else if(k!=="luck")p[k]=(p[k]||0)+v*lv;}} // 功法不加幸运
  const dq=DOUQI[S.douqi||0]; // 斗气境界加成
- if(dq)for(const[k,v]of Object.entries(dq.bonus)){if(k==="hp")p.maxhp+=v;else if(k==="mp")p.maxmp+=v;else p[k]=(p[k]||0)+v;}
+ if(dq)for(const[k,v]of Object.entries(dq.bonus)){if(k==="hp")p.maxhp+=v;else if(k==="mp")p.maxmp+=v;else if(k!=="luck")p[k]=(p[k]||0)+v;} // 斗气不加幸运
  for(const fn of(S.yihuo||[])){const f=YIHUO.find(x=>x.name===fn);if(!f)continue; // 异火加成
- for(const[k,v]of Object.entries(f.bonus)){if(k==="hp")p.maxhp+=v;else if(k==="mp")p.maxmp+=v;else p[k]=(p[k]||0)+v;}}
+ for(const[k,v]of Object.entries(f.bonus)){if(k==="hp")p.maxhp+=v;else if(k==="mp")p.maxmp+=v;else if(k!=="luck")p[k]=(p[k]||0)+v;}} // 异火不加幸运
  const fjlv=(S.fenjue&&S.fenjue.lv)||0,fm=fenjueTier()+1; // 焚诀加成（随异火进化）
  if(fjlv){p.atk+=4*fm*fjlv;p.maxhp+=50*fm*fjlv;p.maxmp+=10*fm*fjlv;}
  const wt=(S.wing&&S.wing.tier)||0; // 翅膀加成：每阶攻击+12 气血+120 速度+3
  if(wt){p.atk+=12*wt;p.maxhp+=120*wt;p.spd+=3*wt;}
  const ap=S.player.level>=5?(S.partners||[])[S.activePartner]:undefined; // 出战伙伴（需5级）：将其30%属性加给玩家
  if(ap){const st=partnerStats(ap);p.atk+=Math.floor(st.atk*0.3);p.def+=Math.floor(st.def*0.3);p.maxhp+=Math.floor(st.hp*0.3);p.spd+=Math.floor(st.spd*0.3);}
- for(const t of myRankTitles()){const b=t.bonus; // 排行榜称号加成（可叠加）
- p.atk+=b.atk||0;p.def+=b.def||0;p.maxhp+=b.hp||0;p.maxmp+=b.mp||0;p.spd+=b.spd||0;p.luck+=b.luck||0;}
- for(const eid of(S.eventTitles||[])){const e=EVENT_TITLES[eid];if(!e)continue;const b=e.bonus; // 节日称号加成（可叠加）
- p.atk+=b.atk||0;p.def+=b.def||0;p.maxhp+=b.hp||0;p.maxmp+=b.mp||0;p.spd+=b.spd||0;p.luck+=b.luck||0;}
+ for(const t of myRankTitles()){const b=t.bonus; // 排行榜称号加成（可叠加，称号不加幸运）
+ p.atk+=b.atk||0;p.def+=b.def||0;p.maxhp+=b.hp||0;p.maxmp+=b.mp||0;p.spd+=b.spd||0;}
+ for(const eid of(S.eventTitles||[])){const e=EVENT_TITLES[eid];if(!e)continue;const b=e.bonus; // 节日称号加成（可叠加，称号不加幸运）
+ p.atk+=b.atk||0;p.def+=b.def||0;p.maxhp+=b.hp||0;p.maxmp+=b.mp||0;p.spd+=b.spd||0;}
  const vb=1+vipLevel()*0.02; // VIP加成：每级攻击/气血+2%
  p.atk=Math.floor(p.atk*vb); p.maxhp=Math.floor(p.maxhp*vb);
- p.luck=Math.min(9,p.luck||0); // 幸运总上限9（武器/防具/称号/功法等所有来源叠加后封顶）
+ p.luck=Math.min(9,p.luck||0); // 幸运总上限9（武器最高7+项链最高2）
  p.hp=Math.min(p.hp,p.maxhp); p.mp=Math.min(p.mp,p.maxmp);
 }
 function zhanli(){
@@ -2776,9 +2779,16 @@ function rEvent(){
  m.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{TAB=b.dataset.go;B=null;render();window.scrollTo(0,0);});
 }
 function rMore(){
- const m=$("main");
- m.innerHTML=`<div class="card"><h3>玩法说明</h3><p class="dim">
- · 建号三选一：战士（攻击+10%）/ 法师（内力上限+30%）/ 射手（速度+15%）；建号自动生成玩家账号（JH+6位数字），充值兑换要用；建号即得本职业2个入门技能<br>· 去「江湖」挑战敌人，战斗点「攻击」自动施展本职业最强技能（内力不够则普通攻击），升级变强；野怪打到30%血以下可捕捉为宠物；修为按关卡难度递增——青竹林1倍、黑风寨2倍、幽冥谷3.5倍、华山之巅6倍、熔岩炼狱10倍、极北冰原16倍、云梦仙泽26倍、九幽魔域40倍，关卡BOSS再享2.5倍；升级所需修为递增（1→2级需2000，越往后越多）<br>· 技能三职业完全隔离，「技能」页只能学本职业的：战士（罗汉拳/打狗棒法/焰分噬浪尺/帝印诀）、法师（绵掌/弄炎诀/五轮离火法/佛怒火莲）、射手（峨眉刺/三千雷动/风之极·陨杀/大天造化掌）<br>· 12个装备栏：武器/帽子/护甲/裤子/护腕×2/戒指×2/项链/勋章/鞋子/腰带；武器分职业，BOSS掉落本关职业武器（优先掉没有的）；武器共7阶（1黄2玄3地4天5神6圣7至尊），带随机属性，洗炼石可重置，幸运上限9，铁匠铺可强化；防具有套装效果——圣龙/冰火/九幽/轩辕套：3件攻击+5%，6件攻击+10%/气血+10%，9件攻击+15%/气血+15%/防御+10%<br>· 背包「神兵合成」：集齐本关战士/法师/射手三职业武器+铜币→本关终极武器（8关：青竹圣剑/黑风魔刃/幽冥鬼剑/华山紫青剑/熔岩圣剑/冰原帝戟/云梦仙剑/九幽帝刃）；集齐前四把+300万铜币→轩辕神剑（6阶圣）；集齐后四把+800万铜币→鸿蒙神剑（7阶至尊，无职业限制）；轩辕神剑×3+1000万铜币→至尊终极武器（7阶至尊·全游戏最高阶：战士斩尤帝剑/法师灭尤帝杖/射手断尤帝弓）；轩辕战甲×3+1000万铜币→至尊终极防具（7阶至尊：战士斩尤帝甲/法师灭尤帝袍/射手断尤帝衣）；同部位四件1-4阶BOSS防具+200万铜币→轩辕防具；同部位三件5-7阶BOSS防具+800万铜币→鸿蒙防具（7阶至尊）<br>· 宠物均为斗罗大陆魂兽，分黄/玄/地/天/神/圣/至尊七级，每级又分低/中/高/终极四档，10级可出战助战；3只同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用）；神级以上需进化石：神级1999/圣级19999/至尊29999元宝，商城有售，世界BOSS也掉落（至尊石概率极低）<br>· 宠物技能（斗罗大陆魂兽技）与伙伴技能（斗破苍穹斗技）：每只/每位初始拥有3个，最高神级，按品级加攻击（黄+3%/玄+5%/地+8%/天+12%/神+18%，可叠加）；出战时有概率施展技能造成额外伤害；宠物/伙伴页点「技能」可花铜币更换领悟（随机同品级及以下新技能，最高神级）；圣级/至尊级技能后续通过限时活动获取<br>· 伙伴均为斗破苍穹人物，5级可出战，出战将其30%属性加给你，只能穿戴武器和护甲，战斗胜利得修为升级；「宠物」页铜币/元宝招募；神级终极：VIP8免费领/「神将降临」（￥1288）/千金募名将；圣级：千金募名将极低概率（3%）；3位同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用；神级以上需进化石）；至尊终极（萧炎/薰儿随机其一）：「至尊降临」（￥7999）或圣级合成（30%，需至尊进化石）<br>· 功法分七级四档，习得后花铜币修炼（最高5重）加属性；神级唯VIP6/限时活动「神功现世」；圣级/至尊级唯限时活动可得<br>· 斗气境界即转生：斗之气/斗者/斗师/大斗师/斗灵/斗王/斗皇/斗宗/斗尊/斗圣/斗帝共十一境，每境有等级上限（3/6/10/14/18/24/30/36/44/99/99级），满级后必须去「功法」页花铜币转生突破才能继续升级，突破还加属性<br>· 翅膀20级激活，灵羽升级，每阶攻击+12/气血+120/速度+3<br>· 充值：游戏内无直接充值，右上角「充值」页凭兑换码兑换——把玩家账号告诉客服，客服后台生成你的专属码后在此输入，一码一用；兑换码元宝、VIP6神级功法、首充小红剑（攻击26/幸运9，永久）、首充大礼包（288元宝+2万铜币+体力+灵兽蛋）全部发放至邮箱手动领取<br>· 累计充值升VIP1-12（6/30/98/198/498/998/1998/2998/4998/7998/12998/19998元），每级攻击/气血+2%、每日VIP礼包（发至邮箱）、专属称号；VIP6及以上名字彩色显示<br>· 充值豪礼5档（30/98/198/498/998）：启程礼（元宝/洗炼石/经验丹）、天级终极宠物天青牛蟒·大明、神级宠物三眼金猊·王秋儿/冰天雪女、稀有称号神之眷顾——真实充值与红包共同累积，平民打怪攒红包也能领；奖励发放至邮箱<br>· 累计充值奖励4档（1998/2998/5998/9999，仅真实充值）：元宝+圣级/至尊进化石+限定称号（一代宗师/开宗立派/纵横四海/名扬四海），奖励发放至邮箱；打怪掉充值红包（0.5/1/3/5/10元，每日上限100个），红包计入充值豪礼进度但不计VIP等级与累计充值奖励<br>· 限时活动（仅真实充值，每位玩家自建号起3天内有效，过期不可再领）：神功现世（￥498神级大日焚天诀）、神将降临（￥1288神话伙伴）、圣宠降临（￥2998圣级光明圣龙）、圣功现世（￥3999圣级圣心诀）、圣凰降临（￥5999圣级光明凤凰）、至尊降临（￥7999至尊萧炎/薰儿）、鸿蒙降临（￥9999金眼黑龙王·帝天/银龙王·古月娜+鸿蒙至尊诀）<br>· 世界BOSS（活动中心，每日可挑战）：血量999999999，打不死，纯粹比拼伤害，单场30回合封顶；挑战按钮旁「伤害榜」查看今日所有玩家伤害排名；每日24点按排名自动发放至邮箱（手动领取）——冠军200元宝+圣级进化石+灵羽×30+百万铜币+洗炼石×10，第2-3名100元宝+神级进化石+灵羽×20+五十万铜币+洗炼石×5，第4-10名50元宝+灵羽×10+二十万铜币+洗炼石×3，参与奖灵羽×5+五万铜币+洗炼石×1<br>· 竞技场每日5次，挑战更高排名对手，胜则排名上升，前三每日领奖（发至邮箱）；江湖任务：击败10个敌人，奖300铜币+1200修为（发至邮箱）<br>· 商店=江湖药铺（铜币）+元宝商城（元宝）+元宝兑换铜币（10元宝→10万/50→55万/100→120万）；经验丹双倍25/三倍45/五倍80元宝，背包使用后30分钟打怪修为加倍<br>· 聊天只有世界频道，5秒发一条，NPC会自动互动；排行榜有战力/充值/宠物/翅膀/等级5榜，前三名得荣誉称号（可佩戴加成）；点击排行/聊天/竞技场中的名字可看档案对比；竞技榜第一、世界BOSS伤害榜第一、等级榜第一、充值榜第一都会世界通报<br>· 邮箱（右上角）：所有奖励统一发放至邮箱手动领取——充值/兑换码/充值豪礼/累计充值奖励/VIP每日礼包/限时活动/竞技场每日奖励/江湖任务/交易行购买与寄售成交/玩家交易码/世界BOSS每日24点排名奖励；最多保留30封<br>· 交易行（底部导航「交易」）：寄售装备/进化石/宠物卖给土豪NPC（每次进入结算，定价合理卖得快，成交收5%税，成交款发至邮箱）；购买区每日刷新他人寄售（购买所得发至邮箱）；玩家交易码可跨设备与真实玩家交易（兑换所得发至邮箱）<br>· 称号分VIP称号/限定称号/排行称号共57个，均可佩戴，属性叠加；其中8个为动态称号（稀有称号神之眷顾、VIP12武道至尊、5榜第一：武林神话/战力之巅/神豪无双/灵兽之主/九天神皇/登峰造极）——完整场景底图+左右双神兽独立游动+光效粒子，背景文字静止；其余49个为静态称号牌（VIP金框/榜二银框/榜三铜框/节日红粉蓝紫四框+文字）；佩戴的称号显示在顶栏左上角，点击可进称号页更换；动态称号在称号页有专属大图展示，点击大图可直接佩戴；存档保存在本机，换设备会丢失<br></p></div>
+ const m=$("main"),p=S.player;
+ const wIt=S.equip.weapon,nIt=S.equip.necklace;
+ const wName=wIt?ITEMS[wIt.iid].name:"未装备",nName=nIt?ITEMS[nIt.iid].name:"未装备";
+ m.innerHTML=`<div class="card"><h3>角色属性</h3>
+ <div class="md">攻击${p.atk} 防御${p.def} 气血${p.maxhp} 内力${p.maxmp} 速度${p.spd} 幸运${p.luck}</div>
+ <div class="md dim">幸运来源：武器「${wName}」+${p.luckW||0}（最高7）/ 项链「${nName}」+${p.luckN||0}（最高2），其他途径不加幸运</div>
+ ${p.setDesc?`<div class="md gold">${p.setDesc}</div>`:""}
+ <div class="md dim">${PROFS[p.prof].name} · ${p.level}级 · ${(DOUQI[S.douqi||0]||{}).name||""} · VIP${vipLevel()}</div></div>`
+ +`<div class="card"><h3>玩法说明</h3><p class="dim">
+ · 建号三选一：战士（攻击+10%）/ 法师（内力上限+30%）/ 射手（速度+15%）；建号自动生成玩家账号（JH+6位数字），充值兑换要用；建号即得本职业2个入门技能<br>· 去「江湖」挑战敌人，战斗点「攻击」自动施展本职业最强技能（内力不够则普通攻击），升级变强；野怪打到30%血以下可捕捉为宠物；修为按关卡难度递增——青竹林1倍、黑风寨2倍、幽冥谷3.5倍、华山之巅6倍、熔岩炼狱10倍、极北冰原16倍、云梦仙泽26倍、九幽魔域40倍，关卡BOSS再享2.5倍；升级所需修为递增（1→2级需2000，越往后越多）<br>· 技能三职业完全隔离，「技能」页只能学本职业的：战士（罗汉拳/打狗棒法/焰分噬浪尺/帝印诀）、法师（绵掌/弄炎诀/五轮离火法/佛怒火莲）、射手（峨眉刺/三千雷动/风之极·陨杀/大天造化掌）<br>· 12个装备栏：武器/帽子/护甲/裤子/护腕×2/戒指×2/项链/勋章/鞋子/腰带；武器分职业，BOSS掉落本关职业武器（优先掉没有的）；武器共7阶（1黄2玄3地4天5神6圣7至尊），带随机属性，洗炼石可重置；幸运只来自武器（最高7）与项链（最高2），其他途径不加幸运；铁匠铺可强化；防具有套装效果——圣龙/冰火/九幽/轩辕套：3件攻击+5%，6件攻击+10%/气血+10%，9件攻击+15%/气血+15%/防御+10%<br>· 背包「神兵合成」：集齐本关战士/法师/射手三职业武器+铜币→本关终极武器（8关：青竹圣剑/黑风魔刃/幽冥鬼剑/华山紫青剑/熔岩圣剑/冰原帝戟/云梦仙剑/九幽帝刃）；集齐前四把+300万铜币→轩辕神剑（6阶圣）；集齐后四把+800万铜币→鸿蒙神剑（7阶至尊，无职业限制）；轩辕神剑×3+1000万铜币→至尊终极武器（7阶至尊·全游戏最高阶：战士斩尤帝剑/法师灭尤帝杖/射手断尤帝弓）；轩辕战甲×3+1000万铜币→至尊终极防具（7阶至尊：战士斩尤帝甲/法师灭尤帝袍/射手断尤帝衣）；同部位四件1-4阶BOSS防具+200万铜币→轩辕防具；同部位三件5-7阶BOSS防具+800万铜币→鸿蒙防具（7阶至尊）<br>· 宠物均为斗罗大陆魂兽，分黄/玄/地/天/神/圣/至尊七级，每级又分低/中/高/终极四档，10级可出战助战；3只同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用）；神级以上需进化石：神级1999/圣级19999/至尊29999元宝，商城有售，世界BOSS也掉落（至尊石概率极低）<br>· 宠物技能（斗罗大陆魂兽技）与伙伴技能（斗破苍穹斗技）：每只/每位初始拥有3个，最高神级，按品级加攻击（黄+3%/玄+5%/地+8%/天+12%/神+18%，可叠加）；出战时有概率施展技能造成额外伤害；宠物/伙伴页点「技能」可花铜币更换领悟（随机同品级及以下新技能，最高神级）；圣级/至尊级技能后续通过限时活动获取<br>· 伙伴均为斗破苍穹人物，5级可出战，出战将其30%属性加给你，只能穿戴武器和护甲，战斗胜利得修为升级；「宠物」页铜币/元宝招募；神级终极：VIP8免费领/「神将降临」（￥1288）/千金募名将；圣级：千金募名将极低概率（3%）；3位同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用；神级以上需进化石）；至尊终极（萧炎/薰儿随机其一）：「至尊降临」（￥7999）或圣级合成（30%，需至尊进化石）<br>· 功法分七级四档，习得后花铜币修炼（最高5重）加属性；神级唯VIP6/限时活动「神功现世」；圣级/至尊级唯限时活动可得<br>· 斗气境界即转生：斗之气/斗者/斗师/大斗师/斗灵/斗王/斗皇/斗宗/斗尊/斗圣/斗帝共十一境，每境有等级上限（3/6/10/14/18/24/30/36/44/99/99级），满级后必须去「功法」页花铜币转生突破才能继续升级，突破还加属性<br>· 翅膀20级激活，灵羽升级，每阶攻击+12/气血+120/速度+3<br>· 充值：游戏内无直接充值，右上角「充值」页凭兑换码兑换——把玩家账号告诉客服，客服后台生成你的专属码后在此输入，一码一用；兑换码元宝、VIP6神级功法、首充小红剑（攻击26/幸运7，永久）、首充大礼包（288元宝+2万铜币+体力+灵兽蛋）全部发放至邮箱手动领取<br>· 累计充值升VIP1-12（6/30/98/198/498/998/1998/2998/4998/7998/12998/19998元），每级攻击/气血+2%、每日VIP礼包（发至邮箱）、专属称号；VIP6及以上名字彩色显示<br>· 充值豪礼5档（30/98/198/498/998）：启程礼（元宝/洗炼石/经验丹）、天级终极宠物天青牛蟒·大明、神级宠物三眼金猊·王秋儿/冰天雪女、稀有称号神之眷顾——真实充值与红包共同累积，平民打怪攒红包也能领；奖励发放至邮箱<br>· 累计充值奖励4档（1998/2998/5998/9999，仅真实充值）：元宝+圣级/至尊进化石+限定称号（一代宗师/开宗立派/纵横四海/名扬四海），奖励发放至邮箱；打怪掉充值红包（0.5/1/3/5/10元，每日上限100个），红包计入充值豪礼进度但不计VIP等级与累计充值奖励<br>· 限时活动（仅真实充值，每位玩家自建号起3天内有效，过期不可再领）：神功现世（￥498神级大日焚天诀）、神将降临（￥1288神话伙伴）、圣宠降临（￥2998圣级光明圣龙）、圣功现世（￥3999圣级圣心诀）、圣凰降临（￥5999圣级光明凤凰）、至尊降临（￥7999至尊萧炎/薰儿）、鸿蒙降临（￥9999金眼黑龙王·帝天/银龙王·古月娜+鸿蒙至尊诀）<br>· 世界BOSS（活动中心，每日可挑战）：血量999999999，打不死，纯粹比拼伤害，单场30回合封顶；挑战按钮旁「伤害榜」查看今日所有玩家伤害排名；每日24点按排名自动发放至邮箱（手动领取）——冠军200元宝+圣级进化石+灵羽×30+百万铜币+洗炼石×10，第2-3名100元宝+神级进化石+灵羽×20+五十万铜币+洗炼石×5，第4-10名50元宝+灵羽×10+二十万铜币+洗炼石×3，参与奖灵羽×5+五万铜币+洗炼石×1<br>· 竞技场每日5次，挑战更高排名对手，胜则排名上升，前三每日领奖（发至邮箱）；江湖任务：击败10个敌人，奖300铜币+1200修为（发至邮箱）<br>· 商店=江湖药铺（铜币）+元宝商城（元宝）+元宝兑换铜币（10元宝→10万/50→55万/100→120万）；经验丹双倍25/三倍45/五倍80元宝，背包使用后30分钟打怪修为加倍<br>· 聊天只有世界频道，5秒发一条，NPC会自动互动；排行榜有战力/充值/宠物/翅膀/等级5榜，前三名得荣誉称号（可佩戴加成）；点击排行/聊天/竞技场中的名字可看档案对比；竞技榜第一、世界BOSS伤害榜第一、等级榜第一、充值榜第一都会世界通报<br>· 邮箱（右上角）：所有奖励统一发放至邮箱手动领取——充值/兑换码/充值豪礼/累计充值奖励/VIP每日礼包/限时活动/竞技场每日奖励/江湖任务/交易行购买与寄售成交/玩家交易码/世界BOSS每日24点排名奖励；最多保留30封<br>· 交易行（底部导航「交易」）：寄售装备/进化石/宠物卖给土豪NPC（每次进入结算，定价合理卖得快，成交收5%税，成交款发至邮箱）；购买区每日刷新他人寄售（购买所得发至邮箱）；玩家交易码可跨设备与真实玩家交易（兑换所得发至邮箱）<br>· 称号分VIP称号/限定称号/排行称号共57个，均可佩戴，属性叠加；其中8个为动态称号（稀有称号神之眷顾、VIP12武道至尊、5榜第一：武林神话/战力之巅/神豪无双/灵兽之主/九天神皇/登峰造极）——完整场景底图+左右双神兽独立游动+光效粒子，背景文字静止；其余49个为静态称号牌（VIP金框/榜二银框/榜三铜框/节日红粉蓝紫四框+文字）；佩戴的称号显示在顶栏左上角，点击可进称号页更换；动态称号在称号页有专属大图展示，点击大图可直接佩戴；存档保存在本机，换设备会丢失<br></p></div>
  <div class="card"><h3>存档</h3>
  <button class="btn small" id="resave">手动保存</button>
  <button class="btn small danger" id="reset">删号重来（清空存档）</button></div>`;
