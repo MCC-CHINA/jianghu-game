@@ -181,12 +181,12 @@ const ITEMS={ // iid: {name,slot,atk,def,hp,spd,luck,tier}
  w9:{name:"骨玉权杖",slot:"weapon",atk:40,spd:4,tier:4,cls:"法师"},w10:{name:"龙纹剑",slot:"weapon",atk:48,tier:4,cls:"战士"},
  w11:{name:"嗜魂法杖",slot:"weapon",atk:54,luck:3,tier:5,cls:"法师"},w12:{name:"屠龙刀",slot:"weapon",atk:68,luck:5,tier:5,cls:"战士"},
  w13:{name:"轩辕神剑",slot:"weapon",atk:95,luck:6,spd:6,tier:6,gift:1}, // 终极武器：神兵合成获得
- w26:{name:"斩尤帝剑",slot:"weapon",atk:135,luck:7,spd:6,tier:7,gift:1,cls:"战士"}, // 至尊终极（7阶）：轩辕神剑×3
- w27:{name:"灭尤帝杖",slot:"weapon",atk:130,hp:600,luck:7,spd:6,tier:7,gift:1,cls:"法师"}, // 至尊终极（7阶）：轩辕神剑×3
- w28:{name:"断尤帝弓",slot:"weapon",atk:130,luck:7,spd:10,tier:7,gift:1,cls:"射手"}, // 至尊终极（7阶）：轩辕神剑×3
- za26:{name:"斩尤帝甲",slot:"armor",def:95,hp:2000,tier:7,gift:1,cls:"战士"}, // 至尊终极防具（7阶）：轩辕战甲×3
- za27:{name:"灭尤帝袍",slot:"armor",def:88,hp:2600,tier:7,gift:1,cls:"法师"}, // 至尊终极防具（7阶）：轩辕战甲×3
- za28:{name:"断尤帝衣",slot:"armor",def:88,hp:2000,spd:8,tier:7,gift:1,cls:"射手"}, // 至尊终极防具（7阶）：轩辕战甲×3
+ w26:{name:"斩尤帝剑",slot:"weapon",atk:135,luck:7,spd:6,tier:7,gift:1,cls:"战士"}, // 至尊终极（7阶）：轩辕神剑×3+1000万铜币
+ w27:{name:"灭尤帝杖",slot:"weapon",atk:130,hp:600,luck:7,spd:6,tier:7,gift:1,cls:"法师"}, // 至尊终极（7阶）：轩辕神剑×3+1000万铜币
+ w28:{name:"断尤帝弓",slot:"weapon",atk:130,luck:7,spd:10,tier:7,gift:1,cls:"射手"}, // 至尊终极（7阶）：轩辕神剑×3+1000万铜币
+ za26:{name:"斩尤帝甲",slot:"armor",def:95,hp:2000,tier:7,gift:1,cls:"战士"}, // 至尊终极防具（7阶）：轩辕战甲×3+1000万铜币
+ za27:{name:"灭尤帝袍",slot:"armor",def:88,hp:2600,tier:7,gift:1,cls:"法师"}, // 至尊终极防具（7阶）：轩辕战甲×3+1000万铜币
+ za28:{name:"断尤帝衣",slot:"armor",def:88,hp:2000,spd:8,tier:7,gift:1,cls:"射手"}, // 至尊终极防具（7阶）：轩辕战甲×3+1000万铜币
  w14:{name:"桃木法杖",slot:"weapon",atk:8,tier:1,cls:"法师"},w15:{name:"猎风短弓",slot:"weapon",atk:8,tier:1,cls:"射手"},
  w16:{name:"烈焰法杖",slot:"weapon",atk:16,tier:2,cls:"法师"},w17:{name:"追风长弓",slot:"weapon",atk:16,tier:2,cls:"射手"},
  w18:{name:"玄冰法杖",slot:"weapon",atk:26,tier:3,cls:"法师"},w19:{name:"落月神弓",slot:"weapon",atk:26,tier:3,cls:"射手"},
@@ -246,8 +246,9 @@ const ZONE_ULT={1:"w22",2:"w23",3:"w24",4:"w25"}; // 每关终极武器
 const ZONE_ULT_COST={1:500000,2:1000000,3:2000000,4:4000000};
 const XUANYUAN_NEED=["w22","w23","w24","w25"]; // 轩辕神剑：四把关卡终极武器
 const SYNTH_COST=3000000;
-const ZHIZUN_WPN=[["w26","斩尤帝剑","战士"],["w27","灭尤帝杖","法师"],["w28","断尤帝弓","射手"]]; // 至尊终极武器：轩辕神剑×3
-const ZHIZUN_ARMOR=[["za26","斩尤帝甲","战士"],["za27","灭尤帝袍","法师"],["za28","断尤帝衣","射手"]]; // 至尊终极防具：轩辕战甲×3
+const ZHIZUN_WPN=[["w26","斩尤帝剑","战士"],["w27","灭尤帝杖","法师"],["w28","断尤帝弓","射手"]]; // 至尊终极武器：轩辕神剑×3+1000万铜币
+const ZHIZUN_ARMOR=[["za26","斩尤帝甲","战士"],["za27","灭尤帝袍","法师"],["za28","断尤帝衣","射手"]]; // 至尊终极防具：轩辕战甲×3+1000万铜币
+const ZHIZUN_COST=10000000; // 至尊终极合成铜币
 function zoneClassWeapon(t){ // BOSS掉落：优先掉玩家没有的本关职业武器
  const ids=CLASS_WPN[t]||[];
  const owned=new Set();
@@ -1275,10 +1276,10 @@ function synthModal(){
   return `<div class="tier"><div><div>${tieredName(xname,5)}<span class="dim"> · ${SLOTNAME[slot]} · 终极防具</span></div><div class="m">${mat} · 200万铜币（拥有${S.player.coins}）</div></div><button class="btn small" style="width:auto;margin:0" data-asynth="${idx}">合成</button></div>`;
  }).join("");
  const xjN=S.bag.filter(x=>x.iid==="w13").length;
- const zzrows=ZHIZUN_WPN.map(([xid,xname,xcls])=>`<div class="tier"><div><div>${tieredName(xname,6)}<span class="dim"> · 至尊终极武器[${xcls}]</span></div><div class="m"><span style="color:${xjN>=3?"#7dd87d":"#ff8787"}">轩辕神剑×3（拥有${xjN}）</span><br><span class="dim">7阶至尊 · 全游戏最高阶武器</span></div></div><button class="btn small primary" style="width:auto;margin:0" data-zhizun="${xid}">合成</button></div>`).join("");
+ const zzrows=ZHIZUN_WPN.map(([xid,xname,xcls])=>`<div class="tier"><div><div>${tieredName(xname,6)}<span class="dim"> · 至尊终极武器[${xcls}]</span></div><div class="m"><span style="color:${xjN>=3?"#7dd87d":"#ff8787"}">轩辕神剑×3（拥有${xjN}）</span> · 1000万铜币（拥有${S.player.coins}）<br><span class="dim">7阶至尊 · 全游戏最高阶武器</span></div></div><button class="btn small primary" style="width:auto;margin:0" data-zhizun="${xid}">合成</button></div>`).join("");
  const xaN=S.bag.filter(x=>x.iid==="xa").length;
- const zarows=ZHIZUN_ARMOR.map(([xid,xname,xcls])=>`<div class="tier"><div><div>${tieredName(xname,6)}<span class="dim"> · 至尊终极防具[${xcls}]</span></div><div class="m"><span style="color:${xaN>=3?"#7dd87d":"#ff8787"}">轩辕战甲×3（拥有${xaN}）</span><br><span class="dim">7阶至尊 · 全游戏最高阶防具</span></div></div><button class="btn small primary" style="width:auto;margin:0" data-zhizunarmor="${xid}">合成</button></div>`).join("");
- modal(`<h3>神兵合成</h3><p class="dim">关卡终极武器：集齐本关战士/法师/射手三职业武器 + 铜币 → 本关终极武器。轩辕神剑：集齐四把关卡终极武器 + 300万铜币。至尊终极武器：轩辕神剑×3（战士斩尤帝剑/法师灭尤帝杖/射手断尤帝弓）。至尊终极防具：轩辕战甲×3（战士斩尤帝甲/法师灭尤帝袍/射手断尤帝衣）。防具：集齐同部位四件BOSS防具 + 200万铜币 → 轩辕防具。材料需放在背包中（已装备的请先卸下）。</p>${zrows}<div class="tier"><div><div>${tieredName("轩辕神剑",5)}<span class="dim"> · 终极武器</span></div><div class="m">${xmat} · 300万铜币（拥有${S.player.coins}）</div></div><button class="btn small primary" style="width:auto;margin:0" id="dosynth">合成</button></div><h3 style="margin-top:8px">至尊终极武器</h3>${zzrows}<h3 style="margin-top:8px">至尊终极防具</h3>${zarows}<h3 style="margin-top:8px">防具合成</h3>${arows}<div class="rowbtns"><button class="btn" onclick="closeModal()">关闭</button></div>`);
+ const zarows=ZHIZUN_ARMOR.map(([xid,xname,xcls])=>`<div class="tier"><div><div>${tieredName(xname,6)}<span class="dim"> · 至尊终极防具[${xcls}]</span></div><div class="m"><span style="color:${xaN>=3?"#7dd87d":"#ff8787"}">轩辕战甲×3（拥有${xaN}）</span> · 1000万铜币（拥有${S.player.coins}）<br><span class="dim">7阶至尊 · 全游戏最高阶防具</span></div></div><button class="btn small primary" style="width:auto;margin:0" data-zhizunarmor="${xid}">合成</button></div>`).join("");
+ modal(`<h3>神兵合成</h3><p class="dim">关卡终极武器：集齐本关战士/法师/射手三职业武器 + 铜币 → 本关终极武器。轩辕神剑：集齐四把关卡终极武器 + 300万铜币。至尊终极武器：轩辕神剑×3 + 1000万铜币（战士斩尤帝剑/法师灭尤帝杖/射手断尤帝弓）。至尊终极防具：轩辕战甲×3 + 1000万铜币（战士斩尤帝甲/法师灭尤帝袍/射手断尤帝衣）。防具：集齐同部位四件BOSS防具 + 200万铜币 → 轩辕防具。材料需放在背包中（已装备的请先卸下）。</p>${zrows}<div class="tier"><div><div>${tieredName("轩辕神剑",5)}<span class="dim"> · 终极武器</span></div><div class="m">${xmat} · 300万铜币（拥有${S.player.coins}）</div></div><button class="btn small primary" style="width:auto;margin:0" id="dosynth">合成</button></div><h3 style="margin-top:8px">至尊终极武器</h3>${zzrows}<h3 style="margin-top:8px">至尊终极防具</h3>${zarows}<h3 style="margin-top:8px">防具合成</h3>${arows}<div class="rowbtns"><button class="btn" onclick="closeModal()">关闭</button></div>`);
  $("modalbox").querySelectorAll("[data-asynth]").forEach(b=>b.onclick=()=>{
   const[slot,xid,xname]=ARMOR_SYNTH[+b.dataset.asynth];
   const needs=[1,2,3,4].map(t=>{const iid=topItemOfSlot(t,slot);return[iid,ITEMS[iid].name];});
@@ -1296,14 +1297,18 @@ function synthModal(){
  $("modalbox").querySelectorAll("[data-zhizun]").forEach(b=>b.onclick=()=>{
   const xid=b.dataset.zhizun,xname=ITEMS[xid].name;
   if(S.bag.filter(x=>x.iid==="w13").length<3){toast("轩辕神剑不足3把，先去合成更多轩辕神剑！");return;}
+  if(S.player.coins<ZHIZUN_COST){toast("铜币不足1000万");return;}
   for(let i=0;i<3;i++)S.bag.splice(S.bag.findIndex(x=>x.iid==="w13"),1);
+  S.player.coins-=ZHIZUN_COST;
   S.bag.push(mkWeapon(xid));
   save();closeModal();render();toast(`合成成功！获得至尊终极武器${tieredName(xname,6)}！`);
  });
  $("modalbox").querySelectorAll("[data-zhizunarmor]").forEach(b=>b.onclick=()=>{
   const xid=b.dataset.zhizunarmor,xname=ITEMS[xid].name;
   if(S.bag.filter(x=>x.iid==="xa").length<3){toast("轩辕战甲不足3件，先去合成更多轩辕战甲！");return;}
+  if(S.player.coins<ZHIZUN_COST){toast("铜币不足1000万");return;}
   for(let i=0;i<3;i++)S.bag.splice(S.bag.findIndex(x=>x.iid==="xa"),1);
+  S.player.coins-=ZHIZUN_COST;
   S.bag.push({iid:xid,enh:0});
   save();closeModal();render();toast(`合成成功！获得至尊终极防具${tieredName(xname,6)}！`);
  });
@@ -2442,7 +2447,7 @@ function rEvent(){
 function rMore(){
  const m=$("main");
  m.innerHTML=`<div class="card"><h3>玩法说明</h3><p class="dim">
- · 建号三选一：战士（攻击+10%）/ 法师（内力上限+30%）/ 射手（速度+15%）；建号自动生成玩家账号（JH+6位数字），充值兑换要用；建号即得本职业2个入门技能<br>· 去「江湖」挑战敌人，战斗点「攻击」自动施展本职业最强技能（内力不够则普通攻击），升级变强；野怪打到30%血以下可捕捉为宠物；修为按关卡难度递增——青竹林1倍、黑风寨2倍、幽冥谷3.5倍、华山之巅6倍，关卡BOSS再享2.5倍；升级所需修为递增（1→2级需2000，越往后越多）<br>· 技能三职业完全隔离，「技能」页只能学本职业的：战士（罗汉拳/打狗棒法/焰分噬浪尺/帝印诀）、法师（绵掌/弄炎诀/五轮离火法/佛怒火莲）、射手（峨眉刺/三千雷动/风之极·陨杀/大天造化掌）<br>· 12个装备栏：武器/帽子/护甲/裤子/护腕×2/戒指×2/项链/勋章/鞋子/饰品；武器分职业，BOSS掉落本关职业武器（优先掉没有的）；武器共7阶（1黄2玄3地4天5神6圣7至尊），带随机属性，洗炼石可重置，幸运上限9，铁匠铺可强化<br>· 背包「神兵合成」：集齐本关战士/法师/射手三职业武器+铜币→本关终极武器；集齐四把+300万铜币→轩辕神剑（6阶圣）；轩辕神剑×3→至尊终极武器（7阶至尊·全游戏最高阶：战士斩尤帝剑/法师灭尤帝杖/射手断尤帝弓）；轩辕战甲×3→至尊终极防具（7阶至尊：战士斩尤帝甲/法师灭尤帝袍/射手断尤帝衣）；同部位四件BOSS防具+200万铜币→轩辕防具<br>· 宠物均为斗罗大陆魂兽，分黄/玄/地/天/神/圣/至尊七级，每级又分低/中/高/终极四档，10级可出战助战；3只同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用）；神级以上需进化石：神级1999/圣级19999/至尊29999元宝，商城有售，世界BOSS也掉落（至尊石概率极低）<br>· 宠物技能（斗罗大陆魂兽技）与伙伴技能（斗破苍穹斗技）：每只/每位初始拥有3个，最高神级，按品级加攻击（黄+3%/玄+5%/地+8%/天+12%/神+18%，可叠加）；出战时有概率施展技能造成额外伤害；宠物/伙伴页点「技能」可花铜币更换领悟（随机同品级及以下新技能，最高神级）；圣级/至尊级技能后续通过限时活动获取<br>· 伙伴均为斗破苍穹人物，5级可出战，出战将其30%属性加给你，只能穿戴武器和护甲，战斗胜利得修为升级；「宠物」页铜币/元宝招募；神级终极：VIP8免费领/「神将降临」（￥1288）/千金募名将；圣级：千金募名将极低概率（3%）；3位同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用；神级以上需进化石）；至尊终极（萧炎/薰儿随机其一）：「至尊降临」（￥7999）或圣级合成（30%，需至尊进化石）<br>· 功法分七级四档，习得后花铜币修炼（最高5重）加属性；神级唯VIP6/限时活动「神功现世」；圣级/至尊级唯限时活动可得<br>· 斗气境界即转生：斗之气/斗者/斗师/大斗师/斗灵/斗王/斗皇/斗宗/斗尊/斗圣/斗帝共十一境，每境有等级上限（3/6/10/14/18/24/30/36/44/99/99级），满级后必须去「功法」页花铜币转生突破才能继续升级，突破还加属性<br>· 翅膀20级激活，灵羽升级，每阶攻击+12/气血+120/速度+3<br>· 充值：游戏内无直接充值，右上角「充值」页凭兑换码兑换——把玩家账号告诉客服，客服后台生成你的专属码后在此输入，一码一用；首充自动赠小红剑（攻击26/幸运9，永久）+首充礼包（288元宝+2万铜币+体力+灵兽蛋）<br>· 累计充值升VIP1-12（6/30/98/198/498/998/1998/2998/4998/7998/12998/19998元），每级攻击/气血+2%、每日VIP礼包、专属称号；VIP6及以上名字彩色显示<br>· 充值豪礼5档（30/98/198/498/998）：启程礼（元宝/洗炼石/经验丹）、天级终极宠物天青牛蟒·大明、神级宠物三眼金猊·王秋儿/冰天雪女、稀有称号神之眷顾——真实充值与红包共同累积，平民打怪攒红包也能领<br>· 累计充值奖励4档（1998/2998/5998/9999，仅真实充值）：元宝+圣级/至尊进化石+限定称号（一代宗师/开宗立派/纵横四海/名扬四海）；打怪掉充值红包（0.5/1/3/5/10元，每日上限100个），红包计入充值豪礼进度但不计VIP等级与累计充值奖励<br>· 限时活动（仅真实充值，每位玩家自建号起3天内有效，过期不可再领）：神功现世（￥498神级大日焚天诀）、神将降临（￥1288神话伙伴）、圣宠降临（￥2998圣级光明圣龙）、圣功现世（￥3999圣级圣心诀）、圣凰降临（￥5999圣级光明凤凰）、至尊降临（￥7999至尊萧炎/薰儿）、鸿蒙降临（￥9999金眼黑龙王·帝天/银龙王·古月娜+鸿蒙至尊诀）<br>· 世界BOSS（活动中心，每日可挑战）：按你造成的伤害比例发奖——击杀/重创（60%）/激战（30%）/参与四档；掉落功法秘籍/异火/灵羽/进化石，神级石（击杀50%/重创30%/激战15%/参与5%）、圣级石（8%/3%/1%）、至尊石（2%/0.8%/0.3%）<br>· 竞技场每日5次，挑战更高排名对手，胜则排名上升，前三每日领奖；江湖任务：击败10个敌人，奖300铜币+1200修为<br>· 商店=江湖药铺（铜币）+元宝商城（元宝）+元宝兑换铜币（10元宝→10万/50→55万/100→120万）；经验丹双倍25/三倍45/五倍80元宝，背包使用后30分钟打怪修为加倍<br>· 聊天只有世界频道，5秒发一条，NPC会自动互动；排行榜有战力/充值/宠物/翅膀/等级5榜，前三名得荣誉称号（可佩戴加成）；点击排行/聊天/竞技场中的名字可看档案对比<br>· 交易行（底部导航「交易」）：寄售装备/进化石/宠物卖给土豪NPC（每次进入结算，定价合理卖得快，成交收5%税）；购买区每日刷新他人寄售；玩家交易码可跨设备与真实玩家交易<br>· 称号分VIP称号/限定称号/排行称号，均可佩戴，属性叠加；存档保存在本机，换设备会丢失<br></p></div>
+ · 建号三选一：战士（攻击+10%）/ 法师（内力上限+30%）/ 射手（速度+15%）；建号自动生成玩家账号（JH+6位数字），充值兑换要用；建号即得本职业2个入门技能<br>· 去「江湖」挑战敌人，战斗点「攻击」自动施展本职业最强技能（内力不够则普通攻击），升级变强；野怪打到30%血以下可捕捉为宠物；修为按关卡难度递增——青竹林1倍、黑风寨2倍、幽冥谷3.5倍、华山之巅6倍，关卡BOSS再享2.5倍；升级所需修为递增（1→2级需2000，越往后越多）<br>· 技能三职业完全隔离，「技能」页只能学本职业的：战士（罗汉拳/打狗棒法/焰分噬浪尺/帝印诀）、法师（绵掌/弄炎诀/五轮离火法/佛怒火莲）、射手（峨眉刺/三千雷动/风之极·陨杀/大天造化掌）<br>· 12个装备栏：武器/帽子/护甲/裤子/护腕×2/戒指×2/项链/勋章/鞋子/饰品；武器分职业，BOSS掉落本关职业武器（优先掉没有的）；武器共7阶（1黄2玄3地4天5神6圣7至尊），带随机属性，洗炼石可重置，幸运上限9，铁匠铺可强化<br>· 背包「神兵合成」：集齐本关战士/法师/射手三职业武器+铜币→本关终极武器；集齐四把+300万铜币→轩辕神剑（6阶圣）；轩辕神剑×3+1000万铜币→至尊终极武器（7阶至尊·全游戏最高阶：战士斩尤帝剑/法师灭尤帝杖/射手断尤帝弓）；轩辕战甲×3+1000万铜币→至尊终极防具（7阶至尊：战士斩尤帝甲/法师灭尤帝袍/射手断尤帝衣）；同部位四件BOSS防具+200万铜币→轩辕防具<br>· 宠物均为斗罗大陆魂兽，分黄/玄/地/天/神/圣/至尊七级，每级又分低/中/高/终极四档，10级可出战助战；3只同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用）；神级以上需进化石：神级1999/圣级19999/至尊29999元宝，商城有售，世界BOSS也掉落（至尊石概率极低）<br>· 宠物技能（斗罗大陆魂兽技）与伙伴技能（斗破苍穹斗技）：每只/每位初始拥有3个，最高神级，按品级加攻击（黄+3%/玄+5%/地+8%/天+12%/神+18%，可叠加）；出战时有概率施展技能造成额外伤害；宠物/伙伴页点「技能」可花铜币更换领悟（随机同品级及以下新技能，最高神级）；圣级/至尊级技能后续通过限时活动获取<br>· 伙伴均为斗破苍穹人物，5级可出战，出战将其30%属性加给你，只能穿戴武器和护甲，战斗胜利得修为升级；「宠物」页铜币/元宝招募；神级终极：VIP8免费领/「神将降临」（￥1288）/千金募名将；圣级：千金募名将极低概率（3%）；3位同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用；神级以上需进化石）；至尊终极（萧炎/薰儿随机其一）：「至尊降临」（￥7999）或圣级合成（30%，需至尊进化石）<br>· 功法分七级四档，习得后花铜币修炼（最高5重）加属性；神级唯VIP6/限时活动「神功现世」；圣级/至尊级唯限时活动可得<br>· 斗气境界即转生：斗之气/斗者/斗师/大斗师/斗灵/斗王/斗皇/斗宗/斗尊/斗圣/斗帝共十一境，每境有等级上限（3/6/10/14/18/24/30/36/44/99/99级），满级后必须去「功法」页花铜币转生突破才能继续升级，突破还加属性<br>· 翅膀20级激活，灵羽升级，每阶攻击+12/气血+120/速度+3<br>· 充值：游戏内无直接充值，右上角「充值」页凭兑换码兑换——把玩家账号告诉客服，客服后台生成你的专属码后在此输入，一码一用；首充自动赠小红剑（攻击26/幸运9，永久）+首充礼包（288元宝+2万铜币+体力+灵兽蛋）<br>· 累计充值升VIP1-12（6/30/98/198/498/998/1998/2998/4998/7998/12998/19998元），每级攻击/气血+2%、每日VIP礼包、专属称号；VIP6及以上名字彩色显示<br>· 充值豪礼5档（30/98/198/498/998）：启程礼（元宝/洗炼石/经验丹）、天级终极宠物天青牛蟒·大明、神级宠物三眼金猊·王秋儿/冰天雪女、稀有称号神之眷顾——真实充值与红包共同累积，平民打怪攒红包也能领<br>· 累计充值奖励4档（1998/2998/5998/9999，仅真实充值）：元宝+圣级/至尊进化石+限定称号（一代宗师/开宗立派/纵横四海/名扬四海）；打怪掉充值红包（0.5/1/3/5/10元，每日上限100个），红包计入充值豪礼进度但不计VIP等级与累计充值奖励<br>· 限时活动（仅真实充值，每位玩家自建号起3天内有效，过期不可再领）：神功现世（￥498神级大日焚天诀）、神将降临（￥1288神话伙伴）、圣宠降临（￥2998圣级光明圣龙）、圣功现世（￥3999圣级圣心诀）、圣凰降临（￥5999圣级光明凤凰）、至尊降临（￥7999至尊萧炎/薰儿）、鸿蒙降临（￥9999金眼黑龙王·帝天/银龙王·古月娜+鸿蒙至尊诀）<br>· 世界BOSS（活动中心，每日可挑战）：按你造成的伤害比例发奖——击杀/重创（60%）/激战（30%）/参与四档；掉落功法秘籍/异火/灵羽/进化石，神级石（击杀50%/重创30%/激战15%/参与5%）、圣级石（8%/3%/1%）、至尊石（2%/0.8%/0.3%）<br>· 竞技场每日5次，挑战更高排名对手，胜则排名上升，前三每日领奖；江湖任务：击败10个敌人，奖300铜币+1200修为<br>· 商店=江湖药铺（铜币）+元宝商城（元宝）+元宝兑换铜币（10元宝→10万/50→55万/100→120万）；经验丹双倍25/三倍45/五倍80元宝，背包使用后30分钟打怪修为加倍<br>· 聊天只有世界频道，5秒发一条，NPC会自动互动；排行榜有战力/充值/宠物/翅膀/等级5榜，前三名得荣誉称号（可佩戴加成）；点击排行/聊天/竞技场中的名字可看档案对比<br>· 交易行（底部导航「交易」）：寄售装备/进化石/宠物卖给土豪NPC（每次进入结算，定价合理卖得快，成交收5%税）；购买区每日刷新他人寄售；玩家交易码可跨设备与真实玩家交易<br>· 称号分VIP称号/限定称号/排行称号，均可佩戴，属性叠加；存档保存在本机，换设备会丢失<br></p></div>
  <div class="card"><h3>存档</h3>
  <button class="btn small" id="resave">手动保存</button>
  <button class="btn small danger" id="reset">删号重来（清空存档）</button></div>`;
