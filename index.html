@@ -887,7 +887,7 @@ function newGame(name,profKey){
  base:{maxhp:115,maxmp:55,atk:14,def:9,spd:9}},
  equip:{weapon:null,armor:null,boots:null,charm:null},bag:[],pets:[],activePet:-1,wing:{tier:0},
  partners:[],activePartner:-1,arena:{rank:1000,date:"",left:5,reward:"",top:ARENA_TOP.map((n,i)=>({name:n,rank:i+1}))},
- orders:[],zone:0,created:nowStr(),createdAt:Date.now(),wornTitle:null,expBuff:null,gongfa:{},gongfaLearned:{},claimedGifts:{},douqi:0,yihuo:[],fenjue:{lv:0},eventTitles:[],chat:{world:[{sys:1,txt:"欢迎来到江湖世界，谨言慎行，行侠仗义！",t:Date.now()}],sect:[],ch:"world",cd:0}};
+ orders:[],zone:0,created:nowStr(),createdAt:Date.now(),marketMine:[],marketNpc:[],marketDate:"",marketLog:[],usedTradeCodes:[],wornTitle:null,expBuff:null,gongfa:{},gongfaLearned:{},claimedGifts:{},douqi:0,yihuo:[],fenjue:{lv:0},eventTitles:[],chat:{world:[{sys:1,txt:"欢迎来到江湖世界，谨言慎行，行侠仗义！",t:Date.now()}],sect:[],ch:"world",cd:0}};
  calcStats();S.player.hp=S.player.maxhp;S.player.mp=S.player.maxmp;save();
 }
 /* ============ 顶栏/导航 ============ */
@@ -909,14 +909,14 @@ function renderTop(){
  $("topPay").onclick=()=>{TAB="pay";B=null;render();window.scrollTo(0,0);};
  const tv=$("topVip");if(tv)tv.onclick=()=>{TAB="vipinfo";B=null;render();window.scrollTo(0,0);};
 }
-const TABS=[["home","江湖"],["bag","背包"],["pet","宠物"],["wing","翅膀"],["partner","伙伴"],["task","任务"],["gongfa","功法"],["skill","技能"],["shop","商店"],["rank","排行"],["title","称号"],["arena","竞技"],["chat","聊天"],["event","活动"],["more","更多"]];
+const TABS=[["home","江湖"],["bag","背包"],["pet","宠物"],["wing","翅膀"],["partner","伙伴"],["task","任务"],["gongfa","功法"],["skill","技能"],["shop","商店"],["market","交易"],["rank","排行"],["title","称号"],["arena","竞技"],["chat","聊天"],["event","活动"],["more","更多"]];
 function renderTabs(){
  const t=$("tabbar");t.style.display="flex";
  t.innerHTML=TABS.map(([k,n])=>`<button class="${TAB===k?'on':''}" data-t="${k}">${n}</button>`).join("");
  t.querySelectorAll("button").forEach(b=>b.onclick=()=>{TAB=b.dataset.t;B=null;render();});
 }
 function render(){if(S&&S.player&&sweepExpired())setTimeout(()=>toast(" 小红剑已到期，已自动卸下"),50);renderTop();renderTabs();
- ({home:rHome,bag:rBag,pet:rPet,task:rTask,gongfa:rGongfa,skill:rSkill,shop:rShop,pay:rPay,rank:rRank,title:rTitle,arena:rArena,chat:rChat,wing:rWing,partner:rPartner,event:rEvent,more:rMore,vipinfo:rVip}[TAB])();}
+ ({home:rHome,bag:rBag,pet:rPet,task:rTask,gongfa:rGongfa,skill:rSkill,shop:rShop,pay:rPay,rank:rRank,title:rTitle,arena:rArena,chat:rChat,wing:rWing,partner:rPartner,event:rEvent,more:rMore,vipinfo:rVip,market:rMarket}[TAB])();}
 /* ============ 创建角色 ============ */
 function rCreate(){
  $("topbar").style.display="none";$("tabbar").style.display="none";
@@ -1962,6 +1962,244 @@ function rChat(){
  $("chatSend").onclick=sendChat;
  $("chatIn").onkeydown=e=>{if(e.key==="Enter")sendChat();};
 }
+/* ============ 交易行 ============ */
+const WHALES=["神豪·叶天帝","氪金战神","富可敌国·沈万三","一刀999","仙界首富·王多鱼","氪佬·萧火火","神壕·龙傲天","低调土豪·马腾云","挥金如土·赵公子","土豪·大力哥"];
+const TRADE_MATS={evostone:{name:"神级进化石",tier:4},evo_saint:{name:"圣级进化石",tier:5},evo_zun:{name:"至尊进化石",tier:6},xilian:{name:"洗炼石",tier:2}};
+function stripHtml(s){return String(s==null?"":s).replace(/<[^>]*>/g,"");}
+function fmtPrice(n,cur){if(cur==="gold")return n+"元宝";if(n>=10000){const w=n/10000;return (Number.isInteger(w)?w:w.toFixed(1))+"万铜币";}return n+"铜币";}
+function tierOfListing(L){
+ if(L.kind==="eq")return ITEMS[L.ref.iid].tier;
+ if(L.kind==="pet")return PETS[L.ref.pid].tier;
+ return (TRADE_MATS[L.ref.use]||{tier:2}).tier;
+}
+function listingName(L){
+ if(L.kind==="pet"){const d=PETS[L.ref.pid];return tieredName(L.ref.name,d.tier)+` <span class="dim">Lv.${L.ref.level}</span>`;}
+ if(L.kind==="eq")return itemNameHTML(L.ref)+(L.ref.enh?` <span class="gold">+${L.ref.enh}</span>`:"")+qualityTag(L.ref);
+ const tm=TRADE_MATS[L.ref.use];
+ return tm&&tm.tier>=4?tieredName(tm.name,tm.tier):(tm?tm.name:(L.ref.name||"物品"));
+}
+function listingDesc(L){
+ if(L.kind==="eq"){const d=ITEMS[L.ref.iid];return `${SLOTNAME[d.slot]} · ${d.tier}阶${d.cls?` [${d.cls}]`:""} · ${[d.atk&&"攻"+d.atk,d.def&&"防"+d.def,d.hp&&"血"+d.hp,d.spd&&"速"+d.spd].filter(Boolean).join(" ")}${L.ref.bonus?` <span class="gold">[${bonusText(L.ref.bonus)}]</span>`:""}`;}
+ if(L.kind==="pet"){const d=PETS[L.ref.pid];return `${PTIERS[d.tier]}${SUBS[d.sub||0]}宠物 · ${d.desc||""}`;}
+ return "稀有材料，合成/洗炼必备";
+}
+function marketRefPrice(L){ // 参考价（铜币）
+ if(L.kind==="mat"){
+  if(L.ref.use==="evostone")return 1999*12000;
+  if(L.ref.use==="evo_saint")return 19999*12000;
+  if(L.ref.use==="evo_zun")return 29999*12000;
+  if(L.ref.use==="xilian")return 38*12000;
+  return 100000;
+ }
+ if(L.kind==="eq"){
+  const t=ITEMS[L.ref.iid].tier;
+  const base=[0,50000,200000,800000,3000000,18000000,96000000,600000000][t]||50000;
+  return Math.round(base*(1+0.1*(L.ref.enh||0)));
+ }
+ const d=PETS[L.ref.pid];
+ const base=[0,100000,500000,2000000,8000000,36000000,240000000,1500000000][d.tier]||100000;
+ return Math.round(base*(1+0.5*(d.sub||0))*(1+(L.ref.level||1)*0.02));
+}
+function marketVisit(){ // 每次进入交易行：土豪NPC前来购买寄售
+ const sold=[];
+ for(const L of [...S.marketMine]){
+  const ref=marketRefPrice(L);
+  const pc=L.cur==="gold"?L.price*12000:L.price;
+  const ratio=pc/Math.max(1,ref);
+  let p;
+  if(ratio>5)p=0;else if(ratio>2)p=0.08;else if(ratio>1.2)p=0.25;else if(ratio>0.8)p=0.45;else p=0.7;
+  if(tierOfListing(L)>=4)p=Math.min(0.93,p+0.15);
+  if(Math.random()<p){
+   const tax=Math.max(1,Math.floor(L.price*0.05)),gain=L.price-tax;
+   if(L.cur==="gold")S.player.gold+=gain;else S.player.coins+=gain;
+   S.marketMine=S.marketMine.filter(x=>x.id!==L.id);
+   const buyer=pick(WHALES),nm=stripHtml(listingName(L));
+   S.marketLog.unshift({txt:`${buyer}买走了你的${nm}，${fmtPrice(L.price,L.cur)}（税${fmtPrice(tax,L.cur)}，实得${fmtPrice(gain,L.cur)}）`,t:Date.now()});
+   if(S.marketLog.length>20)S.marketLog.length=20;
+   pushChat("world",{n:buyer,vip:12,t:Date.now(),txt:`在交易行拿下了${nm}，爽！`});
+   sold.push({buyer,nm,gain,cur:L.cur});
+  }
+ }
+ if(sold.length){calcStats();save();}
+ return sold;
+}
+function refreshNpcMarket(){ // NPC寄售每日刷新
+ const today=nowStr().slice(0,10);
+ if(S.marketDate===today&&S.marketNpc.length)return;
+ S.marketDate=today;const arr=[];let n=0;
+ const nid=()=>"n"+(++n)+"_"+today.replace(/-/g,"");
+ const eqIids=Object.keys(ITEMS).filter(k=>k!=="w0"&&ITEMS[k].tier>=1&&ITEMS[k].tier<=5);
+ for(let i=0;i<5;i++){
+  const iid=pick(eqIids),d=ITEMS[iid];
+  const it=d.slot==="weapon"?mkWeapon(iid):{iid,enh:0};
+  const coins=Math.round(marketRefPrice({kind:"eq",ref:it})*(1.15+Math.random()*0.35));
+  const useGold=coins>24000000;
+  arr.push({id:nid(),seller:pick(WHALES),kind:"eq",ref:it,price:useGold?Math.max(1,Math.round(coins/12000)):coins,cur:useGold?"gold":"coins",ts:Date.now()});
+ }
+ for(let i=0;i<2;i++){
+  const u=pick(["evostone","evo_saint","xilian","evostone","xilian"]),tm=TRADE_MATS[u];
+  const coins=Math.round(marketRefPrice({kind:"mat",ref:{use:u}})*(1.15+Math.random()*0.35));
+  const useGold=u!=="xilian";
+  arr.push({id:nid(),seller:pick(WHALES),kind:"mat",ref:{use:u,name:tm.name,n:1},price:useGold?Math.round(coins/12000):coins,cur:useGold?"gold":"coins",ts:Date.now()});
+ }
+ const pids=Object.keys(PETS).filter(k=>PETS[k].tier>=1&&PETS[k].tier<=3);
+ for(let i=0;i<2;i++){
+  const pid=pick(pids),d=PETS[pid],lv=1+Math.floor(Math.random()*20);
+  const ref={pid,name:d.name,level:lv,exp:0};
+  const coins=Math.round(marketRefPrice({kind:"pet",ref})*(1.15+Math.random()*0.35));
+  arr.push({id:nid(),seller:pick(WHALES),kind:"pet",ref,price:coins,cur:"coins",ts:Date.now()});
+ }
+ S.marketNpc=arr;save();
+}
+function buyNpcListing(id){
+ const L=S.marketNpc.find(x=>x.id===id);if(!L)return;
+ if(L.cur==="gold"&&S.player.gold<L.price){toast("元宝不足");return;}
+ if(L.cur==="coins"&&S.player.coins<L.price){toast("铜币不足");return;}
+ if(L.cur==="gold")S.player.gold-=L.price;else S.player.coins-=L.price;
+ if(L.kind==="pet")S.pets.push(JSON.parse(JSON.stringify(L.ref)));
+ else if(L.kind==="mat"){const st=S.bag.find(x=>x.use===L.ref.use&&(x.n||1)<99);if(st)st.n=(st.n||1)+1;else S.bag.push({use:L.ref.use,name:L.ref.name,n:1});}
+ else S.bag.push(JSON.parse(JSON.stringify(L.ref)));
+ S.marketNpc=S.marketNpc.filter(x=>x.id!==id);
+ S.marketLog.unshift({txt:`你从${L.seller}处购得${stripHtml(listingName(L))}，花费${fmtPrice(L.price,L.cur)}`,t:Date.now()});
+ if(S.marketLog.length>20)S.marketLog.length=20;
+ calcStats();save();render();toast("购买成功！");
+}
+function unlistMarket(id){
+ const L=S.marketMine.find(x=>x.id===id);if(!L)return;
+ if(L.kind==="pet")S.pets.push(L.ref);
+ else if(L.kind==="mat"){const st=S.bag.find(x=>x.use===L.ref.use&&(x.n||1)<99);if(st)st.n=(st.n||1)+1;else S.bag.push({use:L.ref.use,name:L.ref.name,n:1});}
+ else S.bag.push(L.ref);
+ S.marketMine=S.marketMine.filter(x=>x.id!==id);
+ S.marketLog.unshift({txt:`你下架了${stripHtml(listingName(L))}，物品已退回`,t:Date.now()});
+ if(S.marketLog.length>20)S.marketLog.length=20;
+ calcStats();save();render();toast("已下架，物品退回背包");
+}
+let modalRows=[];
+function collectTradables(forCode){
+ const rows=[];
+ S.bag.forEach((it,i)=>{if(!it.use||TRADE_MATS[it.use])rows.push({from:"bag",idx:i,kind:it.use?"mat":"eq",ref:it});});
+ S.pets.forEach((pt,i)=>{if(i!==S.activePet)rows.push({from:"pet",idx:i,kind:"pet",ref:pt});});
+ return rows;
+}
+function openListModal(){
+ const rows=collectTradables();modalRows=rows;
+ let h=`<div class="card"><h3>选择寄售物品</h3><p class="dim">装备、进化石、洗炼石、宠物可寄售（出战中的宠物不行）。上架费500铜币/件，成交收5%税。</p>`;
+ if(!rows.length)h+=`<p class="dim">没有可寄售的物品。</p>`;
+ else h+=rows.map((r,i)=>{
+  const L={kind:r.kind,ref:r.kind==="mat"?{use:r.ref.use,name:r.ref.name}:r.ref};
+  return `<div class="tier"><div><div>${listingName(L)}${r.kind==="mat"&&(r.ref.n||1)>1?` <span class="gold">×${r.ref.n}</span>`:""}</div><div class="m">${listingDesc(L)}<br>参考价约 ${fmtPrice(marketRefPrice(L),"coins")}</div></div><button class="btn small primary" style="width:auto;margin:0" data-lpick="${i}">选择</button></div>`;
+ }).join("");
+ h+=`<button class="btn small" onclick="closeModal()">关闭</button></div>`;
+ modal(h);
+ document.querySelectorAll("[data-lpick]").forEach(b=>b.onclick=()=>selectListTarget(+b.dataset.lpick));
+}
+function removeTradeSource(r){
+ if(r.from==="bag"){
+  const it=S.bag[r.idx];if(!it)return false;
+  if(r.kind==="mat"&&(it.n||1)>1)it.n--;else S.bag.splice(r.idx,1);
+ }else{
+  if(S.activePet===r.idx)return false;
+  S.pets.splice(r.idx,1);
+  if(S.activePet>r.idx)S.activePet--;
+ }
+ return true;
+}
+function selectListTarget(ri){
+ const r=modalRows[ri];if(!r)return;
+ const kind=r.kind;
+ const ref=kind==="mat"?{use:r.ref.use,name:r.ref.name,n:1}:JSON.parse(JSON.stringify(r.ref));
+ const L={kind,ref},refP=marketRefPrice(L);
+ modal(`<div class="card"><h3>寄售</h3><div class="m">${listingName(L)}</div><div class="m">${listingDesc(L)}</div><p class="m">参考价约 <b class="gold">${fmtPrice(refP,"coins")}</b></p><div class="chatinput"><input id="lpPrice" type="number" min="1" placeholder="输入售价"><select id="lpCur"><option value="coins">铜币</option><option value="gold">元宝</option></select><button class="btn small primary" id="lpOk" style="width:auto">确认上架</button></div><p class="dim">定价越接近参考价土豪下单越快；高于5倍参考价无人问津。上架费500铜币，成交收5%税。</p><button class="btn small" onclick="closeModal()">取消</button></div>`);
+ $("lpOk").onclick=()=>{
+  const price=Math.floor(+$("lpPrice").value),cur=$("lpCur").value;
+  if(!(price>0)){toast("请输入有效售价");return;}
+  if(S.player.coins<500){toast("铜币不足支付500上架费");return;}
+  if(!removeTradeSource(r)){toast("该物品已不在背包/宠物栏");closeModal();return;}
+  S.player.coins-=500;
+  S.marketMine.push({id:"m"+Date.now()+Math.floor(Math.random()*9999),kind,ref,price,cur,ts:Date.now()});
+  if(S.marketMine.length>20)S.marketMine=S.marketMine.slice(-20);
+  S.marketLog.unshift({txt:`你上架了${stripHtml(listingName(L))}，售价${fmtPrice(price,cur)}`,t:Date.now()});
+  if(S.marketLog.length>20)S.marketLog.length=20;
+  closeModal();calcStats();save();render();toast("上架成功，等待土豪买家！");
+ };
+}
+function tradeHash(s){let h1=0xdeadbeef^s.length,h2=0x41c6ce57^s.length;const S2="jh-trade-2026";s=S2+s;for(let i=0;i<s.length;i++){const ch=s.charCodeAt(i);h1=Math.imul(h1^ch,2654435761);h2=Math.imul(h2^ch,1597334677);}h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);return((h2>>>0).toString(36)+(h1>>>0).toString(36));}
+function genTradeCode(kind,ref){
+ const raw=JSON.stringify({k:kind,d:ref,ts:Date.now()});
+ const b64=btoa(unescape(encodeURIComponent(raw))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+ return "JY"+b64+tradeHash(b64).slice(0,6).toUpperCase();
+}
+function openCodeModal(){
+ const rows=collectTradables();modalRows=rows;
+ let h=`<div class="card"><h3>选择要交易的物品</h3><p class="dim">生成交易码后物品即从你的背包移除，把码发给对方即可。用过的码不可重复兑换；若交易取消，你自己输入该码可取回物品。</p>`;
+ if(!rows.length)h+=`<p class="dim">没有可交易的物品。</p>`;
+ else h+=rows.map((r,i)=>{
+  const L={kind:r.kind,ref:r.kind==="mat"?{use:r.ref.use,name:r.ref.name}:r.ref};
+  return `<div class="tier"><div><div>${listingName(L)}${r.kind==="mat"&&(r.ref.n||1)>1?` <span class="gold">×${r.ref.n}</span>`:""}</div><div class="m">${listingDesc(L)}</div></div><button class="btn small primary" style="width:auto;margin:0" data-cpick="${i}">生成交易码</button></div>`;
+ }).join("");
+ h+=`<button class="btn small" onclick="closeModal()">关闭</button></div>`;
+ modal(h);
+ document.querySelectorAll("[data-cpick]").forEach(b=>b.onclick=()=>selectCodeTarget(+b.dataset.cpick));
+}
+function selectCodeTarget(ri){
+ const r=modalRows[ri];if(!r)return;
+ const kind=r.kind;
+ const ref=kind==="mat"?{use:r.ref.use,name:r.ref.name}:JSON.parse(JSON.stringify(r.ref));
+ if(!removeTradeSource(r)){toast("该物品已不在背包/宠物栏");closeModal();return;}
+ const code=genTradeCode(kind,ref);
+ S.marketLog.unshift({txt:`你生成了${stripHtml(listingName({kind,ref}))}的交易码`,t:Date.now()});
+ if(S.marketLog.length>20)S.marketLog.length=20;
+ calcStats();save();
+ modal(`<div class="card"><h3>交易码已生成</h3><p class="dim">把这串码发给对方，对方在交易行输入即可领取「${stripHtml(listingName({kind,ref}))}」。物品已从你的背包移除；若交易取消，你自己在此输入该码也可取回物品。</p><p class="gold" style="word-break:break-all;font-size:13px">${code}</p><button class="btn small primary" id="cpCode">复制交易码</button> <button class="btn small" onclick="closeModal()">关闭</button></div>`);
+ $("cpCode").onclick=()=>{try{navigator.clipboard.writeText(code);toast("已复制");}catch(e){toast("复制失败，请手动长按复制");}};
+}
+function redeemTradeCode(){
+ const inp=(($("tcInput")||{}).value||"").trim().replace(/\s+/g,"");
+ if(!inp){toast("请先输入交易码");return;}
+ if((S.usedTradeCodes||[]).includes(inp)){toast("该交易码已使用过");return;}
+ const m=/^JY([A-Za-z0-9\-_]+)([A-Z0-9]{6})$/.exec(inp);
+ if(!m){toast("交易码格式不正确");return;}
+ if(tradeHash(m[1]).slice(0,6).toUpperCase()!==m[2]){toast("交易码无效");return;}
+ let b=m[1].replace(/-/g,"+").replace(/_/g,"/");while(b.length%4)b+="=";
+ let p;try{p=JSON.parse(decodeURIComponent(escape(atob(b))));}catch(e){toast("交易码解析失败");return;}
+ if(!p||!p.k||!p.d){toast("交易码无效");return;}
+ if(p.k==="pet")S.pets.push(p.d);
+ else if(p.k==="mat"){const st=S.bag.find(x=>x.use===p.d.use&&(x.n||1)<99);if(st)st.n=(st.n||1)+1;else S.bag.push({use:p.d.use,name:(TRADE_MATS[p.d.use]||{}).name||p.d.name,n:1});}
+ else if(p.k==="eq")S.bag.push(p.d);
+ else{toast("交易码无效");return;}
+ S.usedTradeCodes.push(inp);
+ const nm=stripHtml(listingName({kind:p.k,ref:p.d}));
+ S.marketLog.unshift({txt:`通过交易码获得${nm}`,t:Date.now()});
+ if(S.marketLog.length>20)S.marketLog.length=20;
+ calcStats();save();render();toast(`兑换成功：${nm}！`);
+}
+function rMarket(){
+ refreshNpcMarket();
+ const sold=marketVisit();
+ const m=$("main"),p=S.player;
+ let h=`<div class="card"><h3>交易行</h3><p class="dim">平民打宝、土豪收货。寄售后土豪NPC会自动前来购买（每次进入交易行结算一次）；购买区每日刷新他人寄售；玩家交易码可跨设备与真实玩家交易。成交收5%税，上架费500铜币/件。</p></div>`;
+ h+=`<div class="card"><h3>购买区·他人寄售 <span class="dim">每日刷新</span></h3>`;
+ if(!S.marketNpc.length)h+=`<p class="dim">今日已被抢购一空，明日再来。</p>`;
+ for(const L of S.marketNpc){
+  h+=`<div class="tier"><div><div>${listingName(L)}<span class="dim"> · 卖家 ${escHtml(L.seller)}</span></div><div class="m">${listingDesc(L)}</div></div><div style="text-align:right"><div class="gold">${fmtPrice(L.price,L.cur)}</div><button class="btn small primary" style="width:auto;margin:4px 0 0" data-buynpc="${L.id}">购买</button></div></div>`;
+ }
+ h+=`</div>`;
+ h+=`<div class="card"><h3>我的寄售</h3>`;
+ if(!S.marketMine.length)h+=`<p class="dim">暂无寄售，把打到的稀有物品上架卖给土豪吧。</p>`;
+ for(const L of S.marketMine){
+  h+=`<div class="tier"><div><div>${listingName(L)}</div><div class="m">售价 <b class="gold">${fmtPrice(L.price,L.cur)}</b></div></div><button class="btn small" style="width:auto;margin:0" data-unlist="${L.id}">下架</button></div>`;
+ }
+ h+=`<button class="btn small primary" id="mkList">上架出售</button></div>`;
+ h+=`<div class="card"><h3>玩家交易码</h3><p class="dim">跨设备与真实玩家交易：生成交易码发给对方，对方在此输入即得物品（生成后物品即从你背包移除，请当面或可信渠道交付）。</p><div class="rowbtns"><button class="btn small" id="mkCode">生成交易码</button></div><div class="chatinput" style="margin-top:8px"><input id="tcInput" placeholder="输入交易码"><button class="btn small primary" id="tcGo" style="width:auto">兑换</button></div></div>`;
+ h+=`<div class="card"><h3>交易记录</h3>${S.marketLog.length?S.marketLog.map(x=>`<div class="m">· ${escHtml(x.txt)}</div>`).join(""):'<p class="dim">暂无记录</p>'}</div>`;
+ m.innerHTML=h;
+ m.querySelectorAll("[data-buynpc]").forEach(b=>b.onclick=()=>buyNpcListing(b.dataset.buynpc));
+ m.querySelectorAll("[data-unlist]").forEach(b=>b.onclick=()=>unlistMarket(b.dataset.unlist));
+ $("mkList").onclick=openListModal;
+ $("mkCode").onclick=openCodeModal;
+ $("tcGo").onclick=redeemTradeCode;
+ if(sold.length)setTimeout(()=>toast(`土豪下单：${sold.map(s=>s.buyer+"买走"+s.nm).join("；")}，${sold.length}件已成交，钱已到账！`),60);
+}
 /* ============ 更多：玩法说明/存档 ============ */
 const EVENT_VALID_DAYS=3; // 限时活动：每位玩家自建号起3天内有效
 function eventDeadline(){return (S.createdAt||Date.now())+EVENT_VALID_DAYS*864e5;}
@@ -2090,7 +2328,7 @@ function rEvent(){
 function rMore(){
  const m=$("main");
  m.innerHTML=`<div class="card"><h3>玩法说明</h3><p class="dim">
- · 建号三选一：战士（攻击+10%）/ 法师（内力上限+30%）/ 射手（速度+15%）；建号自动生成玩家账号（JH+6位数字），充值兑换要用；建号即得本职业2个入门技能<br>· 去「江湖」挑战敌人，战斗点「攻击」自动施展本职业最强技能（内力不够则普通攻击），升级变强；野怪打到30%血以下可捕捉为宠物<br>· 技能三职业完全隔离，「技能」页只能学本职业的：战士（罗汉拳/打狗棒法/焰分噬浪尺/帝印诀）、法师（绵掌/弄炎诀/五轮离火法/佛怒火莲）、射手（峨眉刺/三千雷动/风之极·陨杀/大天造化掌）<br>· 12个装备栏：武器/帽子/护甲/裤子/护腕×2/戒指×2/项链/勋章/鞋子/饰品；武器分职业，BOSS掉落本关职业武器（优先掉没有的）；武器共7阶（1黄2玄3地4天5神6圣7至尊），带随机属性，洗炼石可重置，幸运上限9，铁匠铺可强化<br>· 背包「神兵合成」：集齐本关战士/法师/射手三职业武器+铜币→本关终极武器；集齐四把+300万铜币→轩辕神剑（6阶圣）；轩辕神剑+1000万铜币→至尊终极武器（7阶至尊·全游戏最高阶：战士斩尤帝剑/法师灭尤帝杖/射手断尤帝弓）；同部位四件BOSS防具+200万铜币→轩辕防具<br>· 宠物均为斗罗大陆魂兽，分黄/玄/地/天/神/圣/至尊七级，每级又分低/中/高/终极四档，10级可出战助战；3只同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用）；神级以上需进化石：神级1999/圣级19999/至尊29999元宝，商城有售，世界BOSS也掉落（至尊石概率极低）<br>· 伙伴均为斗破苍穹人物，5级可出战，出战将其30%属性加给你，可穿全部12栏装备，战斗胜利得修为升级；「宠物」页铜币/元宝招募；神级终极：VIP8免费领/「神将降临」（￥1288）/千金募名将；圣级：千金募名将极低概率（3%）；3位同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用；神级以上需进化石）；至尊终极（萧炎/薰儿随机其一）：「至尊降临」（￥7999）或圣级合成（30%，需至尊进化石）<br>· 功法分七级四档，习得后花铜币修炼（最高5重）加属性；神级唯VIP6/限时活动「神功现世」；圣级/至尊级唯限时活动可得<br>· 翅膀20级激活，灵羽升级，每阶攻击+12/气血+120/速度+3<br>· 充值：游戏内无直接充值，右上角「充值」页凭兑换码兑换——把玩家账号告诉客服，客服后台生成你的专属码后在此输入，一码一用；首充自动赠小红剑（攻击26/幸运9，永久）+首充礼包（288元宝+2万铜币+体力+灵兽蛋）<br>· 累计充值升VIP1-12（6/30/98/198/498/998/1998/2998/4998/7998/12998/19998元），每级攻击/气血+2%、每日VIP礼包、专属称号；VIP6及以上名字彩色显示<br>· 充值豪礼5档（30/98/198/498/998）：启程礼（元宝/洗炼石/经验丹）、天级终极宠物天青牛蟒·大明、神级宠物三眼金猊·王秋儿/冰天雪女、稀有称号神之眷顾——真实充值与红包共同累积，平民打怪攒红包也能领<br>· 累计充值奖励4档（1998/2998/5998/9999，仅真实充值）：元宝+圣级/至尊进化石+限定称号（一代宗师/开宗立派/纵横四海/名扬四海）；打怪掉充值红包（0.5/1/3/5/10元，每日上限100个），红包计入充值豪礼进度但不计VIP等级与累计充值奖励<br>· 限时活动（仅真实充值，每位玩家自建号起3天内有效，过期不可再领）：神功现世（￥498神级大日焚天诀）、神将降临（￥1288神话伙伴）、圣宠降临（￥2998圣级光明圣龙）、圣功现世（￥3999圣级圣心诀）、圣凰降临（￥5999圣级光明凤凰）、至尊降临（￥7999至尊萧炎/薰儿）、鸿蒙降临（￥9999金眼黑龙王·帝天/银龙王·古月娜+鸿蒙至尊诀）<br>· 世界BOSS（活动中心，每日可挑战）：按你造成的伤害比例发奖——击杀/重创（60%）/激战（30%）/参与四档；掉落功法秘籍/异火/灵羽/进化石，神级石（击杀50%/重创30%/激战15%/参与5%）、圣级石（8%/3%/1%）、至尊石（2%/0.8%/0.3%）<br>· 竞技场每日5次，挑战更高排名对手，胜则排名上升，前三每日领奖；江湖任务：击败10个敌人，奖300铜币+200修为<br>· 商店=江湖药铺（铜币）+元宝商城（元宝）+元宝兑换铜币（10元宝→10万/50→55万/100→120万）；经验丹双倍25/三倍45/五倍80元宝，背包使用后30分钟打怪修为加倍<br>· 聊天只有世界频道，5秒发一条，NPC会自动互动；排行榜有战力/充值/宠物/翅膀/等级5榜，前三名得荣誉称号（可佩戴加成）；点击排行/聊天/竞技场中的名字可看档案对比<br>· 称号分VIP称号/限定称号/排行称号，均可佩戴，属性叠加；存档保存在本机，换设备会丢失<br></p></div>
+ · 建号三选一：战士（攻击+10%）/ 法师（内力上限+30%）/ 射手（速度+15%）；建号自动生成玩家账号（JH+6位数字），充值兑换要用；建号即得本职业2个入门技能<br>· 去「江湖」挑战敌人，战斗点「攻击」自动施展本职业最强技能（内力不够则普通攻击），升级变强；野怪打到30%血以下可捕捉为宠物<br>· 技能三职业完全隔离，「技能」页只能学本职业的：战士（罗汉拳/打狗棒法/焰分噬浪尺/帝印诀）、法师（绵掌/弄炎诀/五轮离火法/佛怒火莲）、射手（峨眉刺/三千雷动/风之极·陨杀/大天造化掌）<br>· 12个装备栏：武器/帽子/护甲/裤子/护腕×2/戒指×2/项链/勋章/鞋子/饰品；武器分职业，BOSS掉落本关职业武器（优先掉没有的）；武器共7阶（1黄2玄3地4天5神6圣7至尊），带随机属性，洗炼石可重置，幸运上限9，铁匠铺可强化<br>· 背包「神兵合成」：集齐本关战士/法师/射手三职业武器+铜币→本关终极武器；集齐四把+300万铜币→轩辕神剑（6阶圣）；轩辕神剑+1000万铜币→至尊终极武器（7阶至尊·全游戏最高阶：战士斩尤帝剑/法师灭尤帝杖/射手断尤帝弓）；同部位四件BOSS防具+200万铜币→轩辕防具<br>· 宠物均为斗罗大陆魂兽，分黄/玄/地/天/神/圣/至尊七级，每级又分低/中/高/终极四档，10级可出战助战；3只同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用）；神级以上需进化石：神级1999/圣级19999/至尊29999元宝，商城有售，世界BOSS也掉落（至尊石概率极低）<br>· 伙伴均为斗破苍穹人物，5级可出战，出战将其30%属性加给你，可穿全部12栏装备，战斗胜利得修为升级；「宠物」页铜币/元宝招募；神级终极：VIP8免费领/「神将降临」（￥1288）/千金募名将；圣级：千金募名将极低概率（3%）；3位同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用；神级以上需进化石）；至尊终极（萧炎/薰儿随机其一）：「至尊降临」（￥7999）或圣级合成（30%，需至尊进化石）<br>· 功法分七级四档，习得后花铜币修炼（最高5重）加属性；神级唯VIP6/限时活动「神功现世」；圣级/至尊级唯限时活动可得<br>· 翅膀20级激活，灵羽升级，每阶攻击+12/气血+120/速度+3<br>· 充值：游戏内无直接充值，右上角「充值」页凭兑换码兑换——把玩家账号告诉客服，客服后台生成你的专属码后在此输入，一码一用；首充自动赠小红剑（攻击26/幸运9，永久）+首充礼包（288元宝+2万铜币+体力+灵兽蛋）<br>· 累计充值升VIP1-12（6/30/98/198/498/998/1998/2998/4998/7998/12998/19998元），每级攻击/气血+2%、每日VIP礼包、专属称号；VIP6及以上名字彩色显示<br>· 充值豪礼5档（30/98/198/498/998）：启程礼（元宝/洗炼石/经验丹）、天级终极宠物天青牛蟒·大明、神级宠物三眼金猊·王秋儿/冰天雪女、稀有称号神之眷顾——真实充值与红包共同累积，平民打怪攒红包也能领<br>· 累计充值奖励4档（1998/2998/5998/9999，仅真实充值）：元宝+圣级/至尊进化石+限定称号（一代宗师/开宗立派/纵横四海/名扬四海）；打怪掉充值红包（0.5/1/3/5/10元，每日上限100个），红包计入充值豪礼进度但不计VIP等级与累计充值奖励<br>· 限时活动（仅真实充值，每位玩家自建号起3天内有效，过期不可再领）：神功现世（￥498神级大日焚天诀）、神将降临（￥1288神话伙伴）、圣宠降临（￥2998圣级光明圣龙）、圣功现世（￥3999圣级圣心诀）、圣凰降临（￥5999圣级光明凤凰）、至尊降临（￥7999至尊萧炎/薰儿）、鸿蒙降临（￥9999金眼黑龙王·帝天/银龙王·古月娜+鸿蒙至尊诀）<br>· 世界BOSS（活动中心，每日可挑战）：按你造成的伤害比例发奖——击杀/重创（60%）/激战（30%）/参与四档；掉落功法秘籍/异火/灵羽/进化石，神级石（击杀50%/重创30%/激战15%/参与5%）、圣级石（8%/3%/1%）、至尊石（2%/0.8%/0.3%）<br>· 竞技场每日5次，挑战更高排名对手，胜则排名上升，前三每日领奖；江湖任务：击败10个敌人，奖300铜币+200修为<br>· 商店=江湖药铺（铜币）+元宝商城（元宝）+元宝兑换铜币（10元宝→10万/50→55万/100→120万）；经验丹双倍25/三倍45/五倍80元宝，背包使用后30分钟打怪修为加倍<br>· 聊天只有世界频道，5秒发一条，NPC会自动互动；排行榜有战力/充值/宠物/翅膀/等级5榜，前三名得荣誉称号（可佩戴加成）；点击排行/聊天/竞技场中的名字可看档案对比<br>· 交易行（底部导航「交易」）：寄售装备/进化石/宠物卖给土豪NPC（每次进入结算，定价合理卖得快，成交收5%税）；购买区每日刷新他人寄售；玩家交易码可跨设备与真实玩家交易<br>· 称号分VIP称号/限定称号/排行称号，均可佩戴，属性叠加；存档保存在本机，换设备会丢失<br></p></div>
  <div class="card"><h3>存档</h3>
  <button class="btn small" id="resave">手动保存</button>
  <button class="btn small danger" id="reset">删号重来（清空存档）</button></div>`;
@@ -2114,7 +2352,7 @@ if(Array.isArray(S.pets))S.pets.forEach(x=>{if(x.pid==="hongmeng"&&(x.name==="�
  }
  if(!Array.isArray(S.partners))S.partners=[];if(S.activePartner===undefined)S.activePartner=-1;
  for(const pt of S.partners){if(pt.tier===undefined){pt.tier=[0,1,2,3,4,6][pt.quality||0]||0;pt.sub=1;delete pt.quality;}}
- if(!S.player.prof)S.player.prof="warrior";if(!Array.isArray(S.pets))S.pets=[];if(!Array.isArray(S.eventTitles))S.eventTitles=[];if(!S.chat)S.chat={world:[{sys:1,txt:"欢迎来到江湖世界，谨言慎行，行侠仗义！",t:Date.now()}],sect:[],ch:"world",cd:0};migrateTitle();calcStats();TAB="home";render();}
+ if(!S.player.prof)S.player.prof="warrior";if(!Array.isArray(S.pets))S.pets=[];if(!Array.isArray(S.eventTitles))S.eventTitles=[];if(!Array.isArray(S.marketMine))S.marketMine=[];if(!Array.isArray(S.marketNpc))S.marketNpc=[];if(!Array.isArray(S.marketLog))S.marketLog=[];if(!Array.isArray(S.usedTradeCodes))S.usedTradeCodes=[];if(typeof S.marketDate!=="string")S.marketDate="";if(!S.chat)S.chat={world:[{sys:1,txt:"欢迎来到江湖世界，谨言慎行，行侠仗义！",t:Date.now()}],sect:[],ch:"world",cd:0};migrateTitle();calcStats();TAB="home";render();}
  else{rCreate();}
  setInterval(()=>{ // 每60秒回1点体力
  if(S&&S.player&&S.player.stamina<S.player.maxStamina){S.player.stamina++;save();if(TAB==="home"&&!B)renderTop();}
