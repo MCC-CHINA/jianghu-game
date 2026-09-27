@@ -181,9 +181,9 @@ const ITEMS={ // iid: {name,slot,atk,def,hp,spd,luck,tier}
  w9:{name:"骨玉权杖",slot:"weapon",atk:40,spd:4,tier:4,cls:"法师"},w10:{name:"龙纹剑",slot:"weapon",atk:48,tier:4,cls:"战士"},
  w11:{name:"嗜魂法杖",slot:"weapon",atk:54,luck:3,tier:5,cls:"法师"},w12:{name:"屠龙刀",slot:"weapon",atk:68,luck:5,tier:5,cls:"战士"},
  w13:{name:"轩辕神剑",slot:"weapon",atk:95,luck:6,spd:6,tier:6,gift:1}, // 终极武器：神兵合成获得
- w26:{name:"斩尤帝剑",slot:"weapon",atk:135,luck:7,spd:6,tier:6,gift:1,cls:"战士"}, // 至尊终极：轩辕神剑+1000万铜币
- w27:{name:"灭尤帝杖",slot:"weapon",atk:130,hp:600,luck:7,spd:6,tier:6,gift:1,cls:"法师"}, // 至尊终极：轩辕神剑+1000万铜币
- w28:{name:"断尤帝弓",slot:"weapon",atk:130,luck:7,spd:10,tier:6,gift:1,cls:"射手"}, // 至尊终极：轩辕神剑+1000万铜币
+ w26:{name:"斩尤帝剑",slot:"weapon",atk:135,luck:7,spd:6,tier:7,gift:1,cls:"战士"}, // 至尊终极（7阶）：轩辕神剑+1000万铜币
+ w27:{name:"灭尤帝杖",slot:"weapon",atk:130,hp:600,luck:7,spd:6,tier:7,gift:1,cls:"法师"}, // 至尊终极（7阶）：轩辕神剑+1000万铜币
+ w28:{name:"断尤帝弓",slot:"weapon",atk:130,luck:7,spd:10,tier:7,gift:1,cls:"射手"}, // 至尊终极（7阶）：轩辕神剑+1000万铜币
  w14:{name:"桃木法杖",slot:"weapon",atk:8,tier:1,cls:"法师"},w15:{name:"猎风短弓",slot:"weapon",atk:8,tier:1,cls:"射手"},
  w16:{name:"烈焰法杖",slot:"weapon",atk:16,tier:2,cls:"法师"},w17:{name:"追风长弓",slot:"weapon",atk:16,tier:2,cls:"射手"},
  w18:{name:"玄冰法杖",slot:"weapon",atk:26,tier:3,cls:"法师"},w19:{name:"落月神弓",slot:"weapon",atk:26,tier:3,cls:"射手"},
@@ -1104,7 +1104,7 @@ function synthModal(){
   return `<div class="tier"><div><div class="gold">${xname}<span class="dim"> · ${SLOTNAME[slot]} · 终极防具</span></div><div class="m">${mat} · 200万铜币（拥有${S.player.coins}）</div></div><button class="btn small" style="width:auto;margin:0" data-asynth="${idx}">合成</button></div>`;
  }).join("");
  const hasXj=S.bag.some(x=>x.iid==="w13");
- const zzrows=ZHIZUN_WPN.map(([xid,xname,xcls])=>`<div class="tier"><div><div class="gold">${xname}<span class="dim"> · 至尊终极武器[${xcls}]</span></div><div class="m"><span style="color:${hasXj?"#7dd87d":"#ff8787"}">轩辕神剑×1</span> · 1000万铜币（拥有${S.player.coins}）</div></div><button class="btn small primary" style="width:auto;margin:0" data-zhizun="${xid}">合成</button></div>`).join("");
+ const zzrows=ZHIZUN_WPN.map(([xid,xname,xcls])=>`<div class="tier"><div><div class="gold">${xname}<span class="dim"> · 至尊终极武器[${xcls}]</span></div><div class="m"><span style="color:${hasXj?"#7dd87d":"#ff8787"}">轩辕神剑×1</span> · 1000万铜币（拥有${S.player.coins}）<br><span class="dim">7阶至尊 · 全游戏最高阶武器</span></div></div><button class="btn small primary" style="width:auto;margin:0" data-zhizun="${xid}">合成</button></div>`).join("");
  modal(`<h3>神兵合成</h3><p class="dim">关卡终极武器：集齐本关战士/法师/射手三职业武器 + 铜币 → 本关终极武器。轩辕神剑：集齐四把关卡终极武器 + 300万铜币。至尊终极武器：轩辕神剑×1 + 1000万铜币（战士斩尤帝剑/法师灭尤帝杖/射手断尤帝弓）。防具：集齐同部位四件BOSS防具 + 200万铜币 → 轩辕防具。材料需放在背包中（已装备的请先卸下）。</p>${zrows}<div class="tier"><div><div class="gold">轩辕神剑<span class="dim"> · 终极武器</span></div><div class="m">${xmat} · 300万铜币（拥有${S.player.coins}）</div></div><button class="btn small primary" style="width:auto;margin:0" id="dosynth">合成</button></div><h3 style="margin-top:8px">至尊终极武器</h3>${zzrows}<h3 style="margin-top:8px">防具合成</h3>${arows}<div class="rowbtns"><button class="btn" onclick="closeModal()">关闭</button></div>`);
  $("modalbox").querySelectorAll("[data-asynth]").forEach(b=>b.onclick=()=>{
   const[slot,xid,xname]=ARMOR_SYNTH[+b.dataset.asynth];
