@@ -533,24 +533,24 @@ function rpList(){ // 充值红包数组（兼容老存档的数字）
  }
  return S.redpackets;
 }
-function grantReward(g){
+function rewardToMail(g,rw){ // 奖励 [k,v] 转邮箱附件（不直接发放）
  const p=S.player,k=g[0],v=g[1];
- if(k==="gold")p.gold+=v;
- else if(k==="coins")p.coins+=v;
- else if(k==="stamina")p.stamina=Math.min(p.maxStamina,p.stamina+v);
- else if(k==="egg3"){for(let i=0;i<v;i++){const pool=Object.keys(PETS).filter(x=>PETS[x].tier<=2);const pid=pick(pool);S.pets.push(mkPet(pid,p.level));}if(S.activePet===-1&&S.player.level>=10)S.activePet=0;}
- else if(k==="box"){const tier=Math.min(5,Math.floor(p.level/6)+1);for(let i=0;i<v;i++){const pool=Object.keys(ITEMS).filter(x=>ITEMS[x].slot==="weapon"&&ITEMS[x].tier===tier&&!ITEMS[x].gift);S.bag.push(mkWeapon(pick(pool)));}}
- else if(k==="pet"){if(S.pets.some(x=>x.pid===v)){p.gold+=3000;}else{const pb=PETS[v];S.pets.push(mkPet(v,p.level));if(S.activePet===-1&&S.player.level>=10)S.activePet=0;}}
- else if(k==="gongfa"){S.gongfaLearned=S.gongfaLearned||{};if(gfLearned(v))p.gold+=2000;else S.gongfaLearned[v]=1;}
- else if(k==="gongfa_rand_god"){const cand=Object.keys(GONGFA).filter(x=>GONGFA[x].tier===4&&!GONGFA[x].vip6&&!gfLearned(x));S.gongfaLearned=S.gongfaLearned||{};if(cand.length)S.gongfaLearned[pick(cand)]=1;else p.gold+=2000;}
- else if(k==="title"){S.eventTitles=S.eventTitles||[];if(!S.eventTitles.includes(v))S.eventTitles.push(v);}
- else if(k==="xilian")addConsumable("洗炼石","xilian",v);
- else if(k==="expdan")addConsumable(EXPDAN[v].name,v,1);
- else if(k==="evostone")addConsumable("神级进化石","evostone",v);
- else if(k==="evo_saint")addConsumable("圣级进化石","evo_saint",v);
- else if(k==="evo_zun")addConsumable("至尊进化石","evo_zun",v);
- else if(k==="partner"){if(!Array.isArray(S.partners))S.partners=[];const e=pickPartner(v,3,S.partners.map(x=>x.pid||x.name));S.partners.push(mkPartnerObj(e,p.level));if(S.activePartner===-1||S.activePartner===undefined)S.activePartner=0;}
-}
+ if(k==="gold")rw.gold=(rw.gold||0)+v;
+ else if(k==="coins")rw.coins=(rw.coins||0)+v;
+ else if(k==="stamina")rw.stam=(rw.stam||0)+v;
+ else if(k==="egg3"){rw.pets=rw.pets||[];for(let i=0;i<v;i++){const pool=Object.keys(PETS).filter(x=>PETS[x].tier<=2);rw.pets.push(mkPet(pick(pool),p.level));}}
+ else if(k==="box"){rw.equips=rw.equips||[];const tier=Math.min(5,Math.floor(p.level/6)+1);for(let i=0;i<v;i++){const pool=Object.keys(ITEMS).filter(x=>ITEMS[x].slot==="weapon"&&ITEMS[x].tier===tier&&!ITEMS[x].gift);rw.equips.push(mkWeapon(pick(pool)));}}
+ else if(k==="pet"){(rw.pets=rw.pets||[]).push({pid:v});}
+ else if(k==="gongfa"){(rw.gongfa=rw.gongfa||[]).push(v);}
+ else if(k==="gongfa_rand_god")rw.gongfaRandGod=true;
+ else if(k==="title"){(rw.titles=rw.titles||[]).push(v);}
+ else if(k==="xilian"){(rw.cons=rw.cons||[]).push(["洗炼石","xilian",v]);}
+ else if(k==="expdan"){(rw.cons=rw.cons||[]).push([EXPDAN[v].name,v,1]);}
+ else if(k==="evostone"){(rw.cons=rw.cons||[]).push(["神级进化石","evostone",v]);}
+ else if(k==="evo_saint"){(rw.cons=rw.cons||[]).push(["圣级进化石","evo_saint",v]);}
+ else if(k==="evo_zun"){(rw.cons=rw.cons||[]).push(["至尊进化石","evo_zun",v]);}
+ else if(k==="partner"){(rw.partners=rw.partners||[]).push({tier:v,sub:3});}
+ return rw;}
 /* 称号牌渲染：皇冠+翼饰+缎带 */
 function titleBadge(name,cls,hue){return `<span class="rtx ${cls}"${hue==null?"":` style="--h:${hue}"`}><b><em class="tn">${name}</em></b></span>`;}
 function vipTitleCls(t){return "rvip";} // VIP称号统一渐变金
@@ -705,14 +705,50 @@ function showWbRank(){
 /* ============ 邮箱系统 ============ */
 function sendMail(title,txt,rw){S.mail=S.mail||[];S.mail.unshift({id:"m"+Date.now()+Math.floor(Math.random()*1e4),title,txt,t:Date.now(),rw:rw||null,claimed:!rw});if(S.mail.length>30)S.mail.length=30;save();}
 function mailUnread(){return (S.mail||[]).filter(m=>m.rw&&!m.claimed).length;}
-function mailRwDesc(rw){const t=[];if(rw.gold)t.push(rw.gold+"元宝");if(rw.coins)t.push(rw.coins+"铜币");if(rw.feather)t.push("灵羽×"+rw.feather);if(rw.xilian)t.push("洗炼石×"+rw.xilian);if(rw.evoName)t.push(rw.evoName+"×1");return t.join("、");}
-function claimMail(id,silent){const m=(S.mail||[]).find(x=>x.id===id);if(!m||!m.rw||m.claimed)return false;const p=S.player,R=m.rw;
- if(R.gold)p.gold+=R.gold;if(R.coins)p.coins+=R.coins;if(R.feather)p.feather=(p.feather||0)+R.feather;
- if(R.evoIid)addConsumable(R.evoName,R.evoIid);for(let i=0;i<(R.xilian||0);i++)addConsumable("洗炼石","xilian");
- m.claimed=true;save();if(!silent){render();toast("附件已领取！");}return true;}
+function mailRwDesc(rw){const t=[];
+ if(rw.gold)t.push(rw.gold+"元宝");if(rw.coins)t.push(rw.coins+"铜币");if(rw.feather)t.push("灵羽×"+rw.feather);
+ if(rw.stam)t.push("体力×"+rw.stam);if(rw.exp)t.push(rw.exp+"修为");
+ if(rw.xilian)t.push("洗炼石×"+rw.xilian);if(rw.evoName)t.push(rw.evoName+"×1");
+ for(const c of (rw.cons||[]))t.push(c[0]+"×"+c[2]);
+ for(const e of (rw.equips||[])){const d=ITEMS[e.iid];t.push(d?d.name:"装备");}
+ for(const pt of (rw.pets||[]))t.push("宠物「"+(pt.pid?PETS[pt.pid].name:pt.name)+"」");
+ for(const pn of (rw.partners||[]))t.push("伙伴「"+(pn.tier!==undefined?tierName(pn.tier,pn.sub||3)+"·随机":pn.name)+"」");
+ for(const g of (rw.gongfa||[])){const d=GONGFA[g];t.push(d?"功法《"+d.name+"》":"功法");}
+ if(rw.gongfaRandGod)t.push("随机神级功法");
+ for(const e of (rw.titles||[])){const d=EVENT_TITLES[e];t.push(d?"称号「"+d.name+"」":"称号");}
+ return t.join("、");}
+function mailRecruit(t,sub){ // 邮箱领取伙伴（静默招募）
+ if(!Array.isArray(S.partners))S.partners=[];
+ if(S.activePartner===undefined)S.activePartner=-1;
+ const used=S.partners.map(x=>x.pid||x.name);
+ const e=pickPartner(t,sub,used);
+ S.partners.push(mkPartnerObj(e,S.player.level));
+ if((S.activePartner===-1||S.activePartner===undefined)&&S.player.level>=5)S.activePartner=0;
+ return e;}
+function applyMailRw(rw){const p=S.player; // 邮箱附件统一发放
+ if(rw.gold)p.gold+=rw.gold;if(rw.coins)p.coins+=rw.coins;if(rw.feather)p.feather=(p.feather||0)+rw.feather;
+ if(rw.stam)p.stamina=Math.min(p.maxStamina,p.stamina+rw.stam);if(rw.exp)gainExpSilent(rw.exp);
+ if(rw.xilian)for(let i=0;i<rw.xilian;i++)addConsumable("洗炼石","xilian"); // 兼容旧世界BOSS邮件
+ if(rw.evoIid)addConsumable(rw.evoName,rw.evoIid); // 兼容旧世界BOSS邮件
+ for(const c of (rw.cons||[]))addConsumable(c[0],c[1],c[2]);
+ for(const e of (rw.equips||[]))S.bag.push(e);
+ for(const pt of (rw.pets||[])){
+  if(pt&&pt.pid){if(S.pets.some(x=>x.pid===pt.pid)){p.gold+=3000;}else{S.pets.push(mkPet(pt.pid,p.level));if(S.activePet===-1&&p.level>=10)S.activePet=0;}}
+  else if(pt)S.pets.push(pt);}
+ for(const pn of (rw.partners||[])){
+  if(pn&&pn.tier!==undefined)mailRecruit(pn.tier,pn.sub||3);
+  else if(pn){if(!Array.isArray(S.partners))S.partners=[];S.partners.push(pn);if(S.activePartner===-1||S.activePartner===undefined)S.activePartner=0;}}
+ S.gongfaLearned=S.gongfaLearned||{};
+ for(const g of (rw.gongfa||[])){if(gfLearned(g))p.gold+=2000;else S.gongfaLearned[g]=1;}
+ if(rw.gongfaRandGod){const cand=Object.keys(GONGFA).filter(x=>GONGFA[x].tier===4&&!GONGFA[x].vip6&&!gfLearned(x));if(cand.length)S.gongfaLearned[pick(cand)]=1;else p.gold+=2000;}
+ S.eventTitles=S.eventTitles||[];
+ for(const e of (rw.titles||[]))if(!S.eventTitles.includes(e))S.eventTitles.push(e);
+ calcStats();}
+function claimMail(id,silent){const m=(S.mail||[]).find(x=>x.id===id);if(!m||!m.rw||m.claimed)return false;
+ applyMailRw(m.rw);m.claimed=true;save();if(!silent){render();toast("附件已领取！");}return true;}
 function rMail(){
  const m=$("main"),list=S.mail||[];
- let h=`<div class="card"><h3>邮箱</h3><p class="dim">系统奖励会在每日24点自动发放至邮箱，请手动领取附件。最多保留30封。</p><div class="rowbtns"><button class="btn small primary" id="mailAll">一键领取</button></div></div>`;
+ let h=`<div class="card"><h3>邮箱</h3><p class="dim">所有奖励（充值/活动/任务/竞技/交易/世界BOSS）统一发放至邮箱，请手动领取附件。最多保留30封。</p><div class="rowbtns"><button class="btn small primary" id="mailAll">一键领取</button></div></div>`;
  if(!list.length)h+=`<div class="card"><p class="dim">邮箱空空如也。</p></div>`;
  for(const x of list){
   const rw=x.rw,un=rw&&!x.claimed;
@@ -948,7 +984,7 @@ function newGame(name,profKey){
  base:{maxhp:115,maxmp:55,atk:14,def:9,spd:9}},
  equip:{weapon:null,armor:null,boots:null,charm:null},bag:[],pets:[],activePet:-1,wing:{tier:0},
  partners:[],activePartner:-1,arena:{rank:1000,date:"",left:5,reward:"",top:ARENA_TOP.map((n,i)=>({name:n,rank:i+1}))},
- orders:[],zone:0,created:nowStr(),createdAt:Date.now(),marketMine:[],marketNpc:[],marketDate:"",marketLog:[],usedTradeCodes:[],wornTitle:null,expBuff:null,gongfa:{},gongfaLearned:{},claimedGifts:{},douqi:0,yihuo:[],fenjue:{lv:0},eventTitles:[],chat:{world:[{sys:1,txt:"欢迎来到江湖世界，谨言慎行，行侠仗义！",t:Date.now()}],sect:[],ch:"world",cd:0}};
+ mail:[],orders:[],zone:0,created:nowStr(),createdAt:Date.now(),marketMine:[],marketNpc:[],marketDate:"",marketLog:[],usedTradeCodes:[],wornTitle:null,expBuff:null,gongfa:{},gongfaLearned:{},claimedGifts:{},douqi:0,yihuo:[],fenjue:{lv:0},eventTitles:[],chat:{world:[{sys:1,txt:"欢迎来到江湖世界，谨言慎行，行侠仗义！",t:Date.now()}],sect:[],ch:"world",cd:0}};
  calcStats();S.player.hp=S.player.maxhp;S.player.mp=S.player.maxmp;save();
 }
 /* ============ 顶栏/导航 ============ */
@@ -1545,7 +1581,7 @@ else if(p.taskDone){h+=`<p>任务完成！</p><button class="btn primary" id="ta
 else{h+=`<p>进行中：击败敌人 ${p.task.done}/${p.task.need}</p>`;}
 h+=`</div>`;m.innerHTML=h;
 const tg=$("taskget");if(tg)tg.onclick=()=>{p.task={need:10,done:0};p.taskDone=false;save();render();};
-const td=$("taskdone");if(td)td.onclick=()=>{p.coins+=300;gainExpSilent(1200);p.task=null;p.taskDone=false;save();render();toast("领取了任务奖励！");};
+const td=$("taskdone");if(td)td.onclick=()=>{p.task=null;p.taskDone=false;sendMail("江湖任务奖励","江湖任务奖励（300铜币+1200修为）已发放至邮箱，请手动领取附件。",{coins:300,exp:1200});save();render();toast("任务奖励已发放至邮箱！");};
 }
 function gainExpSilent(n){const p=S.player,maxLv=douqiMaxLv();p.exp+=n;while(p.exp>=expNeed(p.level)&&p.level<maxLv){p.exp-=expNeed(p.level);p.level++;}calcStats();}
 /* ============ 功法 ============ */
@@ -1750,22 +1786,19 @@ function rPay(){
  const vv=vipLevel(),tt=nowStr().slice(0,10);
  if(!vv||S.vipClaim===tt)return;
  const gg=vipGift();
- S.vipClaim=tt;p.coins+=gg.coins;p.gold+=gg.gold;p.feather=(p.feather||0)+gg.feather;
- p.stamina=Math.min(p.maxStamina,p.stamina+gg.stam);
- save();render();toast(` VIP${vv}每日礼包到账！`);
+ S.vipClaim=tt;
+ sendMail(`VIP${vv}每日礼包`,`VIP${vv}每日礼包已发放至邮箱，请手动领取附件。`,{coins:gg.coins,gold:gg.gold,feather:gg.feather,stam:gg.stam});
+ save();render();toast(`VIP${vv}每日礼包已发放至邮箱！`);
  };
  const fgb=$("firstgift");
  if(fgb)fgb.onclick=()=>{
  if(!S.orders.length||S.firstGift)return;
  S.firstGift=1;
- p.gold+=288;p.coins+=20000;
- p.stamina=Math.min(p.maxStamina,p.stamina+90);
  const pool=Object.keys(PETS).filter(k=>PETS[k].tier<=3);
  const pid=pick(pool);
- S.pets.push(mkPet(pid,p.level));
- if(S.activePet===-1&&S.player.level>=10)S.activePet=0;
+ sendMail("首充大礼包",`首充大礼包已发放至邮箱，请手动领取附件。灵兽蛋开出「${PETS[pid].name}」。`,{gold:288,coins:20000,stam:90,pets:[mkPet(pid,p.level)]});
  save();render();
- toast(` 首充礼包到账：元宝+288，铜币+20000，体力+90，灵兽蛋开出「${PETS[pid].name}」！`);
+ toast(`首充大礼包已发放至邮箱！`);
  };
  const cdgo=$("cdgo");if(cdgo)cdgo.onclick=redeemCode;
  const cdi=$("cdinput");if(cdi)cdi.addEventListener("keydown",e=>{if(e.key==="Enter")redeemCode();});
@@ -1775,15 +1808,17 @@ function rPay(){
  const pg=rechargeProgress();
  if(!gf||pg<gf.need||(S.claimedGifts||{})[gf.id])return;
  S.claimedGifts=S.claimedGifts||{};S.claimedGifts[gf.id]=1;
- (gf.give||[]).forEach(g=>grantReward(g));
- calcStats();save();render();toast(`获得${gf.name}！`);
+ const _rw={};(gf.give||[]).forEach(g=>rewardToMail(g,_rw));
+ sendMail("充值豪礼·"+stripHtml(gf.name),"充值豪礼「"+stripHtml(gf.name)+"」奖励已发放至邮箱，请手动领取附件。",_rw);
+ calcStats();save();render();toast(`「${stripHtml(gf.name)}」奖励已发放至邮箱！`);
  });
  m.querySelectorAll("[data-rw]").forEach(b=>b.onclick=()=>{
  const rw=RECHARGE_REWARDS[+b.dataset.rw];
  if(!rw||total<rw.need||(S.claimedRecharge||[]).includes(rw.need))return;
  S.claimedRecharge=S.claimedRecharge||[];S.claimedRecharge.push(rw.need);
- rw.give.forEach(grantReward);
- calcStats();save();render();toast(`累计充值奖励到账！`);
+ const _mrw={};rw.give.forEach(g=>rewardToMail(g,_mrw));
+ sendMail("累计充值奖励","累计充值满￥"+rw.need+"奖励已发放至邮箱，请手动领取附件。",_mrw);
+ calcStats();save();render();toast(`累计充值奖励已发放至邮箱！`);
  });
  const orp=$("openrp");
  if(orp)orp.onclick=()=>{
@@ -1794,20 +1829,17 @@ function rPay(){
  save();render();toast(`开启${arr.length}个红包，累计充值奖励进度+￥${add}！`);
  };
 }
-function grantRecharge(tier,oid){ // 兑换码到账（后台管控，游戏内无直接充值）
+function grantRecharge(tier,oid){ // 兑换码到账（后台管控，游戏内无直接充值），奖励统一走邮箱
  const t=TIERS[tier],oldV=vipLevel(),isFirst=!S.orders.length;
- S.player.gold+=t.gold;
+ const rw={gold:t.gold};
  S.orders.push({id:oid,money:t.money,gold:t.gold,time:nowStr(),status:"兑换码到账"});
  if(!(S.crown&&S.crown.pay)){S.crown=S.crown||{};S.crown.pay=1;pushChat("world",{sys:1,txt:`恭喜「${S.player.name}」登顶充值榜，富甲天下！`,t:Date.now()});}
  const newV=vipLevel();
- let msg=`兑换成功！元宝+${t.gold}`;
- if(newV>oldV){msg=`兑换成功！晋升 VIP${newV}！`;S.wornTitle={k:"vip",id:newV};}
- if(newV>=6&&!((S.gongfaLearned||{}).darin)){S.gongfaLearned=S.gongfaLearned||{};S.gongfaLearned.darin=1;msg+=` 获赠神级功法《大日焚天诀》！`;}
- if(isFirst){
-  const sword={iid:"w0",enh:0},cur=S.equip.weapon?ITEMS[S.equip.weapon.iid]:null;
-  if(!cur||(cur.atk||0)<26){if(S.equip.weapon)S.bag.push(S.equip.weapon);S.equip.weapon=sword;msg+=` 小红剑已穿戴！（永久）`;}
-  else{S.bag.push(sword);msg+=` 获赠小红剑！（永久）`;}
- }
+ let msg=`兑换成功！${t.gold}元宝已发放至邮箱`;
+ if(newV>oldV){msg=`兑换成功！晋升 VIP${newV}！元宝已发放至邮箱`;S.wornTitle={k:"vip",id:newV};}
+ if(newV>=6&&!((S.gongfaLearned||{}).darin)){(rw.gongfa=rw.gongfa||[]).push("darin");msg+=` 另获神级功法《大日焚天诀》（邮箱领取）`;}
+ if(isFirst){(rw.equips=rw.equips||[]).push({iid:"w0",enh:0});msg+=` 另获小红剑（永久，邮箱领取）`;}
+ sendMail("兑换码奖励",`兑换码（￥${t.money}）奖励已发放至邮箱，请手动领取附件。`,rw);
  calcStats();save();render();toast(msg);
 }
 function redeemCode(){
@@ -1869,8 +1901,8 @@ function rArena(){
  if(A.rank>3||A.reward===nowStr().slice(0,10))return;
  const rw=[null,{gold:200,coins:20000,feather:20},{gold:120,coins:12000,feather:12},{gold:80,coins:8000,feather:8}][A.rank];
  A.reward=nowStr().slice(0,10);
- p.gold+=rw.gold;p.coins+=rw.coins;p.feather=(p.feather||0)+rw.feather;
- save();render();toast(" 竞技场每日奖励到账！");
+ sendMail("竞技场每日奖励",`竞技场第${A.rank}名每日奖励已发放至邮箱，请手动领取附件。`,{gold:rw.gold,coins:rw.coins,feather:rw.feather});
+ save();render();toast("竞技场每日奖励已发放至邮箱！");
  };
 }
 /* ============ 称号 ============ */
@@ -2148,7 +2180,7 @@ function marketRefPrice(L){ // 参考价（铜币）
  return Math.round(base*(1+0.5*(d.sub||0))*(1+(L.ref.level||1)*0.02));
 }
 function marketVisit(){ // 每次进入交易行：土豪NPC前来购买寄售
- const sold=[];
+ const sold=[];let _sellCoins=0,_sellGold=0;const _sellTxt=[];
  for(const L of [...S.marketMine]){
   const ref=marketRefPrice(L);
   const pc=L.cur==="gold"?L.price*12000:L.price;
@@ -2158,18 +2190,20 @@ function marketVisit(){ // 每次进入交易行：土豪NPC前来购买寄售
   if(tierOfListing(L)>=4)p=Math.min(0.93,p+0.15);
   if(Math.random()<p){
    const tax=Math.max(1,Math.floor(L.price*0.05)),gain=L.price-tax;
-   if(L.cur==="gold")S.player.gold+=gain;else S.player.coins+=gain;
+   _sellCoins+=L.cur==="gold"?0:gain;_sellGold+=L.cur==="gold"?gain:0;
    S.marketMine=S.marketMine.filter(x=>x.id!==L.id);
    const buyer=pick(WHALES),nm=stripHtml(listingName(L));
-   S.marketLog.unshift({txt:`${buyer}买走了你的${nm}，${fmtPrice(L.price,L.cur)}（税${fmtPrice(tax,L.cur)}，实得${fmtPrice(gain,L.cur)}）`,t:Date.now()});
+   _sellTxt.push(`${buyer}买走${nm}（实得${fmtPrice(gain,L.cur)}）`);
+   S.marketLog.unshift({txt:`${buyer}买走了你的${nm}，${fmtPrice(L.price,L.cur)}（税${fmtPrice(tax,L.cur)}，实得${fmtPrice(gain,L.cur)}，已发至邮箱）`,t:Date.now()});
    if(S.marketLog.length>20)S.marketLog.length=20;
    pushChat("world",{n:buyer,vip:12,t:Date.now(),txt:`在交易行拿下了${nm}，爽！`});
    sold.push({buyer,nm,gain,cur:L.cur});
   }
  }
- if(sold.length){calcStats();save();}
- return sold;
-}
+  if(sold.length){
+  sendMail("交易行寄售成交",_sellTxt.join("；")+"。成交款已发放至邮箱，请手动领取。",{coins:_sellCoins,gold:_sellGold});
+  calcStats();save();}
+ return sold;}
 function refreshNpcMarket(){ // NPC寄售每日刷新
  const today=nowStr().slice(0,10);
  if(S.marketDate===today&&S.marketNpc.length)return;
@@ -2203,13 +2237,16 @@ function buyNpcListing(id){
  if(L.cur==="gold"&&S.player.gold<L.price){toast("元宝不足");return;}
  if(L.cur==="coins"&&S.player.coins<L.price){toast("铜币不足");return;}
  if(L.cur==="gold")S.player.gold-=L.price;else S.player.coins-=L.price;
- if(L.kind==="pet")S.pets.push(JSON.parse(JSON.stringify(L.ref)));
- else if(L.kind==="mat"){const st=S.bag.find(x=>x.use===L.ref.use&&(x.n||1)<99);if(st)st.n=(st.n||1)+1;else S.bag.push({use:L.ref.use,name:L.ref.name,n:1});}
- else S.bag.push(JSON.parse(JSON.stringify(L.ref)));
+ const _brw={};
+ if(L.kind==="pet")(_brw.pets=_brw.pets||[]).push(JSON.parse(JSON.stringify(L.ref)));
+ else if(L.kind==="mat")(_brw.cons=_brw.cons||[]).push([L.ref.name,L.ref.use,1]);
+ else (_brw.equips=_brw.equips||[]).push(JSON.parse(JSON.stringify(L.ref)));
+ const _bnm=stripHtml(listingName(L));
+ sendMail("交易行购买",`你从${L.seller}处购得${_bnm}，花费${fmtPrice(L.price,L.cur)}，物品已发放至邮箱，请手动领取。`,_brw);
  S.marketNpc=S.marketNpc.filter(x=>x.id!==id);
- S.marketLog.unshift({txt:`你从${L.seller}处购得${stripHtml(listingName(L))}，花费${fmtPrice(L.price,L.cur)}`,t:Date.now()});
+ S.marketLog.unshift({txt:`你从${L.seller}处购得${_bnm}，花费${fmtPrice(L.price,L.cur)}（物品已发至邮箱）`,t:Date.now()});
  if(S.marketLog.length>20)S.marketLog.length=20;
- calcStats();save();render();toast("购买成功！");
+ calcStats();save();render();toast("购买成功！物品已发放至邮箱！");
 }
 function unlistMarket(id){
  const L=S.marketMine.find(x=>x.id===id);if(!L)return;
@@ -2310,21 +2347,23 @@ function redeemTradeCode(){
  let b=m[1].replace(/-/g,"+").replace(/_/g,"/");while(b.length%4)b+="=";
  let p;try{p=JSON.parse(decodeURIComponent(escape(atob(b))));}catch(e){toast("交易码解析失败");return;}
  if(!p||!p.k||!p.d){toast("交易码无效");return;}
- if(p.k==="pet")S.pets.push(p.d);
- else if(p.k==="mat"){const st=S.bag.find(x=>x.use===p.d.use&&(x.n||1)<99);if(st)st.n=(st.n||1)+1;else S.bag.push({use:p.d.use,name:(TRADE_MATS[p.d.use]||{}).name||p.d.name,n:1});}
- else if(p.k==="eq")S.bag.push(p.d);
+ const _trw={};
+ if(p.k==="pet")(_trw.pets=_trw.pets||[]).push(p.d);
+ else if(p.k==="mat")(_trw.cons=_trw.cons||[]).push([(TRADE_MATS[p.d.use]||{}).name||p.d.name,p.d.use,1]);
+ else if(p.k==="eq")(_trw.equips=_trw.equips||[]).push(p.d);
  else{toast("交易码无效");return;}
  S.usedTradeCodes.push(inp);
  const nm=stripHtml(listingName({kind:p.k,ref:p.d}));
- S.marketLog.unshift({txt:`通过交易码获得${nm}`,t:Date.now()});
+ sendMail("玩家交易",`通过交易码获得${nm}，物品已发放至邮箱，请手动领取。`,_trw);
+ S.marketLog.unshift({txt:`通过交易码获得${nm}（已发至邮箱）`,t:Date.now()});
  if(S.marketLog.length>20)S.marketLog.length=20;
- calcStats();save();render();toast(`兑换成功：${nm}！`);
+ calcStats();save();render();toast(`兑换成功：${nm}！物品已发放至邮箱！`);
 }
 function rMarket(){
  refreshNpcMarket();
  const sold=marketVisit();
  const m=$("main"),p=S.player;
- let h=`<div class="card"><h3>交易行</h3><p class="dim">平民打宝、土豪收货。寄售后土豪NPC会自动前来购买（每次进入交易行结算一次）；购买区每日刷新他人寄售；玩家交易码可跨设备与真实玩家交易。成交收5%税，上架费500铜币/件。</p></div>`;
+ let h=`<div class="card"><h3>交易行</h3><p class="dim">平民打宝、土豪收货。寄售后土豪NPC会自动前来购买（每次进入交易行结算一次，成交款发至邮箱）；购买区每日刷新他人寄售（购买所得发至邮箱）；玩家交易码可跨设备与真实玩家交易（兑换所得发至邮箱）。成交收5%税，上架费500铜币/件。</p></div>`;
  h+=`<div class="card"><h3>购买区·他人寄售 <span class="dim">每日刷新</span></h3>`;
  if(!S.marketNpc.length)h+=`<p class="dim">今日已被抢购一空，明日再来。</p>`;
  for(const L of S.marketNpc){
@@ -2337,7 +2376,7 @@ function rMarket(){
   h+=`<div class="tier"><div><div>${listingName(L)}</div><div class="m">售价 <b class="gold">${fmtPrice(L.price,L.cur)}</b></div></div><button class="btn small" style="width:auto;margin:0" data-unlist="${L.id}">下架</button></div>`;
  }
  h+=`<button class="btn small primary" id="mkList">上架出售</button></div>`;
- h+=`<div class="card"><h3>玩家交易码</h3><p class="dim">跨设备与真实玩家交易：生成交易码发给对方，对方在此输入即得物品（生成后物品即从你背包移除，请当面或可信渠道交付）。</p><div class="rowbtns"><button class="btn small" id="mkCode">生成交易码</button></div><div class="chatinput" style="margin-top:8px"><input id="tcInput" placeholder="输入交易码"><button class="btn small primary" id="tcGo" style="width:auto">兑换</button></div></div>`;
+ h+=`<div class="card"><h3>玩家交易码</h3><p class="dim">跨设备与真实玩家交易：生成交易码发给对方，对方在此输入后物品发放至其邮箱（生成后物品即从你背包移除，请当面或可信渠道交付）。</p><div class="rowbtns"><button class="btn small" id="mkCode">生成交易码</button></div><div class="chatinput" style="margin-top:8px"><input id="tcInput" placeholder="输入交易码"><button class="btn small primary" id="tcGo" style="width:auto">兑换</button></div></div>`;
  h+=`<div class="card"><h3>交易记录</h3>${S.marketLog.length?S.marketLog.map(x=>`<div class="m">· ${escHtml(x.txt)}</div>`).join(""):'<p class="dim">暂无记录</p>'}</div>`;
  m.innerHTML=h;
  m.querySelectorAll("[data-buynpc]").forEach(b=>b.onclick=()=>buyNpcListing(b.dataset.buynpc));
@@ -2345,7 +2384,7 @@ function rMarket(){
  $("mkList").onclick=openListModal;
  $("mkCode").onclick=openCodeModal;
  $("tcGo").onclick=redeemTradeCode;
- if(sold.length)setTimeout(()=>toast(`土豪下单：${sold.map(s=>s.buyer+"买走"+s.nm).join("；")}，${sold.length}件已成交，钱已到账！`),60);
+ if(sold.length)setTimeout(()=>toast(`土豪下单：${sold.map(s=>s.buyer+"买走"+s.nm).join("；")}，${sold.length}件已成交，钱已发放至邮箱！`),60);
 }
 /* ============ 更多：玩法说明/存档 ============ */
 const EVENT_VALID_DAYS=3; // 限时活动：每位玩家自建号起3天内有效
@@ -2415,50 +2454,55 @@ function rEvent(){
  <button class="btn small" style="width:auto;margin:0" data-go="pay">前往领取</button></div></div>`;
  m.innerHTML=h;
  const em=$("evtMid");
- if(em)em.onclick=()=>{if(!eventOpen()){toast("限时活动已结束");return;}S.eventTitles=S.eventTitles||[];
- if(S.eventTitles.includes("midautumn"))return;
- S.eventTitles.push("midautumn");calcStats();save();render();toast(" 获得限定称号「中秋快乐」！");};
+ if(em)em.onclick=()=>{if(!eventOpen()){toast("限时活动已结束");return;}
+ if((S.eventTitles||[]).includes("midautumn"))return;
+ sendMail("限时活动·中秋赏月","限定称号「中秋快乐」已发放至邮箱，请手动领取附件。",{titles:["midautumn"]});
+ calcStats();save();render();toast("限定称号「中秋快乐」已发放至邮箱！")};
  const ef=$("evtFest");
  if(ef)ef.onclick=()=>{if(!eventOpen()){toast("限时活动已结束");return;}if(!festCan)return;
- const eid=pick(festPool);S.eventTitles=S.eventTitles||[];S.eventTitles.push(eid);S.festClaim=festDay;
- calcStats();save();render();toast(" 节日庆典：获得限定称号「"+EVENT_TITLES[eid].name+"」！");};
+ const eid=pick(festPool);S.festClaim=festDay;
+ sendMail("限时活动·节日庆典","限定称号「"+EVENT_TITLES[eid].name+"」已发放至邮箱，请手动领取附件。",{titles:[eid]});
+ calcStats();save();render();toast("限定称号「"+EVENT_TITLES[eid].name+"」已发放至邮箱！")};
  const ed=$("evtDarin");
  if(ed)ed.onclick=()=>{
  if(!eventOpen()){toast("限时活动已结束");return;}
  if(vipTotal()<498||gfLearned("darin"))return;
- S.gongfaLearned=S.gongfaLearned||{};S.gongfaLearned.darin=1;
- calcStats();save();render();toast(" 限时活动：获得神级功法《大日焚天诀》！");};
+ sendMail("限时活动·神功现世","神级功法《大日焚天诀》已发放至邮箱，请手动领取附件。",{gongfa:["darin"]});
+ calcStats();save();render();toast("神级功法《大日焚天诀》已发放至邮箱！")};
  const emy=$("evtMythic");
  if(emy)emy.onclick=()=>{
  if(!eventOpen()){toast("限时活动已结束");return;}
  if(vipTotal()<1288||S.claimedMythicEvent)return;
- S.claimedMythicEvent=true;recruitPartner(4,3);
- toast(" 限时活动：神级终极伙伴加入队伍！")};
+ S.claimedMythicEvent=true;
+ sendMail("限时活动·神将降临","神级终极伙伴（随机）已发放至邮箱，请手动领取附件。",{partners:[{tier:4,sub:3}]});
+ calcStats();save();render();toast("神级终极伙伴已发放至邮箱！")};
  const esp=$("evtSPet");
  if(esp)esp.onclick=()=>{
  if(!eventOpen()){toast("限时活动已结束");return;}
  if(vipTotal()<2998||S.claimedSaintPet)return;
- S.claimedSaintPet=true;S.pets.push(mkPet("shenglong",p.level));
- if(S.activePet===-1&&S.player.level>=10)S.activePet=0;save();render();toast(" 限时活动：圣级宠物「光明圣龙」加入队伍！")};
+ S.claimedSaintPet=true;
+ sendMail("限时活动·圣宠降临","圣级宠物「光明圣龙」已发放至邮箱，请手动领取附件。",{pets:[mkPet("shenglong",p.level)]});
+ save();render();toast("圣级宠物「光明圣龙」已发放至邮箱！")};
  const esg=$("evtSGf");
  if(esg)esg.onclick=()=>{
  if(!eventOpen()){toast("限时活动已结束");return;}
  if(vipTotal()<3999||gfLearned("shengxinjue"))return;
- S.gongfaLearned=S.gongfaLearned||{};S.gongfaLearned.shengxinjue=1;
- calcStats();save();render();toast(" 限时活动：获得圣级功法《圣心诀》！")};
+ sendMail("限时活动·圣功现世","圣级功法《圣心诀》已发放至邮箱，请手动领取附件。",{gongfa:["shengxinjue"]});
+ calcStats();save();render();toast("圣级功法《圣心诀》已发放至邮箱！")};
  const esh=$("evtSHuang");
  if(esh)esh.onclick=()=>{
  if(!eventOpen()){toast("限时活动已结束");return;}
  if(vipTotal()<5999||S.claimedSaintHuang)return;
- S.claimedSaintHuang=true;S.pets.push(mkPet("shenghuang",p.level));
- if(S.activePet===-1&&S.player.level>=10)S.activePet=0;save();render();toast(" 限时活动：圣级宠物「光明凤凰」加入队伍！")};
+ S.claimedSaintHuang=true;
+ sendMail("限时活动·圣凰降临","圣级宠物「光明凤凰」已发放至邮箱，请手动领取附件。",{pets:[mkPet("shenghuang",p.level)]});
+ save();render();toast("圣级宠物「光明凤凰」已发放至邮箱！")};
  const ezz=$("evtZZ");
  if(ezz)ezz.onclick=()=>{
  if(!eventOpen()){toast("限时活动已结束");return;}
  if(vipTotal()<7999||S.claimedZhizun)return;
  S.claimedZhizun=true;
- recruitPartner(6,3);
- toast(" 限时活动：至尊终极伙伴加入队伍！")};
+ sendMail("限时活动·至尊降临","至尊终极伙伴「萧炎」/「薰儿」（随机其一，未拥有的优先）已发放至邮箱，请手动领取附件。",{partners:[{tier:6,sub:3}]});
+ calcStats();save();render();toast("至尊终极伙伴已发放至邮箱！")};
  const ehm=$("evtHM");
  if(ehm)ehm.onclick=()=>{
  if(!eventOpen()){toast("限时活动已结束");return;}
@@ -2466,16 +2510,14 @@ function rEvent(){
  S.claimedHongmeng=true;
  const zunPets=["hongmeng","guhuang"].filter(pid=>!S.pets.some(x=>x.pid===pid));
  const zpid=pick(zunPets.length?zunPets:["hongmeng","guhuang"]);
- S.pets.push(mkPet(zpid,p.level));
- if(S.activePet===-1&&S.player.level>=10)S.activePet=0;
- S.gongfaLearned=S.gongfaLearned||{};S.gongfaLearned.hongmengjue=1;
- calcStats();save();render();toast(` 限时活动：至尊终极宠物「${PETS[zpid].name}」与功法《鸿蒙至尊诀》到手！`)};
+ sendMail("限时活动·鸿蒙降临",`至尊终极宠物「${PETS[zpid].name}」与至尊终极功法《鸿蒙至尊诀》已发放至邮箱，请手动领取附件。`,{pets:[mkPet(zpid,p.level)],gongfa:["hongmengjue"]});
+ calcStats();save();render();toast(`至尊终极宠物「${PETS[zpid].name}」与功法《鸿蒙至尊诀》已发放至邮箱！`)};
  m.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{TAB=b.dataset.go;B=null;render();window.scrollTo(0,0);});
 }
 function rMore(){
  const m=$("main");
  m.innerHTML=`<div class="card"><h3>玩法说明</h3><p class="dim">
- · 建号三选一：战士（攻击+10%）/ 法师（内力上限+30%）/ 射手（速度+15%）；建号自动生成玩家账号（JH+6位数字），充值兑换要用；建号即得本职业2个入门技能<br>· 去「江湖」挑战敌人，战斗点「攻击」自动施展本职业最强技能（内力不够则普通攻击），升级变强；野怪打到30%血以下可捕捉为宠物；修为按关卡难度递增——青竹林1倍、黑风寨2倍、幽冥谷3.5倍、华山之巅6倍，关卡BOSS再享2.5倍；升级所需修为递增（1→2级需2000，越往后越多）<br>· 技能三职业完全隔离，「技能」页只能学本职业的：战士（罗汉拳/打狗棒法/焰分噬浪尺/帝印诀）、法师（绵掌/弄炎诀/五轮离火法/佛怒火莲）、射手（峨眉刺/三千雷动/风之极·陨杀/大天造化掌）<br>· 12个装备栏：武器/帽子/护甲/裤子/护腕×2/戒指×2/项链/勋章/鞋子/腰带；武器分职业，BOSS掉落本关职业武器（优先掉没有的）；武器共7阶（1黄2玄3地4天5神6圣7至尊），带随机属性，洗炼石可重置，幸运上限9，铁匠铺可强化<br>· 背包「神兵合成」：集齐本关战士/法师/射手三职业武器+铜币→本关终极武器；集齐四把+300万铜币→轩辕神剑（6阶圣）；轩辕神剑×3+1000万铜币→至尊终极武器（7阶至尊·全游戏最高阶：战士斩尤帝剑/法师灭尤帝杖/射手断尤帝弓）；轩辕战甲×3+1000万铜币→至尊终极防具（7阶至尊：战士斩尤帝甲/法师灭尤帝袍/射手断尤帝衣）；同部位四件BOSS防具+200万铜币→轩辕防具<br>· 宠物均为斗罗大陆魂兽，分黄/玄/地/天/神/圣/至尊七级，每级又分低/中/高/终极四档，10级可出战助战；3只同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用）；神级以上需进化石：神级1999/圣级19999/至尊29999元宝，商城有售，世界BOSS也掉落（至尊石概率极低）<br>· 宠物技能（斗罗大陆魂兽技）与伙伴技能（斗破苍穹斗技）：每只/每位初始拥有3个，最高神级，按品级加攻击（黄+3%/玄+5%/地+8%/天+12%/神+18%，可叠加）；出战时有概率施展技能造成额外伤害；宠物/伙伴页点「技能」可花铜币更换领悟（随机同品级及以下新技能，最高神级）；圣级/至尊级技能后续通过限时活动获取<br>· 伙伴均为斗破苍穹人物，5级可出战，出战将其30%属性加给你，只能穿戴武器和护甲，战斗胜利得修为升级；「宠物」页铜币/元宝招募；神级终极：VIP8免费领/「神将降临」（￥1288）/千金募名将；圣级：千金募名将极低概率（3%）；3位同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用；神级以上需进化石）；至尊终极（萧炎/薰儿随机其一）：「至尊降临」（￥7999）或圣级合成（30%，需至尊进化石）<br>· 功法分七级四档，习得后花铜币修炼（最高5重）加属性；神级唯VIP6/限时活动「神功现世」；圣级/至尊级唯限时活动可得<br>· 斗气境界即转生：斗之气/斗者/斗师/大斗师/斗灵/斗王/斗皇/斗宗/斗尊/斗圣/斗帝共十一境，每境有等级上限（3/6/10/14/18/24/30/36/44/99/99级），满级后必须去「功法」页花铜币转生突破才能继续升级，突破还加属性<br>· 翅膀20级激活，灵羽升级，每阶攻击+12/气血+120/速度+3<br>· 充值：游戏内无直接充值，右上角「充值」页凭兑换码兑换——把玩家账号告诉客服，客服后台生成你的专属码后在此输入，一码一用；首充自动赠小红剑（攻击26/幸运9，永久）+首充礼包（288元宝+2万铜币+体力+灵兽蛋）<br>· 累计充值升VIP1-12（6/30/98/198/498/998/1998/2998/4998/7998/12998/19998元），每级攻击/气血+2%、每日VIP礼包、专属称号；VIP6及以上名字彩色显示<br>· 充值豪礼5档（30/98/198/498/998）：启程礼（元宝/洗炼石/经验丹）、天级终极宠物天青牛蟒·大明、神级宠物三眼金猊·王秋儿/冰天雪女、稀有称号神之眷顾——真实充值与红包共同累积，平民打怪攒红包也能领<br>· 累计充值奖励4档（1998/2998/5998/9999，仅真实充值）：元宝+圣级/至尊进化石+限定称号（一代宗师/开宗立派/纵横四海/名扬四海）；打怪掉充值红包（0.5/1/3/5/10元，每日上限100个），红包计入充值豪礼进度但不计VIP等级与累计充值奖励<br>· 限时活动（仅真实充值，每位玩家自建号起3天内有效，过期不可再领）：神功现世（￥498神级大日焚天诀）、神将降临（￥1288神话伙伴）、圣宠降临（￥2998圣级光明圣龙）、圣功现世（￥3999圣级圣心诀）、圣凰降临（￥5999圣级光明凤凰）、至尊降临（￥7999至尊萧炎/薰儿）、鸿蒙降临（￥9999金眼黑龙王·帝天/银龙王·古月娜+鸿蒙至尊诀）<br>· 世界BOSS（活动中心，每日可挑战）：血量999999999，打不死，纯粹比拼伤害，单场30回合封顶；挑战按钮旁「伤害榜」查看今日所有玩家伤害排名；每日24点按排名自动发放至邮箱（手动领取）——冠军200元宝+圣级进化石+灵羽×30+百万铜币+洗炼石×10，第2-3名100元宝+神级进化石+灵羽×20+五十万铜币+洗炼石×5，第4-10名50元宝+灵羽×10+二十万铜币+洗炼石×3，参与奖灵羽×5+五万铜币+洗炼石×1<br>· 竞技场每日5次，挑战更高排名对手，胜则排名上升，前三每日领奖；江湖任务：击败10个敌人，奖300铜币+1200修为<br>· 商店=江湖药铺（铜币）+元宝商城（元宝）+元宝兑换铜币（10元宝→10万/50→55万/100→120万）；经验丹双倍25/三倍45/五倍80元宝，背包使用后30分钟打怪修为加倍<br>· 聊天只有世界频道，5秒发一条，NPC会自动互动；排行榜有战力/充值/宠物/翅膀/等级5榜，前三名得荣誉称号（可佩戴加成）；点击排行/聊天/竞技场中的名字可看档案对比；竞技榜第一、世界BOSS伤害榜第一、等级榜第一、充值榜第一都会世界通报<br>· 邮箱（右上角）：世界BOSS每日奖励在24点按排名自动发放至邮箱，需手动领取附件；最多保留30封<br>· 交易行（底部导航「交易」）：寄售装备/进化石/宠物卖给土豪NPC（每次进入结算，定价合理卖得快，成交收5%税）；购买区每日刷新他人寄售；玩家交易码可跨设备与真实玩家交易<br>· 称号分VIP称号/限定称号/排行称号，均可佩戴，属性叠加；存档保存在本机，换设备会丢失<br></p></div>
+ · 建号三选一：战士（攻击+10%）/ 法师（内力上限+30%）/ 射手（速度+15%）；建号自动生成玩家账号（JH+6位数字），充值兑换要用；建号即得本职业2个入门技能<br>· 去「江湖」挑战敌人，战斗点「攻击」自动施展本职业最强技能（内力不够则普通攻击），升级变强；野怪打到30%血以下可捕捉为宠物；修为按关卡难度递增——青竹林1倍、黑风寨2倍、幽冥谷3.5倍、华山之巅6倍，关卡BOSS再享2.5倍；升级所需修为递增（1→2级需2000，越往后越多）<br>· 技能三职业完全隔离，「技能」页只能学本职业的：战士（罗汉拳/打狗棒法/焰分噬浪尺/帝印诀）、法师（绵掌/弄炎诀/五轮离火法/佛怒火莲）、射手（峨眉刺/三千雷动/风之极·陨杀/大天造化掌）<br>· 12个装备栏：武器/帽子/护甲/裤子/护腕×2/戒指×2/项链/勋章/鞋子/腰带；武器分职业，BOSS掉落本关职业武器（优先掉没有的）；武器共7阶（1黄2玄3地4天5神6圣7至尊），带随机属性，洗炼石可重置，幸运上限9，铁匠铺可强化<br>· 背包「神兵合成」：集齐本关战士/法师/射手三职业武器+铜币→本关终极武器；集齐四把+300万铜币→轩辕神剑（6阶圣）；轩辕神剑×3+1000万铜币→至尊终极武器（7阶至尊·全游戏最高阶：战士斩尤帝剑/法师灭尤帝杖/射手断尤帝弓）；轩辕战甲×3+1000万铜币→至尊终极防具（7阶至尊：战士斩尤帝甲/法师灭尤帝袍/射手断尤帝衣）；同部位四件BOSS防具+200万铜币→轩辕防具<br>· 宠物均为斗罗大陆魂兽，分黄/玄/地/天/神/圣/至尊七级，每级又分低/中/高/终极四档，10级可出战助战；3只同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用）；神级以上需进化石：神级1999/圣级19999/至尊29999元宝，商城有售，世界BOSS也掉落（至尊石概率极低）<br>· 宠物技能（斗罗大陆魂兽技）与伙伴技能（斗破苍穹斗技）：每只/每位初始拥有3个，最高神级，按品级加攻击（黄+3%/玄+5%/地+8%/天+12%/神+18%，可叠加）；出战时有概率施展技能造成额外伤害；宠物/伙伴页点「技能」可花铜币更换领悟（随机同品级及以下新技能，最高神级）；圣级/至尊级技能后续通过限时活动获取<br>· 伙伴均为斗破苍穹人物，5级可出战，出战将其30%属性加给你，只能穿戴武器和护甲，战斗胜利得修为升级；「宠物」页铜币/元宝招募；神级终极：VIP8免费领/「神将降临」（￥1288）/千金募名将；圣级：千金募名将极低概率（3%）；3位同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用；神级以上需进化石）；至尊终极（萧炎/薰儿随机其一）：「至尊降临」（￥7999）或圣级合成（30%，需至尊进化石）<br>· 功法分七级四档，习得后花铜币修炼（最高5重）加属性；神级唯VIP6/限时活动「神功现世」；圣级/至尊级唯限时活动可得<br>· 斗气境界即转生：斗之气/斗者/斗师/大斗师/斗灵/斗王/斗皇/斗宗/斗尊/斗圣/斗帝共十一境，每境有等级上限（3/6/10/14/18/24/30/36/44/99/99级），满级后必须去「功法」页花铜币转生突破才能继续升级，突破还加属性<br>· 翅膀20级激活，灵羽升级，每阶攻击+12/气血+120/速度+3<br>· 充值：游戏内无直接充值，右上角「充值」页凭兑换码兑换——把玩家账号告诉客服，客服后台生成你的专属码后在此输入，一码一用；兑换码元宝、VIP6神级功法、首充小红剑（攻击26/幸运9，永久）、首充大礼包（288元宝+2万铜币+体力+灵兽蛋）全部发放至邮箱手动领取<br>· 累计充值升VIP1-12（6/30/98/198/498/998/1998/2998/4998/7998/12998/19998元），每级攻击/气血+2%、每日VIP礼包（发至邮箱）、专属称号；VIP6及以上名字彩色显示<br>· 充值豪礼5档（30/98/198/498/998）：启程礼（元宝/洗炼石/经验丹）、天级终极宠物天青牛蟒·大明、神级宠物三眼金猊·王秋儿/冰天雪女、稀有称号神之眷顾——真实充值与红包共同累积，平民打怪攒红包也能领；奖励发放至邮箱<br>· 累计充值奖励4档（1998/2998/5998/9999，仅真实充值）：元宝+圣级/至尊进化石+限定称号（一代宗师/开宗立派/纵横四海/名扬四海），奖励发放至邮箱；打怪掉充值红包（0.5/1/3/5/10元，每日上限100个），红包计入充值豪礼进度但不计VIP等级与累计充值奖励<br>· 限时活动（仅真实充值，每位玩家自建号起3天内有效，过期不可再领）：神功现世（￥498神级大日焚天诀）、神将降临（￥1288神话伙伴）、圣宠降临（￥2998圣级光明圣龙）、圣功现世（￥3999圣级圣心诀）、圣凰降临（￥5999圣级光明凤凰）、至尊降临（￥7999至尊萧炎/薰儿）、鸿蒙降临（￥9999金眼黑龙王·帝天/银龙王·古月娜+鸿蒙至尊诀）<br>· 世界BOSS（活动中心，每日可挑战）：血量999999999，打不死，纯粹比拼伤害，单场30回合封顶；挑战按钮旁「伤害榜」查看今日所有玩家伤害排名；每日24点按排名自动发放至邮箱（手动领取）——冠军200元宝+圣级进化石+灵羽×30+百万铜币+洗炼石×10，第2-3名100元宝+神级进化石+灵羽×20+五十万铜币+洗炼石×5，第4-10名50元宝+灵羽×10+二十万铜币+洗炼石×3，参与奖灵羽×5+五万铜币+洗炼石×1<br>· 竞技场每日5次，挑战更高排名对手，胜则排名上升，前三每日领奖（发至邮箱）；江湖任务：击败10个敌人，奖300铜币+1200修为（发至邮箱）<br>· 商店=江湖药铺（铜币）+元宝商城（元宝）+元宝兑换铜币（10元宝→10万/50→55万/100→120万）；经验丹双倍25/三倍45/五倍80元宝，背包使用后30分钟打怪修为加倍<br>· 聊天只有世界频道，5秒发一条，NPC会自动互动；排行榜有战力/充值/宠物/翅膀/等级5榜，前三名得荣誉称号（可佩戴加成）；点击排行/聊天/竞技场中的名字可看档案对比；竞技榜第一、世界BOSS伤害榜第一、等级榜第一、充值榜第一都会世界通报<br>· 邮箱（右上角）：所有奖励统一发放至邮箱手动领取——充值/兑换码/充值豪礼/累计充值奖励/VIP每日礼包/限时活动/竞技场每日奖励/江湖任务/交易行购买与寄售成交/玩家交易码/世界BOSS每日24点排名奖励；最多保留30封<br>· 交易行（底部导航「交易」）：寄售装备/进化石/宠物卖给土豪NPC（每次进入结算，定价合理卖得快，成交收5%税，成交款发至邮箱）；购买区每日刷新他人寄售（购买所得发至邮箱）；玩家交易码可跨设备与真实玩家交易（兑换所得发至邮箱）<br>· 称号分VIP称号/限定称号/排行称号，均可佩戴，属性叠加；存档保存在本机，换设备会丢失<br></p></div>
  <div class="card"><h3>存档</h3>
  <button class="btn small" id="resave">手动保存</button>
  <button class="btn small danger" id="reset">删号重来（清空存档）</button></div>`;
