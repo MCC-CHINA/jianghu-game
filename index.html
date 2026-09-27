@@ -459,11 +459,11 @@ const GIFTS=[
  {id:"title_shenzhi",need:998,kind:"title",eid:"shenzhi",name:"稀有称号「神之眷顾」",desc:"攻击+50 气血+500 幸运+3，可叠加"}
 ];
 /* 累计充值奖励：4档（1998起，与充值豪礼不重复），真实充值+红包共同累积进度（红包不计VIP等级） */
-const RECHARGE_REWARDS=[ // 与充值豪礼不重复：只保留豪礼没有的高档
- {need:1998,desc:"元宝×20000 · 神话伙伴×1 · 限定称号「一代宗师」",give:[["gold",20000],["partner",4],["title","zongshi"]]},
- {need:2998,desc:"元宝×30000 · 神级功法《大日焚天诀》· 限定称号「开宗立派」",give:[["gold",30000],["gongfa","darin"],["title","kaizong"]]},
- {need:5998,desc:"元宝×60000 · 神级双宠（金猊+雪女）· 限定称号「纵横四海」",give:[["gold",60000],["pet","sanyan"],["pet","xuenv"],["title","zongheng"]]},
- {need:9999,desc:"元宝×100000 · 神话伙伴×2 · 限定称号「名扬四海」· 铜币×1000万",give:[["gold",100000],["partner",4],["partner",4],["title","mingyang"],["coins",10000000]]}
+const RECHARGE_REWARDS=[ // 与充值豪礼不重复：只保留豪礼没有的高档（神级奖励名带品级色）
+ {need:1998,desc:`元宝×20000 · ${tieredName("神话伙伴",4)}×1 · 限定称号「一代宗师」`,give:[["gold",20000],["partner",4],["title","zongshi"]]},
+ {need:2998,desc:`元宝×30000 · ${tieredName("神级功法",4)}《大日焚天诀》· 限定称号「开宗立派」`,give:[["gold",30000],["gongfa","darin"],["title","kaizong"]]},
+ {need:5998,desc:`元宝×60000 · ${tieredName("神级双宠",4)}（金猊+雪女）· 限定称号「纵横四海」`,give:[["gold",60000],["pet","sanyan"],["pet","xuenv"],["title","zongheng"]]},
+ {need:9999,desc:`元宝×100000 · ${tieredName("神话伙伴",4)}×2 · 限定称号「名扬四海」· 铜币×1000万`,give:[["gold",100000],["partner",4],["partner",4],["title","mingyang"],["coins",10000000]]}
 ];
 function rechargeProgress(){return vipTotal()+(S.rechargeBonus||0);} // 累计充值奖励进度：真实充值+红包
 function rpList(){ // 充值红包数组（兼容老存档的数字）
