@@ -62,6 +62,37 @@ body{background:#141009;color:#e8dcc0;font-family:"Songti SC","STSong","SimSun",
 .rtx .tn{font-style:normal}.rtx.rtcust b{background:linear-gradient(180deg,hsl(var(--h),85%,72%,.42) 0%,hsl(var(--h),80%,60%,.28) 35%,hsl(var(--h),82%,48%,.34) 70%,hsl(var(--h),88%,34%,.42) 100%);border-color:hsl(var(--h),90%,78%,.85);color:#fff;text-shadow:0 0 10px hsl(var(--h),95%,66%,1),0 0 3px #fff,0 1px 3px hsla(var(--h),85%,22%,.9);box-shadow:0 0 16px hsla(var(--h),90%,60%,.55),inset 0 1px 2px rgba(255,255,255,.55),inset 0 -3px 6px hsla(var(--h),80%,40%,.4)}.rtx.rvip b{text-shadow:0 1px 2px rgba(90,50,5,.9)}.rtx.rvip .tn{background:linear-gradient(90deg,#ff2d2d,#ff7f00,#ffe600,#2dff2d,#00e5ff,#2d7fff,#a52dff,#ff2d2d);background-size:300% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:rainbow 3s linear infinite;text-shadow:0 1px 2px rgba(90,50,5,.45)}
 .rtx.rt0 b{background:linear-gradient(180deg,rgba(60,50,90,.55) 0%,rgba(35,28,60,.50) 40%,rgba(15,12,28,.60) 100%);border-color:rgba(255,225,150,.8);color:#ffe9a8;text-shadow:0 0 10px rgba(255,210,110,1),0 0 3px #fff,0 1px 3px #000;box-shadow:0 0 16px rgba(255,205,95,.65),inset 0 1px 2px rgba(255,255,255,.35)}
 .rtx.rt0{filter:drop-shadow(0 0 10px rgba(255,205,95,.6))}
+/* ============ 动态光效称号（AE风格·纯CSS动画） ============ */
+.atitle{display:inline-block;font-weight:900;letter-spacing:4px;background-size:220% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:tshine 3s linear infinite}
+.at-gold{background-image:linear-gradient(100deg,#8a5a00 5%,#ffd700 25%,#fff8d0 50%,#ffd700 75%,#8a5a00 95%);animation:tshine 2.6s linear infinite,tglowG 1.8s ease-in-out infinite}
+.at-fire{background-image:linear-gradient(100deg,#7a1500 5%,#ff5a00 25%,#ffd23e 50%,#ff5a00 75%,#7a1500 95%);animation:tshine 2.2s linear infinite,tglowF 1.1s ease-in-out infinite}
+.at-ice{background-image:linear-gradient(100deg,#0b3d66 5%,#4fc3ff 25%,#e8fbff 50%,#4fc3ff 75%,#0b3d66 95%);animation:tshine 2.8s linear infinite,tglowI 2s ease-in-out infinite}
+.at-crystal{background-image:linear-gradient(100deg,#3d0b5e 5%,#c56cf0 28%,#ffe9ff 45%,#ffd700 60%,#c56cf0 75%,#3d0b5e 95%);animation:tshine 3s linear infinite,tglowC 2s ease-in-out infinite}
+.at-blue{background-image:linear-gradient(100deg,#0b2a66 5%,#4f9fff 30%,#e8f4ff 50%,#4f9fff 70%,#0b2a66 95%);animation:tshine 3s linear infinite,tglowI 2.4s ease-in-out infinite}
+.at-orange{background-image:linear-gradient(100deg,#6b2d05 5%,#ff9f43 30%,#fff3d6 50%,#ff9f43 70%,#6b2d05 95%);animation:tshine 3s linear infinite,tglowF 2.2s ease-in-out infinite}
+.at-rainbow{background-image:linear-gradient(100deg,#ff2d2d,#ff7f00,#ffe600,#2dff2d,#00e5ff,#2d7fff,#a52dff,#ff2d2d);background-size:300% auto;animation:tshine2 3s linear infinite,tglowC 2.4s ease-in-out infinite}
+.at-hue{background-image:linear-gradient(100deg,hsl(var(--h),80%,30%) 5%,hsl(var(--h),95%,60%) 30%,#fff 50%,hsl(var(--h),95%,60%) 70%,hsl(var(--h),80%,30%) 95%);animation:tshine 3s linear infinite,tglowH 2.2s ease-in-out infinite}
+@keyframes tshine{to{background-position:220% center}}
+@keyframes tshine2{to{background-position:300% center}}
+@keyframes tglowG{0%,100%{filter:drop-shadow(0 0 4px rgba(255,200,60,.5))}50%{filter:drop-shadow(0 0 14px rgba(255,200,60,.95))}}
+@keyframes tglowF{0%,100%{filter:drop-shadow(0 0 5px rgba(255,90,0,.55))}50%{filter:drop-shadow(0 0 16px rgba(255,140,0,1))}}
+@keyframes tglowI{0%,100%{filter:drop-shadow(0 0 5px rgba(80,200,255,.5))}50%{filter:drop-shadow(0 0 15px rgba(120,220,255,1))}}
+@keyframes tglowC{0%,100%{filter:drop-shadow(0 0 5px rgba(197,108,240,.5))}50%{filter:drop-shadow(0 0 15px rgba(220,150,255,1))}}
+@keyframes tglowH{0%,100%{filter:drop-shadow(0 0 4px hsla(var(--h),90%,60%,.5))}50%{filter:drop-shadow(0 0 14px hsla(var(--h),95%,65%,1))}}
+/* 称号大图框：扫光+呼吸辉光 */
+.tart{position:relative;overflow:hidden;text-align:center;margin:6px 0 10px;padding:18px 8px 16px;border-radius:12px;border:1px solid;cursor:pointer}
+.tart .atitle{font-size:30px;letter-spacing:10px;text-indent:10px}
+.tart::before{content:"";position:absolute;top:0;left:-80%;width:55%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.32),transparent);transform:skewX(-20deg);animation:tsweep 3.2s ease-in-out infinite;pointer-events:none}
+.tart::after{content:"";position:absolute;inset:0;border-radius:12px;pointer-events:none;animation:tframe 2.6s ease-in-out infinite}
+@keyframes tsweep{0%{left:-80%}55%,100%{left:135%}}
+@keyframes tframe{0%,100%{box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)}50%{box-shadow:inset 0 0 0 2px rgba(255,255,255,.28)}}
+.tart-fire{border-color:rgba(255,140,0,.7);background:radial-gradient(ellipse at center,#3a1502 0%,#160a04 72%);box-shadow:0 0 18px rgba(255,120,0,.35),inset 0 0 34px rgba(255,100,0,.16)}
+.tart-ice{border-color:rgba(120,200,255,.7);background:radial-gradient(ellipse at center,#0a2036 0%,#060d16 72%);box-shadow:0 0 18px rgba(80,180,255,.35),inset 0 0 34px rgba(80,180,255,.13)}
+.tart-crystal{border-color:rgba(197,108,240,.7);background:radial-gradient(ellipse at center,#220a38 0%,#0e0616 72%);box-shadow:0 0 18px rgba(180,100,240,.35),inset 0 0 34px rgba(180,100,240,.13)}
+/* 顶栏左上角佩戴称号 */
+#topbar .wornt{display:block;margin:0 0 3px;cursor:pointer;line-height:1.25}
+#topbar .wornt .atitle{font-size:19px;letter-spacing:5px}
+#topbar .wornt.none{color:#8a7a5a;font-size:13px;letter-spacing:2px}
 #topbar .pname .title{color:#ffe9a8;font-size:13px;margin-right:4px;text-shadow:0 0 6px rgba(245,214,123,.6)}
 .bars{margin-top:6px;display:flex;flex-direction:column;gap:4px}
 .bar{height:14px;background:#0d0a06;border:1px solid #5a4a26;border-radius:7px;overflow:hidden;position:relative;font-size:10px}
@@ -561,6 +592,24 @@ function rewardToMail(g,rw){ // 奖励 [k,v] 转邮箱附件（不直接发放�
 /* 称号牌渲染：皇冠+翼饰+缎带 */
 function titleBadge(name,cls,hue){return `<span class="rtx ${cls}"${hue==null?"":` style="--h:${hue}"`}><b><em class="tn">${name}</em></b></span>`;}
 function vipTitleCls(t){return "rvip";} // VIP称号统一渐变金
+/* 动态光效称号：按称号映射动画样式（AE风格） */
+function animTitleCls(name,cls,hue){
+ if(name==="武林神话")return "at-fire";   // VIP6：烈焰金
+ if(name==="绝世高手")return "at-ice";     // VIP5：冰蓝
+ if(name==="神之眷顾")return "at-crystal"; // 限定：紫晶
+ if(cls==="rvip")return "at-gold";
+ if(cls==="rt1")return "at-gold";
+ if(cls==="rt2")return "at-blue";
+ if(cls==="rt3")return "at-orange";
+ if(cls==="rt0")return "at-gold";
+ if(cls==="rt-moon")return "at-crystal";
+ if(cls==="rtcust")return "at-hue";
+ return "at-gold";
+}
+function animTitle(name,cls,hue){
+ const c=animTitleCls(name,cls,hue);
+ return `<span class="atitle ${c}"${c==="at-hue"&&hue!=null?` style="--h:${hue}"`:""}>${name}</span>`;
+}
 // 统一佩戴称号：{k:"vip",id:等级} | {k:"ev",id:称号eid} | {k:"rank",id:"榜:名次"}
 function migrateTitle(){if(S&&S.player&&S.wornTitle===undefined){const t=S.title||0;S.wornTitle=t?{k:"vip",id:t}:null;}}
 function wornTitleInfo(){const w=S.wornTitle;if(!w)return null;
@@ -1001,7 +1050,7 @@ function renderTop(){
  const p=S.player,t=$("topbar");t.style.display="block";
  const v=vipLevel();
  const wt=wornTitleInfo();
- t.innerHTML=`<div class="pname">${wt?titleBadge(wt.name,wt.cls,wt.hue):""}<span class="${v>=6?"vipn"+Math.min(v,12):""}">${p.name}</span><span class="lv">Lv.${p.level} ${PROFS[p.prof||"warrior"].name}</span>${v?`<span class="vip" id="topVip" title="查看VIP详情">VIP${v}</span>`:""}</div>
+ t.innerHTML=`<div class="pname">${wt?`<div class="wornt" id="topWorn" title="点击更换称号">${animTitle(wt.name,wt.cls,wt.hue)}</div>`:`<div class="wornt none" id="topWorn" title="点击前往称号页">暂无称号·点击获取</div>`}<div><span class="${v>=6?"vipn"+Math.min(v,12):""}">${p.name}</span><span class="lv">Lv.${p.level} ${PROFS[p.prof||"warrior"].name}</span>${v?`<span class="vip" id="topVip" title="查看VIP详情">VIP${v}</span>`:""}</div>
  <div class="bars">
  <div class="bar hp"><i style="width:${p.hp/p.maxhp*100}%"></i><span>气血 ${p.hp}/${p.maxhp}</span></div>
  <div class="bar mp"><i style="width:${p.mp/p.maxmp*100}%"></i><span>内力 ${p.mp}/${p.maxmp}</span></div>
@@ -1013,6 +1062,7 @@ function renderTop(){
  $("topPay").onclick=()=>{TAB="pay";B=null;render();window.scrollTo(0,0);};
  t.innerHTML+=`<button class="btn small" id="topMail">邮箱${mailUnread()?` <b class="gold">(${mailUnread()})</b>`:""}</button>`;
  $("topMail").onclick=()=>{TAB="mail";B=null;render();window.scrollTo(0,0);};
+ $("topWorn").onclick=()=>{TAB="title";B=null;render();window.scrollTo(0,0);};
  const tv=$("topVip");if(tv)tv.onclick=()=>{TAB="vipinfo";B=null;render();window.scrollTo(0,0);};
 }
 const TABS=[["home","江湖"],["bag","背包"],["pet","宠物"],["wing","翅膀"],["partner","伙伴"],["task","任务"],["gongfa","功法"],["skill","技能"],["shop","商店"],["market","交易"],["rank","排行"],["title","称号"],["arena","竞技"],["chat","聊天"],["event","活动"],["more","更多"]];
@@ -1926,9 +1976,9 @@ function rTitle(){
  for(const eid of Object.keys(EVENT_TITLES)){const e=EVENT_TITLES[eid],got=evGot.includes(eid);
  evHtml+=`<span class="tt${got?"":" locked"}${isWorn("ev",eid)?" worn":""}"${got?` data-wk="ev" data-wid="${eid}"`:""}>${titleBadge(e.name,e.cls,e.hue)}</span>`;}
  let vipArt="";
- if(v>=6)vipArt+=`<img class="titleart" src="title-wulin.webp" alt="武林神话">`;
- if(v>=5)vipArt+=`<img class="titleart" src="title-jueshi.webp" alt="绝世高手">`;
- const shenArt=evGot.includes("shenzhi")?`<img class="titleart" src="title-shenzhi.webp" alt="神之眷顾">`:"";
+ if(v>=6)vipArt+=`<div class="tart tart-fire" data-wk="vip" data-wid="6" title="点击佩戴">${animTitle("武林神话","rvip")}</div>`;
+ if(v>=5)vipArt+=`<div class="tart tart-ice" data-wk="vip" data-wid="5" title="点击佩戴">${animTitle("绝世高手","rvip")}</div>`;
+ const shenArt=evGot.includes("shenzhi")?`<div class="tart tart-crystal" data-wk="ev" data-wid="shenzhi" title="点击佩戴">${animTitle("神之眷顾","rtcust",48)}</div>`:"";
  m.innerHTML=`<div class="card"><h3>VIP称号</h3>${vipArt}<p class="dim">点击已获得的称号进行佩戴/切换</p><div class="tgrid">${vipHtml}</div></div>`
  +`<div class="card"><h3>排行榜荣誉称号</h3><div class="tgrid">${rkHtml}</div></div>`
  +`<div class="card"><h3>限定称号</h3>${shenArt}<div class="tgrid">${evHtml}</div></div>`;
@@ -2528,7 +2578,7 @@ function rEvent(){
 function rMore(){
  const m=$("main");
  m.innerHTML=`<div class="card"><h3>玩法说明</h3><p class="dim">
- · 建号三选一：战士（攻击+10%）/ 法师（内力上限+30%）/ 射手（速度+15%）；建号自动生成玩家账号（JH+6位数字），充值兑换要用；建号即得本职业2个入门技能<br>· 去「江湖」挑战敌人，战斗点「攻击」自动施展本职业最强技能（内力不够则普通攻击），升级变强；野怪打到30%血以下可捕捉为宠物；修为按关卡难度递增——青竹林1倍、黑风寨2倍、幽冥谷3.5倍、华山之巅6倍，关卡BOSS再享2.5倍；升级所需修为递增（1→2级需2000，越往后越多）<br>· 技能三职业完全隔离，「技能」页只能学本职业的：战士（罗汉拳/打狗棒法/焰分噬浪尺/帝印诀）、法师（绵掌/弄炎诀/五轮离火法/佛怒火莲）、射手（峨眉刺/三千雷动/风之极·陨杀/大天造化掌）<br>· 12个装备栏：武器/帽子/护甲/裤子/护腕×2/戒指×2/项链/勋章/鞋子/腰带；武器分职业，BOSS掉落本关职业武器（优先掉没有的）；武器共7阶（1黄2玄3地4天5神6圣7至尊），带随机属性，洗炼石可重置，幸运上限9，铁匠铺可强化<br>· 背包「神兵合成」：集齐本关战士/法师/射手三职业武器+铜币→本关终极武器；集齐四把+300万铜币→轩辕神剑（6阶圣）；轩辕神剑×3+1000万铜币→至尊终极武器（7阶至尊·全游戏最高阶：战士斩尤帝剑/法师灭尤帝杖/射手断尤帝弓）；轩辕战甲×3+1000万铜币→至尊终极防具（7阶至尊：战士斩尤帝甲/法师灭尤帝袍/射手断尤帝衣）；同部位四件BOSS防具+200万铜币→轩辕防具<br>· 宠物均为斗罗大陆魂兽，分黄/玄/地/天/神/圣/至尊七级，每级又分低/中/高/终极四档，10级可出战助战；3只同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用）；神级以上需进化石：神级1999/圣级19999/至尊29999元宝，商城有售，世界BOSS也掉落（至尊石概率极低）<br>· 宠物技能（斗罗大陆魂兽技）与伙伴技能（斗破苍穹斗技）：每只/每位初始拥有3个，最高神级，按品级加攻击（黄+3%/玄+5%/地+8%/天+12%/神+18%，可叠加）；出战时有概率施展技能造成额外伤害；宠物/伙伴页点「技能」可花铜币更换领悟（随机同品级及以下新技能，最高神级）；圣级/至尊级技能后续通过限时活动获取<br>· 伙伴均为斗破苍穹人物，5级可出战，出战将其30%属性加给你，只能穿戴武器和护甲，战斗胜利得修为升级；「宠物」页铜币/元宝招募；神级终极：VIP8免费领/「神将降临」（￥1288）/千金募名将；圣级：千金募名将极低概率（3%）；3位同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用；神级以上需进化石）；至尊终极（萧炎/薰儿随机其一）：「至尊降临」（￥7999）或圣级合成（30%，需至尊进化石）<br>· 功法分七级四档，习得后花铜币修炼（最高5重）加属性；神级唯VIP6/限时活动「神功现世」；圣级/至尊级唯限时活动可得<br>· 斗气境界即转生：斗之气/斗者/斗师/大斗师/斗灵/斗王/斗皇/斗宗/斗尊/斗圣/斗帝共十一境，每境有等级上限（3/6/10/14/18/24/30/36/44/99/99级），满级后必须去「功法」页花铜币转生突破才能继续升级，突破还加属性<br>· 翅膀20级激活，灵羽升级，每阶攻击+12/气血+120/速度+3<br>· 充值：游戏内无直接充值，右上角「充值」页凭兑换码兑换——把玩家账号告诉客服，客服后台生成你的专属码后在此输入，一码一用；兑换码元宝、VIP6神级功法、首充小红剑（攻击26/幸运9，永久）、首充大礼包（288元宝+2万铜币+体力+灵兽蛋）全部发放至邮箱手动领取<br>· 累计充值升VIP1-12（6/30/98/198/498/998/1998/2998/4998/7998/12998/19998元），每级攻击/气血+2%、每日VIP礼包（发至邮箱）、专属称号；VIP6及以上名字彩色显示<br>· 充值豪礼5档（30/98/198/498/998）：启程礼（元宝/洗炼石/经验丹）、天级终极宠物天青牛蟒·大明、神级宠物三眼金猊·王秋儿/冰天雪女、稀有称号神之眷顾——真实充值与红包共同累积，平民打怪攒红包也能领；奖励发放至邮箱<br>· 累计充值奖励4档（1998/2998/5998/9999，仅真实充值）：元宝+圣级/至尊进化石+限定称号（一代宗师/开宗立派/纵横四海/名扬四海），奖励发放至邮箱；打怪掉充值红包（0.5/1/3/5/10元，每日上限100个），红包计入充值豪礼进度但不计VIP等级与累计充值奖励<br>· 限时活动（仅真实充值，每位玩家自建号起3天内有效，过期不可再领）：神功现世（￥498神级大日焚天诀）、神将降临（￥1288神话伙伴）、圣宠降临（￥2998圣级光明圣龙）、圣功现世（￥3999圣级圣心诀）、圣凰降临（￥5999圣级光明凤凰）、至尊降临（￥7999至尊萧炎/薰儿）、鸿蒙降临（￥9999金眼黑龙王·帝天/银龙王·古月娜+鸿蒙至尊诀）<br>· 世界BOSS（活动中心，每日可挑战）：血量999999999，打不死，纯粹比拼伤害，单场30回合封顶；挑战按钮旁「伤害榜」查看今日所有玩家伤害排名；每日24点按排名自动发放至邮箱（手动领取）——冠军200元宝+圣级进化石+灵羽×30+百万铜币+洗炼石×10，第2-3名100元宝+神级进化石+灵羽×20+五十万铜币+洗炼石×5，第4-10名50元宝+灵羽×10+二十万铜币+洗炼石×3，参与奖灵羽×5+五万铜币+洗炼石×1<br>· 竞技场每日5次，挑战更高排名对手，胜则排名上升，前三每日领奖（发至邮箱）；江湖任务：击败10个敌人，奖300铜币+1200修为（发至邮箱）<br>· 商店=江湖药铺（铜币）+元宝商城（元宝）+元宝兑换铜币（10元宝→10万/50→55万/100→120万）；经验丹双倍25/三倍45/五倍80元宝，背包使用后30分钟打怪修为加倍<br>· 聊天只有世界频道，5秒发一条，NPC会自动互动；排行榜有战力/充值/宠物/翅膀/等级5榜，前三名得荣誉称号（可佩戴加成）；点击排行/聊天/竞技场中的名字可看档案对比；竞技榜第一、世界BOSS伤害榜第一、等级榜第一、充值榜第一都会世界通报<br>· 邮箱（右上角）：所有奖励统一发放至邮箱手动领取——充值/兑换码/充值豪礼/累计充值奖励/VIP每日礼包/限时活动/竞技场每日奖励/江湖任务/交易行购买与寄售成交/玩家交易码/世界BOSS每日24点排名奖励；最多保留30封<br>· 交易行（底部导航「交易」）：寄售装备/进化石/宠物卖给土豪NPC（每次进入结算，定价合理卖得快，成交收5%税，成交款发至邮箱）；购买区每日刷新他人寄售（购买所得发至邮箱）；玩家交易码可跨设备与真实玩家交易（兑换所得发至邮箱）<br>· 称号分VIP称号/限定称号/排行称号，均可佩戴，属性叠加；绝世高手/武林神话/神之眷顾配有专属称号图，在称号页查看；存档保存在本机，换设备会丢失<br></p></div>
+ · 建号三选一：战士（攻击+10%）/ 法师（内力上限+30%）/ 射手（速度+15%）；建号自动生成玩家账号（JH+6位数字），充值兑换要用；建号即得本职业2个入门技能<br>· 去「江湖」挑战敌人，战斗点「攻击」自动施展本职业最强技能（内力不够则普通攻击），升级变强；野怪打到30%血以下可捕捉为宠物；修为按关卡难度递增——青竹林1倍、黑风寨2倍、幽冥谷3.5倍、华山之巅6倍，关卡BOSS再享2.5倍；升级所需修为递增（1→2级需2000，越往后越多）<br>· 技能三职业完全隔离，「技能」页只能学本职业的：战士（罗汉拳/打狗棒法/焰分噬浪尺/帝印诀）、法师（绵掌/弄炎诀/五轮离火法/佛怒火莲）、射手（峨眉刺/三千雷动/风之极·陨杀/大天造化掌）<br>· 12个装备栏：武器/帽子/护甲/裤子/护腕×2/戒指×2/项链/勋章/鞋子/腰带；武器分职业，BOSS掉落本关职业武器（优先掉没有的）；武器共7阶（1黄2玄3地4天5神6圣7至尊），带随机属性，洗炼石可重置，幸运上限9，铁匠铺可强化<br>· 背包「神兵合成」：集齐本关战士/法师/射手三职业武器+铜币→本关终极武器；集齐四把+300万铜币→轩辕神剑（6阶圣）；轩辕神剑×3+1000万铜币→至尊终极武器（7阶至尊·全游戏最高阶：战士斩尤帝剑/法师灭尤帝杖/射手断尤帝弓）；轩辕战甲×3+1000万铜币→至尊终极防具（7阶至尊：战士斩尤帝甲/法师灭尤帝袍/射手断尤帝衣）；同部位四件BOSS防具+200万铜币→轩辕防具<br>· 宠物均为斗罗大陆魂兽，分黄/玄/地/天/神/圣/至尊七级，每级又分低/中/高/终极四档，10级可出战助战；3只同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用）；神级以上需进化石：神级1999/圣级19999/至尊29999元宝，商城有售，世界BOSS也掉落（至尊石概率极低）<br>· 宠物技能（斗罗大陆魂兽技）与伙伴技能（斗破苍穹斗技）：每只/每位初始拥有3个，最高神级，按品级加攻击（黄+3%/玄+5%/地+8%/天+12%/神+18%，可叠加）；出战时有概率施展技能造成额外伤害；宠物/伙伴页点「技能」可花铜币更换领悟（随机同品级及以下新技能，最高神级）；圣级/至尊级技能后续通过限时活动获取<br>· 伙伴均为斗破苍穹人物，5级可出战，出战将其30%属性加给你，只能穿戴武器和护甲，战斗胜利得修为升级；「宠物」页铜币/元宝招募；神级终极：VIP8免费领/「神将降临」（￥1288）/千金募名将；圣级：千金募名将极低概率（3%）；3位同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用；神级以上需进化石）；至尊终极（萧炎/薰儿随机其一）：「至尊降临」（￥7999）或圣级合成（30%，需至尊进化石）<br>· 功法分七级四档，习得后花铜币修炼（最高5重）加属性；神级唯VIP6/限时活动「神功现世」；圣级/至尊级唯限时活动可得<br>· 斗气境界即转生：斗之气/斗者/斗师/大斗师/斗灵/斗王/斗皇/斗宗/斗尊/斗圣/斗帝共十一境，每境有等级上限（3/6/10/14/18/24/30/36/44/99/99级），满级后必须去「功法」页花铜币转生突破才能继续升级，突破还加属性<br>· 翅膀20级激活，灵羽升级，每阶攻击+12/气血+120/速度+3<br>· 充值：游戏内无直接充值，右上角「充值」页凭兑换码兑换——把玩家账号告诉客服，客服后台生成你的专属码后在此输入，一码一用；兑换码元宝、VIP6神级功法、首充小红剑（攻击26/幸运9，永久）、首充大礼包（288元宝+2万铜币+体力+灵兽蛋）全部发放至邮箱手动领取<br>· 累计充值升VIP1-12（6/30/98/198/498/998/1998/2998/4998/7998/12998/19998元），每级攻击/气血+2%、每日VIP礼包（发至邮箱）、专属称号；VIP6及以上名字彩色显示<br>· 充值豪礼5档（30/98/198/498/998）：启程礼（元宝/洗炼石/经验丹）、天级终极宠物天青牛蟒·大明、神级宠物三眼金猊·王秋儿/冰天雪女、稀有称号神之眷顾——真实充值与红包共同累积，平民打怪攒红包也能领；奖励发放至邮箱<br>· 累计充值奖励4档（1998/2998/5998/9999，仅真实充值）：元宝+圣级/至尊进化石+限定称号（一代宗师/开宗立派/纵横四海/名扬四海），奖励发放至邮箱；打怪掉充值红包（0.5/1/3/5/10元，每日上限100个），红包计入充值豪礼进度但不计VIP等级与累计充值奖励<br>· 限时活动（仅真实充值，每位玩家自建号起3天内有效，过期不可再领）：神功现世（￥498神级大日焚天诀）、神将降临（￥1288神话伙伴）、圣宠降临（￥2998圣级光明圣龙）、圣功现世（￥3999圣级圣心诀）、圣凰降临（￥5999圣级光明凤凰）、至尊降临（￥7999至尊萧炎/薰儿）、鸿蒙降临（￥9999金眼黑龙王·帝天/银龙王·古月娜+鸿蒙至尊诀）<br>· 世界BOSS（活动中心，每日可挑战）：血量999999999，打不死，纯粹比拼伤害，单场30回合封顶；挑战按钮旁「伤害榜」查看今日所有玩家伤害排名；每日24点按排名自动发放至邮箱（手动领取）——冠军200元宝+圣级进化石+灵羽×30+百万铜币+洗炼石×10，第2-3名100元宝+神级进化石+灵羽×20+五十万铜币+洗炼石×5，第4-10名50元宝+灵羽×10+二十万铜币+洗炼石×3，参与奖灵羽×5+五万铜币+洗炼石×1<br>· 竞技场每日5次，挑战更高排名对手，胜则排名上升，前三每日领奖（发至邮箱）；江湖任务：击败10个敌人，奖300铜币+1200修为（发至邮箱）<br>· 商店=江湖药铺（铜币）+元宝商城（元宝）+元宝兑换铜币（10元宝→10万/50→55万/100→120万）；经验丹双倍25/三倍45/五倍80元宝，背包使用后30分钟打怪修为加倍<br>· 聊天只有世界频道，5秒发一条，NPC会自动互动；排行榜有战力/充值/宠物/翅膀/等级5榜，前三名得荣誉称号（可佩戴加成）；点击排行/聊天/竞技场中的名字可看档案对比；竞技榜第一、世界BOSS伤害榜第一、等级榜第一、充值榜第一都会世界通报<br>· 邮箱（右上角）：所有奖励统一发放至邮箱手动领取——充值/兑换码/充值豪礼/累计充值奖励/VIP每日礼包/限时活动/竞技场每日奖励/江湖任务/交易行购买与寄售成交/玩家交易码/世界BOSS每日24点排名奖励；最多保留30封<br>· 交易行（底部导航「交易」）：寄售装备/进化石/宠物卖给土豪NPC（每次进入结算，定价合理卖得快，成交收5%税，成交款发至邮箱）；购买区每日刷新他人寄售（购买所得发至邮箱）；玩家交易码可跨设备与真实玩家交易（兑换所得发至邮箱）<br>· 称号分VIP称号/限定称号/排行称号，均可佩戴，属性叠加；佩戴的称号以动态光效显示在顶栏左上角（烈焰/冰晶/紫晶流光动画），点击可进称号页更换；绝世高手/武林神话/神之眷顾在称号页有专属动态光效大图，点击大图可直接佩戴；存档保存在本机，换设备会丢失<br></p></div>
  <div class="card"><h3>存档</h3>
  <button class="btn small" id="resave">手动保存</button>
  <button class="btn small danger" id="reset">删号重来（清空存档）</button></div>`;
