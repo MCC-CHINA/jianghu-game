@@ -85,6 +85,12 @@ body{background:#141009;color:#e8dcc0;font-family:"Songti SC","STSong","SimSun",
 .bar.hp>i{background:linear-gradient(90deg,#a83232,#e05a5a)}
 .bar.mp>i{background:linear-gradient(90deg,#2f6da3,#5aa3e0)}
 .bar.exp>i{background:linear-gradient(90deg,#7a8a2f,#c3d65a)}
+.bar.rage>i{background:linear-gradient(90deg,#b36a00,#ffb43c)}
+.tag{display:inline-block;font-size:11px;padding:1px 7px;border-radius:8px;border:1px solid #5a4a26;margin-left:6px;color:#f5d67b;vertical-align:1px}
+.tag.elite{border-color:#8a2be2;color:#d9a7ff}
+.tag.boss{border-color:#a83232;color:#ff9a9a}
+.tag.enrage{border-color:#ff5a00;color:#ffb43c}
+.bstat{display:flex;gap:12px;align-items:center;margin:6px 0;font-size:12px}
 .bar>span{position:absolute;left:0;right:0;top:0;text-align:center;line-height:14px;color:#fff;text-shadow:0 1px 2px #000}
 .wallet{display:flex;gap:12px;margin-top:6px;font-size:13px;color:#d8c690}
 .wallet b{color:#f5d67b}
@@ -391,6 +397,21 @@ const ZONES=[
 const ZONE_EXP_MULT=[1,2,3.5,6]; // 关卡越难经验越高：青竹林1倍、黑风寨2倍、幽冥谷3.5倍、华山之巅6倍
 const BOSS_EXP_MULT=2.5; // 关卡BOSS额外2.5倍修为
 function zoneMobExp(zi,mo){return Math.floor(mo.exp*(ZONE_EXP_MULT[zi]||1)*(mo.boss?BOSS_EXP_MULT:1));}
+/* 战斗丰富化（2026-09-27）：区域战场特性 / 精英怪 / BOSS狂暴 / 怪物技能 / 连击 / 怒气必杀 / 防御 / 战斗评价 */
+const ZONE_FX=[
+ {name:"清风拂面",desc:"每3回合恢复5%气血"},
+ {name:"险要地形",desc:"怪物伤害+12%，铜币掉落+20%"},
+ {name:"瘴气弥漫",desc:"双方每回合损失1%最大气血（不致死）"},
+ {name:"剑意凛然",desc:"玩家暴击率+10%"},
+];
+const ULT={warrior:"开天斩",mage:"焚天灭世",archer:"九星连珠"}; // 怒气必杀（3.2倍）
+const FOE_SKILLS=[
+ ["猴拳乱打","竹叶飞镖","缠绕绞杀"],
+ ["裂风爪","断魂刀","黑风吼"],
+ ["腐毒喷吐","尸煞爪击","瘴气缠身"],
+ ["剑荡八方","华山剑气","云雾迷踪掌"],
+];
+const BOSS_SKILLS=["狂风刀法","幽冥毒掌","剑荡八荒","魔龙摆尾"];
 const SHOP=[
  {id:"jinchuang",name:"金疮药",price:50,desc:"恢复150点气血",use:"hp150"},
  {id:"dahuan",name:"大还丹",price:150,desc:"恢复450点气血",use:"hp450"},
@@ -832,7 +853,7 @@ function startWBattle(){
  if(wbLeft()<=0){toast("今日挑战次数已用完，明日再战");return;}
  if(p.stamina<10){toast("体力不足（需10点），去打坐或商城买体力丹");return;}
  p.stamina-=10;S.wboss.left--;
- const f=wbStats();B={wb:true,wbdmg:0,foe:{...f,maxhp:f.hp},log:[],over:false};
+ const f=wbStats();B={wb:true,wbdmg:0,foe:{...f,maxhp:f.hp},log:[],over:false,round:0,combo:0,rage:0,guard:false};
  log(`<span class="sys">世界BOSS降临！${f.name}出现了！</span>`);
  save();rBattle();
 }
@@ -1109,7 +1130,7 @@ function rHome(){
  let h=`<div class="card"><img class="titleart" src="title-jianghu.webp" alt="江湖行"><h3>闯荡江湖</h3><p class="dim">选择区域，挑战其中的江湖人物。每次挑战消耗5点体力。</p>`;
  ZONES.forEach((z,i)=>{
  const lock=p.level<z.req;
- h+=`<div class="mob"><div><div class="mn">${z.name} </div><div class="md">${z.desc} · 建议${z.req}级+</div></div>
+ h+=`<div class="mob"><div><div class="mn">${z.name} </div><div class="md">${z.desc} · 【${ZONE_FX[i].name}】 · 建议${z.req}级+</div></div>
  <button class="btn" ${lock?'disabled':''} data-z="${i}">${lock?z.req+'级':"前往"}</button></div>`;
  });
  h+=`<button class="btn small" id="dazuo">打坐调息（+10体力）</button>
@@ -1128,7 +1149,7 @@ const wrb=$("wbRankBtn");if(wrb)wrb.onclick=showWbRank;
 }
 function rZone(zi){
  const m=$("main"),z=ZONES[zi],p=S.player;
- let h=`<div class="card"><h3>${z.name}</h3><p class="dim">${z.desc}</p>`;
+ let h=`<div class="card"><h3>${z.name}</h3><p class="dim">${z.desc}<br>战场特性【${ZONE_FX[zi].name}】：${ZONE_FX[zi].desc}</p>`;
  z.mobs.forEach((fn,i)=>{
  const mo=fn();
  h+=`<div class="mob"><div><div class="mn">${mo.name} <span class="dim">Lv.${mo.lv}</span></div>
@@ -1149,24 +1170,62 @@ const p=S.player;
 if(p.stamina<5){toast("体力不足，去打坐或商城买体力丹");return;}
 p.stamina-=5;
 const mo=ZONES[zi].mobs[mi]();mo.exp=zoneMobExp(zi,mo);
-B={zi,mi,foe:{...mo,maxhp:mo.hp},log:[],over:false};
-log(`<span class="sys">你在${ZONES[zi].name}遭遇了！</span>`);
+// 精英怪：12%概率（BOSS除外），属性×1.4，修为铜币×2
+if(!mo.boss&&Math.random()<0.12){mo.name="精英·"+mo.name;mo.hp=Math.floor(mo.hp*1.4);mo.atk=Math.floor(mo.atk*1.4);mo.def=Math.floor(mo.def*1.4);mo.exp*=2;mo.coins*=2;mo.elite=true;}
+B={zi,mi,foe:{...mo,maxhp:mo.hp,skillCd:3+Math.floor(Math.random()*2)},log:[],over:false,round:0,combo:0,rage:0,guard:false};
+log(`<span class="sys">你在${ZONES[zi].name}遭遇了${mo.elite?"精英怪":"强敌"}！战场特性【${ZONE_FX[zi].name}】：${ZONE_FX[zi].desc}</span>`);
 save();rBattle();
 }
 function log(t){B.log.push(t);}
-function dmgCalc(atk,def,mult,luck){
+function dmgCalc(atk,def,mult,luck,critB){
 let d=Math.max(1,(atk*(mult||1.6)-def*0.8))* (0.9+Math.random()*0.2);
-const crit=Math.random()<Math.min(0.5,0.15+(luck||0)*0.01); if(crit)d*=1.6;
+const crit=Math.random()<Math.min(0.5,0.15+(luck||0)*0.01+(critB||0)); if(crit)d*=1.6;
 return{h:Math.floor(d),crit};
+}
+/* 区域战场特性结算（仅闯荡江湖）。返回true表示战斗已结束 */
+function zoneTick(){
+const f=B.foe,p=S.player,zi=B.zi;
+if(zi===0&&B.round>0&&B.round%3===0){const rh=Math.floor(p.maxhp*0.05);p.hp=Math.min(p.maxhp,p.hp+rh);log(`<span class="sys">【${ZONE_FX[0].name}】清风拂面，恢复气血 ${rh}</span>`);}
+if(zi===2){
+ const ph=Math.max(1,Math.floor(p.maxhp*0.01));p.hp=Math.max(1,p.hp-ph);
+ const fh=Math.max(1,Math.floor(f.maxhp*(f.boss?0.005:0.01)));f.hp=Math.max(1,f.hp-fh);
+ log(`<span class="sys">【${ZONE_FX[2].name}】瘴气侵蚀，你损失 ${ph} 气血，${f.name}损失 ${fh} 气血</span>`);
+}
+return B.over;
 }
 function foeTurn(){
 const f=B.foe,p=S.player;
 if(f.hp<=0||B.over)return;
 if(B.wb){B.wbround=(B.wbround||0)+1;
  if(B.wbround>30){log(`<span class="sys">30回合已到，世界BOSS战结束！本场共造成 ${B.wbdmg||0} 点伤害</span>`);endBattle(false);return;}}
-const d=dmgCalc(f.atk,p.def,1.5);
-p.hp=Math.max(0,p.hp-d.h);
-log(`<span class="foe">${f.name}攻来，造成 ${d.h} 点伤害${d.crit?"（暴击！）":""}</span>`);
+const zone=!B.wb&&!B.arena&&B.zi!==undefined;
+if(zone&&zoneTick())return;
+// BOSS狂暴：血量低于30%时攻击+30%、防御-20%
+if(zone&&f.boss&&!f.enraged&&f.hp<f.maxhp*0.3){
+ f.enraged=true;f.atk=Math.floor(f.atk*1.3);f.def=Math.floor(f.def*0.8);
+ log(`<span class="foe">【狂暴】${f.name}狂性大发，攻击暴涨、防御下降！速战速决！</span>`);}
+// 怪物技能：每4回合一次，提前一回合预警
+let mult=1.5,skillName=null;
+if(zone){
+ if(f.warned){
+  f.warned=false;f.skillCd=4;skillName=f.warnName;
+  mult=f.boss?(f.enraged?2.7:2.4):(f.elite?2.2:2.0);
+ }else{
+  f.skillCd=(f.skillCd||3)-1;
+  if(f.skillCd<=0){f.warned=true;
+   f.warnName=pick(f.boss?BOSS_SKILLS:(FOE_SKILLS[B.zi]||FOE_SKILLS[0]));
+   log(`<span class="foe">【预警】${f.name}正在蓄力，下一回合将释放「${f.warnName}」！可防御或吃药应对</span>`);}
+ }
+}
+const d=dmgCalc(f.atk,p.def,mult);
+let hurt=d.h;
+if(zone&&B.zi===1)hurt=Math.floor(hurt*1.12); // 黑风寨险要地形
+if(B.guard){hurt=Math.floor(hurt*0.4);p.mp=Math.min(p.maxmp,p.mp+Math.floor(p.maxmp*0.1));B.guard=false;
+ log(`<span class="me">你以防御姿态硬扛下了这一击，内力恢复少许</span>`);}
+p.hp=Math.max(0,p.hp-hurt);
+if(skillName)B.combo=0; // 被怪物技能命中：连击清零（普通攻击不断连击）
+B.rage=Math.min(100,(B.rage||0)+15); // 受击：怒气+15
+log(`<span class="foe">${f.name}${skillName?`施展「${skillName}」`:"攻来"}，造成 ${hurt} 点伤害${d.crit?"（暴击！）":""}</span>`);
 if(p.hp<=0){endBattle(false);return;}
 petTurn();
 }
@@ -1218,10 +1277,23 @@ function endBattle(win){
 B.over=true;const p=S.player,f=B.foe;
 if(B.wb){wbBattleSettle(win);}
 if(win&&!B.wb){
-const em=expMult(),ge=Math.floor(f.exp*em);
-log(`<span class="sys">战胜了！获得修为 ${ge}${em>1?`（${em}倍经验）`:""}、铜币 ${f.coins}</span>`);
+const em=expMult();
+// 战斗评价（仅闯荡江湖）：回合数越少、剩余气血越高，评价越高
+let rate="",rm=1;
+if(!B.arena){
+ const hpPct=p.hp/p.maxhp,rd=B.round||99;
+ if(rd<=6&&hpPct>=0.7){rate="S";rm=1.3;}
+ else if(rd<=10){rate="A";rm=1.15;}
+ else if(rd<=15){rate="B";rm=1.05;}
+ else{rate="C";rm=1;}
+}
+const ge=Math.floor(f.exp*em*rm);
+let gc=f.coins;
+if(!B.arena&&B.zi===1)gc=Math.floor(gc*1.2); // 黑风寨险要地形：铜币+20%
+gc=Math.floor(gc*rm);
+log(`<span class="sys">战胜了！${rate?`战斗评价：<b>${rate}级</b>${rm>1?`（修为铜币+${Math.round((rm-1)*100)}%）`:""}！`:""}获得修为 ${ge}${em>1?`（${em}倍经验）`:""}、铜币 ${gc}</span>`);
 if(f.boss)pushChat("world",{sys:1,txt:`恭喜「${p.name}」击败了${f.name}，威震江湖！`,t:Date.now()});
-gainExp(ge);p.coins+=f.coins;gainPetExp(Math.floor(ge/2));gainPartnerExp(Math.floor(ge/2));
+gainExp(ge);p.coins+=gc;gainPetExp(Math.floor(ge/2));gainPartnerExp(Math.floor(ge/2));
 if(B.arena){ // 竞技场：获胜提升排名
  const R=B.oppRank,A=S.arena;
  if(R<A.rank){
@@ -1267,22 +1339,31 @@ calcStats();save();
 }
 function rBattle(){
 const m=$("main"),p=S.player,f=B.foe;
-let h=`<div class="card"><h3>${f.name} ${f.boss?"":""} <span class="dim">Lv.${f.lv}</span></h3>
+let h=`<div class="card"><h3>${f.name}${f.elite?'<span class="tag elite">精英</span>':""}${f.boss?'<span class="tag boss">BOSS</span>':""}${f.enraged?'<span class="tag enrage">狂暴</span>':""} <span class="dim">Lv.${f.lv}</span></h3>
 <div class="bar hp"><i style="width:${f.hp/f.maxhp*100}%"></i><span>${f.hp}/${f.maxhp}</span></div>
+${f.warned?`<div class="warn">预警：${f.name}正在蓄力「${f.warnName}」，下回合释放！建议防御或吃药</div>`:""}
+<div class="bstat"><div style="flex:1"><div class="dim" style="font-size:11px">怒气 ${(B.rage||0)}/100</div><div class="bar rage"><i style="width:${Math.min(100,B.rage||0)}%"></i></div></div><div class="dim">连击 <b class="gold">x${B.combo||0}</b></div><div class="dim">回合 ${B.round||0}</div></div>
 <div id="battlelog">${B.log.map(t=>`<p>${t}</p>`).join("")}</div>`;
 if(B.over){
 h+=`<button class="btn primary" id="bback">继续闯荡</button></div>`;
 }else{
-h+=`<div class="rowbtns"><button class="btn" id="a_atk">攻击</button><button class="btn" id="a_med">吃药</button></div>
-<div class="rowbtns">${f.catchPet?`<button class="btn small" id="a_cap">捕捉</button>`:""}<button class="btn small danger" id="a_flee">逃跑</button></div></div>`;
+h+=`<div class="rowbtns"><button class="btn" id="a_atk">普攻</button><button class="btn" id="a_auto">自动</button><button class="btn" id="a_def">防御</button><button class="btn ${(B.rage||0)>=100?"primary":""}" id="a_ult"${(B.rage||0)>=100?"":" disabled"}>必杀</button></div>`;
+const sks=(p.skills||[]).filter(id=>SKILLS[id]);
+if(sks.length)h+=`<div class="rowbtns" style="margin-top:8px">${sks.map(id=>{const sk=SKILLS[id],ok=p.mp>=sk.mp;return `<button class="btn small" data-sk="${id}"${ok?"":" disabled"}>${sk.name}(${sk.mp})</button>`;}).join("")}</div>`;
+h+=`<div class="rowbtns" style="margin-top:8px"><button class="btn small" id="a_med">吃药</button>${f.catchPet?`<button class="btn small" id="a_cap">捕捉</button>`:""}<button class="btn small danger" id="a_flee">逃跑</button></div></div>`;
 }
 m.innerHTML=h;
 const bl=$("battlelog");bl.scrollTop=bl.scrollHeight;
 if(B.over){$("bback").onclick=()=>{B=null;TAB="home";render();};return;}
-$("a_atk").onclick=()=>doAutoAtk();
+$("a_atk").onclick=()=>doAtk(null);
+$("a_auto").onclick=()=>doAutoAtk();
+$("a_def").onclick=()=>doDefend();
+const ult=$("a_ult");if(ult)ult.onclick=()=>doUlt();
+m.querySelectorAll("[data-sk]").forEach(b=>b.onclick=()=>doAtk(b.dataset.sk));
 $("a_med").onclick=()=>{
 const med=S.bag.find(x=>x.use);
 if(!med){toast("背包里没有药品，去商店买");return;}
+B.combo=0; // 吃药打断连击
 if(med.use==="hp150")p.hp=Math.min(p.maxhp,p.hp+150);
 if(med.use==="hp450")p.hp=Math.min(p.maxhp,p.hp+450);
 if(med.use==="mpfull")p.mp=p.maxmp;
@@ -1306,20 +1387,26 @@ function doAutoAtk(){
  doAtk(sk);
  if(sk)toast("施展「"+SKILLS[sk].name+"」！");
 }
-function doAtk(skId){
+function doAtk(skId,isUlt){
 const p=S.player,f=B.foe;
-if(skId){
-const sk=SKILLS[skId];
-if(p.mp<sk.mp){toast("内力不足");return;}
-p.mp-=sk.mp;
-const d=dmgCalc(p.atk,f.def,sk.mult,p.luck);
+const zone=!B.wb&&!B.arena&&B.zi!==undefined;
+let mult,critB=0,act;
+if(isUlt){ // 怒气必杀：3.2倍，不耗内力
+ mult=3.2;act=`必杀·${ULT[p.prof||"warrior"]}`;B.rage=0;
+}else if(skId){
+ const sk=SKILLS[skId];
+ if(p.mp<sk.mp){toast("内力不足");return;}
+ p.mp-=sk.mp;mult=sk.mult;act=`「${sk.name}」`;
+}else{mult=1.6;act="挥剑斩去";}
+B.round=(B.round||0)+1;
+if(zone&&B.zi===3)critB=0.1; // 华山之巅剑意：暴击率+10%
+const cb=1+Math.min(0.3,(B.combo||0)*0.02); // 连击加成：每层+2%，上限+30%
+const d=dmgCalc(p.atk,f.def,mult*cb,p.luck,critB);
 f.hp=Math.max(0,f.hp-d.h);if(B.wb)B.wbdmg=(B.wbdmg||0)+d.h;
-log(`<span class="me">你使出「${sk.name}」，造成 ${d.h} 点伤害${d.crit?"（暴击！）":""}</span>`);
-}else{
-const d=dmgCalc(p.atk,f.def,1.6,p.luck);
-f.hp=Math.max(0,f.hp-d.h);if(B.wb)B.wbdmg=(B.wbdmg||0)+d.h;
-log(`<span class="me">你挥剑斩去，造成 ${d.h} 点伤害${d.crit?"（暴击！）":""}</span>`);
-}
+B.combo=(B.combo||0)+1;
+if(!isUlt)B.rage=Math.min(100,(B.rage||0)+10); // 出手：连击+1，怒气+10（必杀不回怒）
+log(`<span class="me">你使出${act}，造成 ${d.h} 点伤害${d.crit?"（暴击！）":""}${B.combo>1?`（连击x${B.combo}）`:""}</span>`);
+if(B.rage>=100)log(`<span class="sys">怒气已满！可释放必杀·${ULT[p.prof||"warrior"]}！</span>`);
 const apt=S.player.level>=5?(S.partners||[])[S.activePartner]:undefined;
 if(apt&&f.hp>0&&!B.over){
  const psks=skillIdsOf(apt);
@@ -1333,6 +1420,15 @@ if(apt&&f.hp>0&&!B.over){
 }
 if(f.hp<=0){endBattle(true);}else{foeTurn();}
 save();rBattle();
+}
+function doUlt(){
+if((B.rage||0)<100){toast("怒气未满（"+(B.rage||0)+"/100）");return;}
+doAtk(null,true);
+}
+function doDefend(){
+B.guard=true;B.round=(B.round||0)+1;B.combo=0; // 防御打断连击
+log(`<span class="me">你凝神戒备，摆出防御姿态（本回合受到伤害-60%，恢复10%内力）</span>`);
+foeTurn();save();rBattle();
 }
 function afterPlayer(){const f=B.foe;if(f.hp<=0){endBattle(true);}else{foeTurn();}save();rBattle();}
 function doCapture(){
@@ -1929,7 +2025,7 @@ function startArenaBattle(rank){
  if(p.stamina<5){toast("体力不足（需5点），去打坐或商城买体力丹");return;}
  p.stamina-=5;S.arena.left--;
  const f=ARENA_OPPS[rank]||arenaOpp(rank);
- B={arena:true,oppRank:rank,foe:{...f,maxhp:f.hp},log:[],over:false};
+ B={arena:true,oppRank:rank,foe:{...f,maxhp:f.hp},log:[],over:false,round:0,combo:0,rage:0,guard:false};
  log(`<span class="sys">竞技场挑战！${f.name}（第${rank}名）出现了！</span>`);
  save();rBattle();
 }
