@@ -1203,7 +1203,7 @@ if(wu)wu.onclick=()=>{
 function rPartner(){
 const m=$("main"),p=S.player;
 const v=vipLevel(),canMythicVip=v>=8&&!S.claimedMythicVip;
-let h=`<div class="card"><h3>我的伙伴</h3><p class="dim">伙伴可穿戴全部12个装备栏位（武器/帽子/护甲/裤子/护腕×2/戒指×2/项链/勋章/鞋子/饰品）。出战伙伴将其30%属性加给你，战斗胜利出战伙伴获得修为升级。<br>伙伴分黄/玄/地/天/神/圣/至尊七级，每级又分低级/中级/高级/终极四档。神级终极获取：VIP8免费领取 / 限时活动「神将降临」/ 千金募名将（低概率）；圣级：千金募名将（极低概率3%）；至尊终极（萧炎/薰儿）唯限时活动「至尊降临」可得。</p>`;
+let h=`<div class="card"><h3>我的伙伴</h3><p class="dim">伙伴可穿戴全部12个装备栏位（武器/帽子/护甲/裤子/护腕×2/戒指×2/项链/勋章/鞋子/饰品）。出战伙伴将其30%属性加给你，战斗胜利出战伙伴获得修为升级。<br>伙伴分黄/玄/地/天/神/圣/至尊七级，每级又分低级/中级/高级/终极四档。神级终极获取：VIP8免费领取 / 限时活动「神将降临」/ 千金募名将（低概率）；圣级：千金募名将（极低概率3%）；至尊终极（萧炎/薰儿）：限时活动「至尊降临」或下方圣级合成。3位同品级伙伴可合成更高品级。</p>`;
 if(canMythicVip)h+=`<div class="tier"><div><div class="gold">VIP8专属神将</div><div class="m">免费招募神话品质伙伴×1</div></div><button class="btn small primary" style="width:auto;margin:0" id="mythicVip">领取</button></div>`;
 else if(v>=8&&S.claimedMythicVip)h+=`<p class="dim">VIP8专属神将已领取。</p>`;
 h+=`<div class="rowbtns"><button class="btn small" id="recC">广发英雄帖<br><span class="dim">5000铜币</span></button><button class="btn small" id="recG">千金募名将<br><span class="dim">88元宝</span></button></div>`;
@@ -1220,6 +1220,14 @@ if(!(S.partners||[]).length)h+=`<p class="dim">还没有伙伴，去招募一位
  h+=`</div></div>${i===S.activePartner?"":`<button class="btn small" style="width:auto;margin:0" data-pfight="${i}"${p.level<5?" disabled":""}>${p.level<5?"5级可召唤":"出战"}</button>`}</div>`;
 });
 h+=`</div>`;m.innerHTML=h;
+let ph=`<div class="card"><h3>伙伴合成</h3><p class="dim">3位同品级伙伴可合成1位更高品级的随机伙伴（出战中的不可用，身上装备自动退回背包）。神级以上合成需对应进化石：神级1999元宝、圣级19999元宝、至尊29999元宝（商城有售，世界BOSS也掉落，至尊石概率极低）。圣→至尊必出萧炎/薰儿（未拥有的优先）。合成失败时材料消失，请谨慎！</p>`;
+for(let t=0;t<6;t++){
+ const n=partnerSynthCount(t),rate=Math.floor(SYNTH_RATE[t]*100),st=SYNTH_STONE[t];
+ const stone=st?`<div class="m">需${st[1]}×1（拥有${countItem(st[0])}）</div>`:"";
+ ph+=`<div class="tier"><div><div>${tieredName(PTIERS[t]+"级",t)} → ${tieredName(PTIERS[t+1]+"级",t+1)}${t===5?'<span class="dim">（萧炎/薰儿）</span>':""}</div><div class="m">可用 ${n}/3 位 · 成功率${rate}%</div>${stone}</div><button class="btn small primary" style="width:auto;margin:0" data-psynth="${t}"${n<3?" disabled":""}>合成</button></div>`;
+}
+ph+=`</div>`;m.insertAdjacentHTML("beforeend",ph);
+m.querySelectorAll("[data-psynth]").forEach(b=>b.onclick=()=>doPartnerSynth(+b.dataset.psynth));
 const rc=$("recC");
 if(rc)rc.onclick=()=>{if(p.coins<5000){toast("铜币不足（需5000）");return;}p.coins-=5000;
  const r=Math.random();recruitPartner(r<0.5?0:(r<0.8?1:2));};
@@ -1264,7 +1272,25 @@ function doPetSynth(t){
   const pid=pick(pool),b=PETS[pid];
   S.pets.push({pid,name:b.name,level:S.player.level,exp:0});
   save();render();toast(`合成成功！获得${tieredName(b.name,b.tier)}${tierBadge(b.tier,b.sub)}！`);
- }else{save();render();toast("合成失败，三只宠物消散了……");}
+  }else{save();render();toast("合成失败，三只宠物消散了……");}
+}
+function partnerSynthCount(t){return (S.partners||[]).filter((pt,i)=>pt.tier===t&&i!==S.activePartner).length;}
+function doPartnerSynth(t){
+ const idx=[];(S.partners||[]).forEach((pt,i)=>{if(pt.tier===t&&i!==S.activePartner)idx.push(i);});
+ if(idx.length<3){toast("同品级伙伴不足3位（出战中的不可用）");return;}
+ const need=SYNTH_STONE[t];
+ if(need&&!takeConsumable(need[0])){toast(`${PTIERS[t]}级合成${PTIERS[t+1]}级需要${need[1]}×1（元宝商城购买/世界BOSS掉落）`);return;}
+ const use=idx.slice(0,3).sort((a,b)=>b-a);
+ use.forEach(i=>{const pt=S.partners[i];for(const slot in pt.equip){if(pt.equip[slot])S.bag.push(pt.equip[slot]);}}); // 退装备
+ let ap=S.activePartner;use.forEach(i=>{S.partners.splice(i,1);if(i<ap)ap--;});
+ S.activePartner=ap;
+ if(Math.random()<SYNTH_RATE[t]){
+  const tier=t+1,used=S.partners.map(x=>x.name);let name,sub;
+  if(tier===6){name=pick(ZHIZUN_PARTNERS.filter(n=>!used.includes(n)))||pick(ZHIZUN_PARTNERS);sub=3;} // 圣→至尊必出萧炎/薰儿
+  else{name=pick(PARTNER_NAMES.filter(n=>!used.includes(n)))||pick(PARTNER_NAMES);sub=Math.floor(Math.random()*4);}
+  S.partners.push({name,tier,sub,level:S.player.level,exp:0,equip:{weapon:null,armor:null,boots:null,charm:null}});
+  calcStats();save();render();toast(`合成成功！${tieredName(PTIERS[tier]+"终极",tier)}伙伴「${tieredName(name,tier)}」加入队伍！`);
+ }else{calcStats();save();render();toast("合成失败，三位伙伴离队了……");}
 }
 function rPet(){
 const m=$("main"),p=S.player;
@@ -1901,7 +1927,7 @@ function rEvent(){
 function rMore(){
  const m=$("main");
  m.innerHTML=`<div class="card"><h3>玩法说明</h3><p class="dim">
- · 建号三选一：战士（攻击+10%）/ 法师（内力上限+30%）/ 射手（速度+15%）；建号自动生成玩家账号（JH+6位数字），充值兑换要用；建号即得本职业2个入门技能<br>· 去「江湖」挑战敌人，战斗点「攻击」自动施展本职业最强技能（内力不够则普通攻击），升级变强；野怪打到30%血以下可捕捉为宠物<br>· 技能三职业完全隔离，「技能」页只能学本职业的：战士（罗汉拳/打狗棒法/焰分噬浪尺/帝印诀）、法师（绵掌/弄炎诀/五轮离火法/佛怒火莲）、射手（峨眉刺/三千雷动/风之极·陨杀/大天造化掌）<br>· 12个装备栏：武器/帽子/护甲/裤子/护腕×2/戒指×2/项链/勋章/鞋子/饰品；武器分职业，BOSS掉落本关职业武器（优先掉没有的）；武器共7阶（1黄2玄3地4天5神6圣7至尊），带随机属性，洗炼石可重置，幸运上限9，铁匠铺可强化<br>· 背包「神兵合成」：集齐本关战士/法师/射手三职业武器+铜币→本关终极武器；集齐四把+300万铜币→轩辕神剑（6阶圣）；轩辕神剑+1000万铜币→至尊终极武器（7阶至尊·全游戏最高阶：战士斩尤帝剑/法师灭尤帝杖/射手断尤帝弓）；同部位四件BOSS防具+200万铜币→轩辕防具<br>· 宠物分黄/玄/地/天/神/圣/至尊七级，每级又分低/中/高/终极四档，10级可出战助战；3只同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用）；神级以上需进化石：神级1999/圣级19999/至尊29999元宝，商城有售，世界BOSS也掉落（至尊石概率极低）<br>· 伙伴5级可出战，出战将其30%属性加给你，可穿全部12栏装备，战斗胜利得修为升级；「宠物」页铜币/元宝招募；神级终极：VIP8免费领/「神将降临」（￥1288）/千金募名将；圣级：千金募名将极低概率（3%）；至尊终极（萧炎/薰儿随机其一）唯「至尊降临」（￥7999）可得<br>· 功法分七级四档，习得后花铜币修炼（最高5重）加属性；神级唯VIP6/限时活动「神功现世」；圣级/至尊级唯限时活动可得<br>· 翅膀20级激活，灵羽升级，每阶攻击+12/气血+120/速度+3<br>· 充值：游戏内无直接充值，右上角「充值」页凭兑换码兑换——把玩家账号告诉客服，客服后台生成你的专属码后在此输入，一码一用；首充自动赠小红剑（攻击26/幸运9，限时3天）+首充礼包（288元宝+2万铜币+体力+灵兽蛋）<br>· 累计充值升VIP1-12（6/30/98/198/498/998/1998/2998/4998/7998/12998/19998元），每级攻击/气血+2%、每日VIP礼包、专属称号；VIP6及以上名字彩色显示<br>· 充值豪礼198/498/998三档（神级宠物三眼金猊·王秋儿/冰天雪女、稀有称号神之眷顾）；累计充值奖励1998/2998/5998/9999四档（元宝/神话伙伴/神级功法/限定称号）；打怪掉充值红包（0.5/1/3/5/10元，每日上限100个），红包计入累计充值进度但不计VIP等级<br>· 世界BOSS（活动中心，每日可挑战）：按你造成的伤害比例发奖——击杀/重创（60%）/激战（30%）/参与四档；掉落功法秘籍/异火/灵羽/进化石，神级石（击杀50%/重创30%/激战15%/参与5%）、圣级石（8%/3%/1%）、至尊石（2%/0.8%/0.3%）<br>· 竞技场每日5次，挑战更高排名对手，胜则排名上升，前三每日领奖；江湖任务：击败10个敌人，奖300铜币+200修为<br>· 商店=江湖药铺（铜币）+元宝商城（元宝）+元宝兑换铜币（10元宝→10万/50→55万/100→120万）；经验丹双倍25/三倍45/五倍80元宝，背包使用后30分钟打怪修为加倍<br>· 聊天只有世界频道，5秒发一条，NPC会自动互动；排行榜有战力/充值/宠物/翅膀/等级5榜，前三名得荣誉称号（可佩戴加成）；点击排行/聊天/竞技场中的名字可看档案对比<br>· 称号分VIP称号/限定称号/排行称号，均可佩戴，属性叠加；存档保存在本机，换设备会丢失<br></p></div>
+ · 建号三选一：战士（攻击+10%）/ 法师（内力上限+30%）/ 射手（速度+15%）；建号自动生成玩家账号（JH+6位数字），充值兑换要用；建号即得本职业2个入门技能<br>· 去「江湖」挑战敌人，战斗点「攻击」自动施展本职业最强技能（内力不够则普通攻击），升级变强；野怪打到30%血以下可捕捉为宠物<br>· 技能三职业完全隔离，「技能」页只能学本职业的：战士（罗汉拳/打狗棒法/焰分噬浪尺/帝印诀）、法师（绵掌/弄炎诀/五轮离火法/佛怒火莲）、射手（峨眉刺/三千雷动/风之极·陨杀/大天造化掌）<br>· 12个装备栏：武器/帽子/护甲/裤子/护腕×2/戒指×2/项链/勋章/鞋子/饰品；武器分职业，BOSS掉落本关职业武器（优先掉没有的）；武器共7阶（1黄2玄3地4天5神6圣7至尊），带随机属性，洗炼石可重置，幸运上限9，铁匠铺可强化<br>· 背包「神兵合成」：集齐本关战士/法师/射手三职业武器+铜币→本关终极武器；集齐四把+300万铜币→轩辕神剑（6阶圣）；轩辕神剑+1000万铜币→至尊终极武器（7阶至尊·全游戏最高阶：战士斩尤帝剑/法师灭尤帝杖/射手断尤帝弓）；同部位四件BOSS防具+200万铜币→轩辕防具<br>· 宠物分黄/玄/地/天/神/圣/至尊七级，每级又分低/中/高/终极四档，10级可出战助战；3只同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用）；神级以上需进化石：神级1999/圣级19999/至尊29999元宝，商城有售，世界BOSS也掉落（至尊石概率极低）<br>· 伙伴5级可出战，出战将其30%属性加给你，可穿全部12栏装备，战斗胜利得修为升级；「宠物」页铜币/元宝招募；神级终极：VIP8免费领/「神将降临」（￥1288）/千金募名将；圣级：千金募名将极低概率（3%）；3位同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用；神级以上需进化石）；至尊终极（萧炎/薰儿随机其一）：「至尊降临」（￥7999）或圣级合成（30%，需至尊进化石）<br>· 功法分七级四档，习得后花铜币修炼（最高5重）加属性；神级唯VIP6/限时活动「神功现世」；圣级/至尊级唯限时活动可得<br>· 翅膀20级激活，灵羽升级，每阶攻击+12/气血+120/速度+3<br>· 充值：游戏内无直接充值，右上角「充值」页凭兑换码兑换——把玩家账号告诉客服，客服后台生成你的专属码后在此输入，一码一用；首充自动赠小红剑（攻击26/幸运9，限时3天）+首充礼包（288元宝+2万铜币+体力+灵兽蛋）<br>· 累计充值升VIP1-12（6/30/98/198/498/998/1998/2998/4998/7998/12998/19998元），每级攻击/气血+2%、每日VIP礼包、专属称号；VIP6及以上名字彩色显示<br>· 充值豪礼198/498/998三档（神级宠物三眼金猊·王秋儿/冰天雪女、稀有称号神之眷顾）；累计充值奖励1998/2998/5998/9999四档（元宝/神话伙伴/神级功法/限定称号）；打怪掉充值红包（0.5/1/3/5/10元，每日上限100个），红包计入累计充值进度但不计VIP等级<br>· 世界BOSS（活动中心，每日可挑战）：按你造成的伤害比例发奖——击杀/重创（60%）/激战（30%）/参与四档；掉落功法秘籍/异火/灵羽/进化石，神级石（击杀50%/重创30%/激战15%/参与5%）、圣级石（8%/3%/1%）、至尊石（2%/0.8%/0.3%）<br>· 竞技场每日5次，挑战更高排名对手，胜则排名上升，前三每日领奖；江湖任务：击败10个敌人，奖300铜币+200修为<br>· 商店=江湖药铺（铜币）+元宝商城（元宝）+元宝兑换铜币（10元宝→10万/50→55万/100→120万）；经验丹双倍25/三倍45/五倍80元宝，背包使用后30分钟打怪修为加倍<br>· 聊天只有世界频道，5秒发一条，NPC会自动互动；排行榜有战力/充值/宠物/翅膀/等级5榜，前三名得荣誉称号（可佩戴加成）；点击排行/聊天/竞技场中的名字可看档案对比<br>· 称号分VIP称号/限定称号/排行称号，均可佩戴，属性叠加；存档保存在本机，换设备会丢失<br></p></div>
  <div class="card"><h3>存档</h3>
  <button class="btn small" id="resave">手动保存</button>
  <button class="btn small danger" id="reset">删号重来（清空存档）</button></div>`;
