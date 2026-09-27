@@ -352,9 +352,15 @@ const PETS={ // pid: {name,hp,atk,def,spd,desc,tier:0黄..6至尊,sub:0低1中2�
  hongmeng:{name:"金眼黑龙王·帝天",hp:950,atk:175,def:88,spd:50,desc:"星斗大森林之主，八十万年修为",tier:6,sub:3},
  guhuang:{name:"银龙王·古月娜",hp:900,atk:185,def:82,spd:58,desc:"银龙王古月娜，魂兽共主",tier:6,sub:3}
 };
-function mkMonster(name,lv,catchPet,boss){return{name,lv,catchPet:catchPet||null,boss:!!boss,
- hp:Math.floor(45+lv*24),atk:Math.floor(8+lv*2.3),def:Math.floor(4+lv*1.3),spd:Math.floor(5+lv*0.9),
- exp:Math.floor((22+lv*13)*6),coins:rnd(10+lv*5,16+lv*8)};}
+function mkMonster(name,lv,catchPet,boss){
+ const o={name,lv,catchPet:catchPet||null,boss:!!boss,
+ spd:Math.floor(5+lv*0.9),exp:Math.floor((22+lv*13)*6),coins:rnd(10+lv*5,16+lv*8)};
+ // 数值平衡（2026-09-27）：按平民/土豪双档建模调优——
+ // 小怪平民4~10轮击杀、自身几乎无危险，土豪任何单次攻击（含暴击/宠物助战）都秒不掉；
+ // BOSS平民10~14轮+1瓶铜币药可过，土豪2.5轮以上。修为/铜币掉落不变。
+ if(boss){o.hp=Math.floor(1300-300*lv+23*lv*lv);o.atk=Math.floor(2+3.2*lv);o.def=Math.floor(6+2*lv);}
+ else{o.hp=Math.floor(170+20*lv+4.5*lv*lv);o.atk=Math.floor(8+2.8*lv);o.def=Math.floor(6+2*lv);}
+ return o;}
 const ZONES=[
  {name:"青竹林",req:1,desc:"新手历练之地，竹影婆娑",tier:1,
  mobs:[()=>mkMonster("野猴",1,"linghou"),()=>mkMonster("青竹蛇",2,"linghou"),()=>mkMonster("魂兽·柔骨兔",2,"rougutu"),()=>mkMonster("山贼喽啰",3),()=>mkMonster("小头目·赵虎",5,null,true)]},
