@@ -15,7 +15,7 @@ body{background:#141009;color:#e8dcc0;font-family:"Songti SC","STSong","SimSun",
 #topbar .pname .lv{background:#8a6d2f;color:#141009;font-size:12px;padding:1px 8px;border-radius:10px;margin-left:6px;vertical-align:2px}
 #topbar .pname .vip{background:linear-gradient(180deg,#f5d67b,#c8903c);color:#3a2a08;font-size:12px;font-weight:bold;padding:1px 8px;border-radius:10px;margin-left:6px;vertical-align:2px}
 #topVip{cursor:pointer;background:rgba(20,12,4,.55);color:#f5d67b;border:1px solid #c8903c;text-shadow:0 0 8px rgba(245,214,123,.7);box-shadow:0 0 8px rgba(200,144,60,.35)}
-/* VIP6+名字变色，VIP12彩虹流动 */
+/* VIP6+名字变色，VIP10彩虹流动 */
 .vipn1{color:#a8a8a8;font-weight:bold}
 .vipn2{color:#7bed9f;font-weight:bold}
 .vipn3{color:#70a1ff;font-weight:bold}
@@ -25,9 +25,7 @@ body{background:#141009;color:#e8dcc0;font-family:"Songti SC","STSong","SimSun",
 .vipn7{color:#ff9f43;font-weight:bold;text-shadow:0 0 8px rgba(255,159,67,.7)}
 .vipn8{color:#ff5b5b;font-weight:bold;text-shadow:0 0 8px rgba(255,91,91,.7)}
 .vipn9{color:#c56cf0;font-weight:bold;text-shadow:0 0 8px rgba(197,108,240,.7)}
-.vipn10{color:#54a0ff;font-weight:bold;text-shadow:0 0 8px rgba(84,160,255,.7)}
-.vipn11{color:#1dd1a1;font-weight:bold;text-shadow:0 0 8px rgba(29,209,161,.7)}
-.vipn12{font-weight:bold;background:linear-gradient(90deg,#ff2d2d,#ff7f00,#ffe600,#2dff2d,#00e5ff,#2d7fff,#a52dff,#ffd700,#ff2d2d);background-size:300% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:rainbow 4s linear infinite}
+.vipn10{font-weight:bold;background:linear-gradient(90deg,#ff2d2d,#ff7f00,#ffe600,#2dff2d,#00e5ff,#2d7fff,#a52dff,#ffd700,#ff2d2d);background-size:300% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:rainbow 4s linear infinite}
 @keyframes rainbow{to{background-position:300% center}}
 /* 神级物品：七彩流光 */
 .godflow{font-weight:bold;background:linear-gradient(90deg,#ff2d2d,#ff7f00,#ffe600,#2dff2d,#00e5ff,#2d7fff,#a52dff,#ffd700,#ff2d2d);background-size:300% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:rainbow 3s linear infinite}
@@ -484,11 +482,11 @@ function cdSig(payload,account){var L=CD_A.length,h=cyrb53(CD_SECRET+"|"+payload
 function cdVerify(code,account){var raw=String(code||"").toUpperCase().replace(/[^A-Z0-9]/g,"");if(raw.length!==12)return -1;var p=raw.slice(0,6);if(cdSig(p,account)!==raw.slice(6))return -1;var tier=CD_A.indexOf(p[0]);return(tier>=0&&tier<TIERS.length)?tier:-1;}
 function newAccount(){return "JH"+String(Math.floor(100000+Math.random()*900000));}
 function cdNorm(code){return String(code||"").toUpperCase().replace(/[^A-Z0-9]/g,"");}
-const RANKS=[{name:"武林神话·叶孤鸿",zl:99999,vip:12},{name:"剑圣·西门飘雪",zl:52000,vip:10},{name:"魔教教主·任逍遥",zl:38000,vip:9},{name:"丐帮帮主·洪七",zl:26000,vip:8},{name:"武当掌门·张真人",zl:18000,vip:7},{name:"峨眉掌门·灭绝师太",zl:12000,vip:6},{name:"少林方丈·玄慈",zl:9000,vip:5},{name:"黑风寨主·黑风虎",zl:5000,vip:3},{name:"采花大盗·田伯光",zl:2800,vip:2},{name:"江南大侠·江别鹤",zl:1500,vip:1}];
-const RANK_PAY=[{name:"神豪·王多鱼",pay:99999,vip:12},{name:"江南首富·沈万三",pay:52000,vip:11},{name:"西域土豪·金轮法王",pay:26000,vip:10},{name:"盐帮帮主·方中信",pay:12000,vip:8},{name:"总镖头·铁中堂",pay:6000,vip:7},{name:"富商·陶朱公",pay:2600,vip:5},{name:"钱庄掌柜·金算盘",pay:1200,vip:4},{name:"小地主·黄世仁",pay:500,vip:2},{name:"暴发户·苟富贵",pay:150,vip:1}];
+const RANKS=[{name:"武林神话·叶孤鸿",zl:99999,vip:10},{name:"剑圣·西门飘雪",zl:52000,vip:10},{name:"魔教教主·任逍遥",zl:38000,vip:9},{name:"丐帮帮主·洪七",zl:26000,vip:8},{name:"武当掌门·张真人",zl:18000,vip:7},{name:"峨眉掌门·灭绝师太",zl:12000,vip:6},{name:"少林方丈·玄慈",zl:9000,vip:5},{name:"黑风寨主·黑风虎",zl:5000,vip:3},{name:"采花大盗·田伯光",zl:2800,vip:2},{name:"江南大侠·江别鹤",zl:1500,vip:1}];
+const RANK_PAY=[{name:"神豪·王多鱼",pay:99999,vip:10},{name:"江南首富·沈万三",pay:52000,vip:10},{name:"西域土豪·金轮法王",pay:26000,vip:10},{name:"盐帮帮主·方中信",pay:12000,vip:8},{name:"总镖头·铁中堂",pay:6000,vip:7},{name:"富商·陶朱公",pay:2600,vip:5},{name:"钱庄掌柜·金算盘",pay:1200,vip:4},{name:"小地主·黄世仁",pay:500,vip:2},{name:"暴发户·苟富贵",pay:150,vip:1}];
 const RANK_PET=[{name:"兽王·蛮吉",pet:"啸天虎",score:8800,vip:8},{name:"毒仙·何仙姑",pet:"碧鳞蛇",score:7200,vip:6},{name:"驭兽斋主·公孙瓒",pet:"金翅雕",score:6100,vip:5},{name:"南疆蛊女·蓝凤凰",pet:"金蚕蛊",score:4800,vip:4},{name:"猎户·石大壮",pet:"苍原狼",score:3500,vip:2},{name:"药农·老蔫",pet:"月影兔",score:2200,vip:1},{name:"顽童·小豆子",pet:"灵羽鸡",score:1200,vip:0}];
-const RANK_WING=[{name:"翼皇·陆九天",wing:"九天神翼",tier:12,vip:12},{name:"风神·聂风行",wing:"混沌天翼",tier:10,vip:9},{name:"火凤传人·祝融焱",wing:"天罡神翼",tier:9,vip:8},{name:"夜枭·影无痕",wing:"暗影之翼",tier:7,vip:6},{name:"云游僧·慧远",wing:"圣光之翼",tier:6,vip:5},{name:"苗疆翼女·阿幼",wing:"烈焰之翼",tier:3,vip:2},{name:"送信小厮·阿毛",wing:"翠羽之翼",tier:1,vip:0}];
-const RANK_LV=[{name:"武林神话·叶孤鸿",lv:99,vip:12},{name:"剑圣·西门飘雪",lv:88,vip:10},{name:"魔教教主·任逍遥",lv:80,vip:9},{name:"丐帮帮主·洪七",lv:72,vip:8},{name:"武当掌门·张真人",lv:65,vip:7},{name:"峨眉掌门·灭绝师太",lv:58,vip:6},{name:"少林方丈·玄慈",lv:52,vip:5},{name:"黑风寨主·黑风虎",lv:40,vip:3},{name:"采花大盗·田伯光",lv:30,vip:2},{name:"江南大侠·江别鹤",lv:20,vip:1}];
+const RANK_WING=[{name:"翼皇·陆九天",wing:"九天神翼",tier:12,vip:10},{name:"风神·聂风行",wing:"混沌天翼",tier:10,vip:9},{name:"火凤传人·祝融焱",wing:"天罡神翼",tier:9,vip:8},{name:"夜枭·影无痕",wing:"暗影之翼",tier:7,vip:6},{name:"云游僧·慧远",wing:"圣光之翼",tier:6,vip:5},{name:"苗疆翼女·阿幼",wing:"烈焰之翼",tier:3,vip:2},{name:"送信小厮·阿毛",wing:"翠羽之翼",tier:1,vip:0}];
+const RANK_LV=[{name:"武林神话·叶孤鸿",lv:99,vip:10},{name:"剑圣·西门飘雪",lv:88,vip:10},{name:"魔教教主·任逍遥",lv:80,vip:9},{name:"丐帮帮主·洪七",lv:72,vip:8},{name:"武当掌门·张真人",lv:65,vip:7},{name:"峨眉掌门·灭绝师太",lv:58,vip:6},{name:"少林方丈·玄慈",lv:52,vip:5},{name:"黑风寨主·黑风虎",lv:40,vip:3},{name:"采花大盗·田伯光",lv:30,vip:2},{name:"江南大侠·江别鹤",lv:20,vip:1}];
 /* 排行榜称号：前三名自动获得，属性可叠加 */
 const RANK_TITLES={
  zl:[{name:"战力之巅",cls:"rt1",bonus:{atk:30,hp:300}},{name:"武林传奇",cls:"rt2",bonus:{atk:20,hp:200}},{name:"江湖豪杰",cls:"rt3",bonus:{atk:10,hp:100}}],
@@ -907,7 +905,7 @@ function startWBattle(){
 }
 const GFNAME={atk:"攻击",def:"防御",hp:"气血",mp:"内力",spd:"速度",luck:"幸运"};
 /* ============ VIP系统 ============ */
-const VIP_NEED=[0,6,30,98,198,498,998,1998,2998,4998,7998,12998,19998]; // 索引即VIP等级：升到该级所需累计充值
+const VIP_NEED=[0,6,30,98,198,498,998,1998,2998,4998,9999]; // 索引即VIP等级：升到该级所需累计充值
 function vipTotal(){return S.orders.reduce((a,o)=>a+o.money,0);}
 function vipLevel(){const t=vipTotal();let v=0;for(let i=1;i<VIP_NEED.length;i++)if(t>=VIP_NEED[i])v=i;return v;}
 function vipGift(){const v=vipLevel();return{coins:v*300,stam:10+v*5,gold:v*8,feather:v*2};}
@@ -1056,7 +1054,7 @@ const VIP_TITLES=[null, // 索引=VIP等级：称号名+属性+爆率
  {name:"初露锋芒",atk:8,hp:80,drop:5},{name:"江湖新秀",atk:16,hp:160,drop:8},{name:"一方豪杰",atk:28,hp:280,drop:12},
  {name:"武林名宿",atk:45,hp:450,drop:16},{name:"绝世高手",atk:70,hp:700,drop:20},{name:"武林神话",atk:110,hp:1100,drop:30},
  {name:"独步天下",atk:160,hp:1600,drop:35},{name:"盖世无双",atk:230,hp:2300,drop:40},{name:"君临天下",atk:320,hp:3200,drop:45},
- {name:"天人合一",atk:450,hp:4500,drop:50},{name:"破碎虚空",atk:620,hp:6200,drop:60},{name:"武道至尊",atk:850,hp:8500,drop:70}];
+ {name:"武道至尊",atk:850,hp:8500,drop:70}];
 function isWorn(k,id){const w=S.wornTitle;return !!(w&&w.k===k&&w.id===id);}
 function vipDrop(){const w=S.wornTitle;return(w&&w.k==="vip"&&VIP_TITLES[w.id])?VIP_TITLES[w.id].drop||0:0;} // 当前佩戴VIP称号的爆率加成%
 </script>
@@ -1147,7 +1145,7 @@ function renderTop(){
  const p=S.player,t=$("topbar");t.style.display="block";
  const v=vipLevel();
  const wt=wornTitleInfo();
- t.innerHTML=`<div class="pname">${wt?`<div class="wornt" id="topWorn" title="点击更换称号">${wornTitleHTML(wt)}</div>`:`<div class="wornt none" id="topWorn" title="点击前往称号页">暂无称号·点击获取</div>`}<div><span id="topName" class="${v>=6?"vipn"+Math.min(v,12):""}" style="cursor:pointer" title="点击查看角色属性">${p.name}</span><span class="lv">Lv.${p.level} ${PROFS[p.prof||"warrior"].name}</span>${v?`<span class="vip" id="topVip" title="查看VIP详情">VIP${v}</span>`:""}</div>
+ t.innerHTML=`<div class="pname">${wt?`<div class="wornt" id="topWorn" title="点击更换称号">${wornTitleHTML(wt)}</div>`:`<div class="wornt none" id="topWorn" title="点击前往称号页">暂无称号·点击获取</div>`}<div><span id="topName" class="${v>=6?"vipn"+Math.min(v,10):""}" style="cursor:pointer" title="点击查看角色属性">${p.name}</span><span class="lv">Lv.${p.level} ${PROFS[p.prof||"warrior"].name}</span>${v?`<span class="vip" id="topVip" title="查看VIP详情">VIP${v}</span>`:""}</div>
  <div class="bars">
  <div class="bar hp"><i style="width:${p.hp/p.maxhp*100}%"></i><span>气血 ${p.hp}/${p.maxhp}</span></div>
  <div class="bar mp"><i style="width:${p.mp/p.maxmp*100}%"></i><span>内力 ${p.mp}/${p.maxmp}</span></div>
@@ -1979,12 +1977,12 @@ p.gold-=e.gold;p.coins+=e.coins;save();render();toast(`兑换成功！铜币+${e
 /* ============ 充值（兑换码后台管控） ============ */
 /* ============ VIP详情 ============ */
 function rVip(){
- const m=$("main"),v=vipLevel(),total=vipTotal(),next=v<12?VIP_NEED[v+1]:null;
+ const m=$("main"),v=vipLevel(),total=vipTotal(),next=v<VIP_NEED.length-1?VIP_NEED[v+1]:null;
  let h='<div class="card"><h3>VIP详情</h3>'
  +'<p>当前等级：<b class="gold">VIP'+v+'</b> · 累计充值 <b class="gold">￥'+total+'</b></p>'
- +'<p class="dim">'+(next?('再充值 ￥'+(next-total)+' 即可晋升 VIP'+(v+1)):'已达最高 VIP12，威震江湖！')+'</p></div>';
+ +'<p class="dim">'+(next?('再充值 ￥'+(next-total)+' 即可晋升 VIP'+(v+1)):'已达最高 VIP10，威震江湖！')+'</p></div>';
  h+='<div class="card"><h3>VIP等级一览</h3>';
- for(let i=1;i<=12;i++){const t=VIP_TITLES[i];
+ for(let i=1;i<VIP_NEED.length;i++){const t=VIP_TITLES[i];
  const sp=i===6?'<br><span class="gold">特殊福利：神级功法《大日焚天诀》</span>':(i===8?'<br><span class="gold">特殊福利：神话伙伴免费领取</span>':'');
  h+='<div class="tier"'+(i===v?' style="border-color:#f5d67b"':'')+'><div>'
  +'<div class="mn">VIP'+i+' <span class="dim">累计￥'+VIP_NEED[i]+'</span>'+(i===v?' <span class="gold">当前</span>':'')+(i<=v?' <span class="dim">已达成</span>':'')+'</div>'
@@ -2167,7 +2165,7 @@ function rTitle(){
  const m=$("main"),v=vipLevel(),w=S.wornTitle;
  const myT=myRankTitles().map(t=>t.name),evGot=S.eventTitles||[];
  let vipHtml="";
- for(let i=1;i<=12;i++){const tt=VIP_TITLES[i],got=i<=v;
+ for(let i=1;i<VIP_NEED.length;i++){const tt=VIP_TITLES[i],got=i<=v;
  vipHtml+=`<span class="tt${got?"":" locked"}${isWorn("vip",i)?" worn":""}"${got?` data-wk="vip" data-wid="${i}"`:""}>${titleArtHTML(tt.name,vipTitleCls(i))}</span>`;}
  let rkHtml="";
  for(const bk of Object.keys(RANK_TITLES))for(let i=0;i<3;i++){const t=RANK_TITLES[bk][i],got=myT.includes(t.name),wid=bk+":"+i;
@@ -2178,7 +2176,7 @@ function rTitle(){
  // 动态称号大图展示区：已获得的动态称号，点击直接佩戴
  let vipArt="";
  if(v>=6)vipArt+=`<div class="tshow" data-wk="vip" data-wid="6" title="点击佩戴">${titleDynHTML("武林神话",true)}</div>`;
- if(v>=12)vipArt+=`<div class="tshow" data-wk="vip" data-wid="12" title="点击佩戴">${titleDynHTML("武道至尊",true)}</div>`;
+ if(v>=10)vipArt+=`<div class="tshow" data-wk="vip" data-wid="10" title="点击佩戴">${titleDynHTML("武道至尊",true)}</div>`;
  let rkArt="";
  const RKB={zl:"战力之巅",pay:"神豪无双",pet:"灵兽之主",wing:"九天神皇",lv:"登峰造极"};
  for(const bk of Object.keys(RKB)){if(myT.includes(RKB[bk]))rkArt+=`<div class="tshow" data-wk="rank" data-wid="${bk}:0" title="点击佩戴">${titleDynHTML(RKB[bk],true)}</div>`;}
@@ -2461,7 +2459,7 @@ function marketVisit(){ // 每次进入交易行：土豪NPC前来购买寄售
    _sellTxt.push(`${buyer}买走${nm}（实得${fmtPrice(gain,L.cur)}）`);
    S.marketLog.unshift({txt:`${buyer}买走了你的${nm}，${fmtPrice(L.price,L.cur)}（税${fmtPrice(tax,L.cur)}，实得${fmtPrice(gain,L.cur)}，已发至邮箱）`,t:Date.now()});
    if(S.marketLog.length>20)S.marketLog.length=20;
-   pushChat("world",{n:buyer,vip:12,t:Date.now(),txt:`在交易行拿下了${nm}，爽！`});
+   pushChat("world",{n:buyer,vip:10,t:Date.now(),txt:`在交易行拿下了${nm}，爽！`});
    sold.push({buyer,nm,gain,cur:L.cur});
   }
  }
@@ -2793,7 +2791,7 @@ function rMore(){
  const m=$("main");
  m.innerHTML=attrPanelHTML()
  +`<div class="card"><h3>玩法说明</h3><p class="dim">
- · 建号三选一：战士（攻击+10%）/ 法师（内力上限+30%）/ 射手（速度+15%）；建号自动生成玩家账号（JH+6位数字），充值兑换要用；建号即得本职业2个入门技能<br>· 去「江湖」挑战敌人，战斗点「攻击」自动施展本职业最强技能（内力不够则普通攻击），升级变强；野怪打到30%血以下可捕捉为宠物；修为按关卡难度递增——青竹林1倍、黑风寨2倍、幽冥谷3.5倍、华山之巅6倍、熔岩炼狱10倍、极北冰原16倍、云梦仙泽26倍、九幽魔域40倍，关卡BOSS再享2.5倍；升级所需修为递增（1→2级需2000，越往后越多）<br>· 技能三职业完全隔离，「技能」页只能学本职业的：战士（罗汉拳/打狗棒法/焰分噬浪尺/帝印诀）、法师（绵掌/弄炎诀/五轮离火法/佛怒火莲）、射手（峨眉刺/三千雷动/风之极·陨杀/大天造化掌）<br>· 12个装备栏：武器/帽子/护甲/裤子/护腕×2/戒指×2/项链/勋章/鞋子/腰带；武器分职业，BOSS掉落本关职业武器（优先掉没有的）；武器共7阶（1黄2玄3地4天5神6圣7至尊），带随机属性，洗炼石可重置；幸运只来自武器（最高7）与项链（最高2），其他途径不加幸运；铁匠铺可强化；防具有套装效果——圣龙/冰火/九幽/轩辕套：3件攻击+5%，6件攻击+10%/气血+10%，9件攻击+15%/气血+15%/防御+10%<br>· 背包「神兵合成」：集齐本关战士/法师/射手三职业武器+铜币→本关终极武器（8关：青竹圣剑/黑风魔刃/幽冥鬼剑/华山紫青剑/熔岩圣剑/冰原帝戟/云梦仙剑/九幽帝刃）；集齐前四把+300万铜币→轩辕神剑（6阶圣）；集齐后四把+800万铜币→鸿蒙神剑（7阶至尊，无职业限制）；轩辕神剑×3+1000万铜币→至尊终极武器（7阶至尊·全游戏最高阶：战士斩尤帝剑/法师灭尤帝杖/射手断尤帝弓）；轩辕战甲×3+1000万铜币→至尊终极防具（7阶至尊：战士斩尤帝甲/法师灭尤帝袍/射手断尤帝衣）；同部位四件1-4阶BOSS防具+200万铜币→轩辕防具；同部位三件5-7阶BOSS防具+800万铜币→鸿蒙防具（7阶至尊）<br>· 宠物均为斗罗大陆魂兽，分黄/玄/地/天/神/圣/至尊七级，每级又分低/中/高/终极四档，10级可出战助战；3只同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用）；神级以上需进化石：神级1999/圣级19999/至尊29999元宝，商城有售，世界BOSS也掉落（至尊石概率极低）<br>· 宠物技能（斗罗大陆魂兽技）与伙伴技能（斗破苍穹斗技）：每只/每位初始拥有3个，最高神级，按品级加攻击（黄+3%/玄+5%/地+8%/天+12%/神+18%，可叠加）；出战时有概率施展技能造成额外伤害；宠物/伙伴页点「技能」可花铜币更换领悟（随机同品级及以下新技能，最高神级）；圣级/至尊级技能后续通过限时活动获取<br>· 伙伴均为斗破苍穹人物，5级可出战，出战将其30%属性加给你，只能穿戴武器和护甲，战斗胜利得修为升级；「宠物」页铜币/元宝招募；神级终极：VIP8免费领/「神将降临」（￥1288）/千金募名将；圣级：千金募名将极低概率（3%）；3位同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用；神级以上需进化石）；至尊终极（萧炎/薰儿随机其一）：「至尊降临」（￥7999）或圣级合成（30%，需至尊进化石）<br>· 功法分七级四档，习得后花铜币修炼（最高5重）加属性；神级唯VIP6/限时活动「神功现世」；圣级/至尊级唯限时活动可得<br>· 斗气境界即转生：斗之气/斗者/斗师/大斗师/斗灵/斗王/斗皇/斗宗/斗尊/斗圣/斗帝共十一境，每境有等级上限（3/6/10/14/18/24/30/36/44/99/99级），满级后必须去「功法」页花铜币转生突破才能继续升级，突破还加属性<br>· 翅膀20级激活，灵羽升级，每阶攻击+12/气血+120/速度+3<br>· 充值：游戏内无直接充值，右上角「充值」页凭兑换码兑换——把玩家账号告诉客服，客服后台生成你的专属码后在此输入，一码一用；兑换码元宝、VIP6神级功法、首充小红剑（攻击26/幸运7，永久）、首充大礼包（288元宝+2万铜币+体力+灵兽蛋）全部发放至邮箱手动领取<br>· 累计充值升VIP1-12（6/30/98/198/498/998/1998/2998/4998/7998/12998/19998元），每级攻击/气血+2%、每日VIP礼包（发至邮箱）、专属称号；VIP6及以上名字彩色显示<br>· 充值豪礼5档（30/98/198/498/998）：启程礼（元宝/洗炼石/经验丹）、天级终极宠物天青牛蟒·大明、神级宠物三眼金猊·王秋儿/冰天雪女、稀有称号神之眷顾——真实充值与红包共同累积，平民打怪攒红包也能领；奖励发放至邮箱<br>· 累计充值奖励4档（1998/2998/5998/9999，仅真实充值）：元宝+圣级/至尊进化石+限定称号（一代宗师/开宗立派/纵横四海/名扬四海），奖励发放至邮箱；打怪掉充值红包（0.5/1/3/5/10元，每日上限100个），红包计入充值豪礼进度但不计VIP等级与累计充值奖励<br>· 限时活动（仅真实充值，每位玩家自建号起3天内有效，过期不可再领）：神功现世（￥498神级大日焚天诀）、神将降临（￥1288神话伙伴）、圣宠降临（￥2998圣级光明圣龙）、圣功现世（￥3999圣级圣心诀）、圣凰降临（￥5999圣级光明凤凰）、至尊降临（￥7999至尊萧炎/薰儿）、鸿蒙降临（￥9999金眼黑龙王·帝天/银龙王·古月娜+鸿蒙至尊诀）<br>· 世界BOSS（活动中心，每日可挑战）：血量999999999，打不死，纯粹比拼伤害，单场30回合封顶；挑战按钮旁「伤害榜」查看今日所有玩家伤害排名；每日24点按排名自动发放至邮箱（手动领取）——冠军200元宝+圣级进化石+灵羽×30+百万铜币+洗炼石×10，第2-3名100元宝+神级进化石+灵羽×20+五十万铜币+洗炼石×5，第4-10名50元宝+灵羽×10+二十万铜币+洗炼石×3，参与奖灵羽×5+五万铜币+洗炼石×1<br>· 竞技场每日5次，挑战更高排名对手，胜则排名上升，前三每日领奖（发至邮箱）；江湖任务：击败10个敌人，奖300铜币+1200修为（发至邮箱）<br>· 商店=江湖药铺（铜币）+元宝商城（元宝）+元宝兑换铜币（10元宝→10万/50→55万/100→120万）；经验丹双倍25/三倍45/五倍80元宝，背包使用后30分钟打怪修为加倍<br>· 聊天只有世界频道，5秒发一条，NPC会自动互动；排行榜有战力/充值/宠物/翅膀/等级5榜，前三名得荣誉称号（可佩戴加成）；点击排行/聊天/竞技场中的名字可看档案对比；竞技榜第一、世界BOSS伤害榜第一、等级榜第一、充值榜第一都会世界通报<br>· 邮箱（右上角）：所有奖励统一发放至邮箱手动领取——充值/兑换码/充值豪礼/累计充值奖励/VIP每日礼包/限时活动/竞技场每日奖励/江湖任务/交易行购买与寄售成交/玩家交易码/世界BOSS每日24点排名奖励；最多保留30封<br>· 交易行（底部导航「交易」）：寄售装备/进化石/宠物卖给土豪NPC（每次进入结算，定价合理卖得快，成交收5%税，成交款发至邮箱）；购买区每日刷新他人寄售（购买所得发至邮箱）；玩家交易码可跨设备与真实玩家交易（兑换所得发至邮箱）<br>· 称号分VIP称号/限定称号/排行称号共57个，均可佩戴，属性叠加；其中8个为动态称号（稀有称号神之眷顾、VIP12武道至尊、5榜第一：武林神话/战力之巅/神豪无双/灵兽之主/九天神皇/登峰造极）——完整场景底图+左右双神兽独立游动+光效粒子，背景文字静止；其余49个为静态称号牌（VIP金框/榜二银框/榜三铜框/节日红粉蓝紫四框+文字）；佩戴的称号显示在顶栏左上角，点击可进称号页更换；动态称号在称号页有专属大图展示，点击大图可直接佩戴；存档保存在本机，换设备会丢失<br></p></div>
+ · 建号三选一：战士（攻击+10%）/ 法师（内力上限+30%）/ 射手（速度+15%）；建号自动生成玩家账号（JH+6位数字），充值兑换要用；建号即得本职业2个入门技能<br>· 去「江湖」挑战敌人，战斗点「攻击」自动施展本职业最强技能（内力不够则普通攻击），升级变强；野怪打到30%血以下可捕捉为宠物；修为按关卡难度递增——青竹林1倍、黑风寨2倍、幽冥谷3.5倍、华山之巅6倍、熔岩炼狱10倍、极北冰原16倍、云梦仙泽26倍、九幽魔域40倍，关卡BOSS再享2.5倍；升级所需修为递增（1→2级需2000，越往后越多）<br>· 技能三职业完全隔离，「技能」页只能学本职业的：战士（罗汉拳/打狗棒法/焰分噬浪尺/帝印诀）、法师（绵掌/弄炎诀/五轮离火法/佛怒火莲）、射手（峨眉刺/三千雷动/风之极·陨杀/大天造化掌）<br>· 12个装备栏：武器/帽子/护甲/裤子/护腕×2/戒指×2/项链/勋章/鞋子/腰带；武器分职业，BOSS掉落本关职业武器（优先掉没有的）；武器共7阶（1黄2玄3地4天5神6圣7至尊），带随机属性，洗炼石可重置；幸运只来自武器（最高7）与项链（最高2），其他途径不加幸运；铁匠铺可强化；防具有套装效果——圣龙/冰火/九幽/轩辕套：3件攻击+5%，6件攻击+10%/气血+10%，9件攻击+15%/气血+15%/防御+10%<br>· 背包「神兵合成」：集齐本关战士/法师/射手三职业武器+铜币→本关终极武器（8关：青竹圣剑/黑风魔刃/幽冥鬼剑/华山紫青剑/熔岩圣剑/冰原帝戟/云梦仙剑/九幽帝刃）；集齐前四把+300万铜币→轩辕神剑（6阶圣）；集齐后四把+800万铜币→鸿蒙神剑（7阶至尊，无职业限制）；轩辕神剑×3+1000万铜币→至尊终极武器（7阶至尊·全游戏最高阶：战士斩尤帝剑/法师灭尤帝杖/射手断尤帝弓）；轩辕战甲×3+1000万铜币→至尊终极防具（7阶至尊：战士斩尤帝甲/法师灭尤帝袍/射手断尤帝衣）；同部位四件1-4阶BOSS防具+200万铜币→轩辕防具；同部位三件5-7阶BOSS防具+800万铜币→鸿蒙防具（7阶至尊）<br>· 宠物均为斗罗大陆魂兽，分黄/玄/地/天/神/圣/至尊七级，每级又分低/中/高/终极四档，10级可出战助战；3只同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用）；神级以上需进化石：神级1999/圣级19999/至尊29999元宝，商城有售，世界BOSS也掉落（至尊石概率极低）<br>· 宠物技能（斗罗大陆魂兽技）与伙伴技能（斗破苍穹斗技）：每只/每位初始拥有3个，最高神级，按品级加攻击（黄+3%/玄+5%/地+8%/天+12%/神+18%，可叠加）；出战时有概率施展技能造成额外伤害；宠物/伙伴页点「技能」可花铜币更换领悟（随机同品级及以下新技能，最高神级）；圣级/至尊级技能后续通过限时活动获取<br>· 伙伴均为斗破苍穹人物，5级可出战，出战将其30%属性加给你，只能穿戴武器和护甲，战斗胜利得修为升级；「宠物」页铜币/元宝招募；神级终极：VIP8免费领/「神将降临」（￥1288）/千金募名将；圣级：千金募名将极低概率（3%）；3位同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用；神级以上需进化石）；至尊终极（萧炎/薰儿随机其一）：「至尊降临」（￥7999）或圣级合成（30%，需至尊进化石）<br>· 功法分七级四档，习得后花铜币修炼（最高5重）加属性；神级唯VIP6/限时活动「神功现世」；圣级/至尊级唯限时活动可得<br>· 斗气境界即转生：斗之气/斗者/斗师/大斗师/斗灵/斗王/斗皇/斗宗/斗尊/斗圣/斗帝共十一境，每境有等级上限（3/6/10/14/18/24/30/36/44/99/99级），满级后必须去「功法」页花铜币转生突破才能继续升级，突破还加属性<br>· 翅膀20级激活，灵羽升级，每阶攻击+12/气血+120/速度+3<br>· 充值：游戏内无直接充值，右上角「充值」页凭兑换码兑换——把玩家账号告诉客服，客服后台生成你的专属码后在此输入，一码一用；兑换码元宝、VIP6神级功法、首充小红剑（攻击26/幸运7，永久）、首充大礼包（288元宝+2万铜币+体力+灵兽蛋）全部发放至邮箱手动领取<br>· 累计充值升VIP1-10（6/30/98/198/498/998/1998/2998/4998/9999元），每级攻击/气血+2%、每日VIP礼包（发至邮箱）、专属称号；VIP6及以上名字彩色显示<br>· 充值豪礼5档（30/98/198/498/998）：启程礼（元宝/洗炼石/经验丹）、天级终极宠物天青牛蟒·大明、神级宠物三眼金猊·王秋儿/冰天雪女、稀有称号神之眷顾——真实充值与红包共同累积，平民打怪攒红包也能领；奖励发放至邮箱<br>· 累计充值奖励4档（1998/2998/5998/9999，仅真实充值）：元宝+圣级/至尊进化石+限定称号（一代宗师/开宗立派/纵横四海/名扬四海），奖励发放至邮箱；打怪掉充值红包（0.5/1/3/5/10元，每日上限100个），红包计入充值豪礼进度但不计VIP等级与累计充值奖励<br>· 限时活动（仅真实充值，每位玩家自建号起3天内有效，过期不可再领）：神功现世（￥498神级大日焚天诀）、神将降临（￥1288神话伙伴）、圣宠降临（￥2998圣级光明圣龙）、圣功现世（￥3999圣级圣心诀）、圣凰降临（￥5999圣级光明凤凰）、至尊降临（￥7999至尊萧炎/薰儿）、鸿蒙降临（￥9999金眼黑龙王·帝天/银龙王·古月娜+鸿蒙至尊诀）<br>· 世界BOSS（活动中心，每日可挑战）：血量999999999，打不死，纯粹比拼伤害，单场30回合封顶；挑战按钮旁「伤害榜」查看今日所有玩家伤害排名；每日24点按排名自动发放至邮箱（手动领取）——冠军200元宝+圣级进化石+灵羽×30+百万铜币+洗炼石×10，第2-3名100元宝+神级进化石+灵羽×20+五十万铜币+洗炼石×5，第4-10名50元宝+灵羽×10+二十万铜币+洗炼石×3，参与奖灵羽×5+五万铜币+洗炼石×1<br>· 竞技场每日5次，挑战更高排名对手，胜则排名上升，前三每日领奖（发至邮箱）；江湖任务：击败10个敌人，奖300铜币+1200修为（发至邮箱）<br>· 商店=江湖药铺（铜币）+元宝商城（元宝）+元宝兑换铜币（10元宝→10万/50→55万/100→120万）；经验丹双倍25/三倍45/五倍80元宝，背包使用后30分钟打怪修为加倍<br>· 聊天只有世界频道，5秒发一条，NPC会自动互动；排行榜有战力/充值/宠物/翅膀/等级5榜，前三名得荣誉称号（可佩戴加成）；点击排行/聊天/竞技场中的名字可看档案对比；竞技榜第一、世界BOSS伤害榜第一、等级榜第一、充值榜第一都会世界通报<br>· 邮箱（右上角）：所有奖励统一发放至邮箱手动领取——充值/兑换码/充值豪礼/累计充值奖励/VIP每日礼包/限时活动/竞技场每日奖励/江湖任务/交易行购买与寄售成交/玩家交易码/世界BOSS每日24点排名奖励；最多保留30封<br>· 交易行（底部导航「交易」）：寄售装备/进化石/宠物卖给土豪NPC（每次进入结算，定价合理卖得快，成交收5%税，成交款发至邮箱）；购买区每日刷新他人寄售（购买所得发至邮箱）；玩家交易码可跨设备与真实玩家交易（兑换所得发至邮箱）<br>· 称号分VIP称号/限定称号/排行称号共55个，均可佩戴，属性叠加；其中8个为动态称号（稀有称号神之眷顾、VIP10武道至尊、5榜第一：武林神话/战力之巅/神豪无双/灵兽之主/九天神皇/登峰造极）——完整场景底图+左右双神兽独立游动+光效粒子，背景文字静止；其余47个为静态称号牌（VIP金框/榜二银框/榜三铜框/节日红粉蓝紫四框+文字）；佩戴的称号显示在顶栏左上角，点击可进称号页更换；动态称号在称号页有专属大图展示，点击大图可直接佩戴；存档保存在本机，换设备会丢失<br></p></div>
  <div class="card"><h3>存档</h3>
  <button class="btn small" id="resave">手动保存</button>
  <button class="btn small danger" id="reset">删号重来（清空存档）</button></div>`;
