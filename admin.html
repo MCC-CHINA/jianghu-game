@@ -39,9 +39,11 @@ td.code{font-family:monospace;color:#ffd75e;word-break:break-all}
 
 <div id="app" style="display:none">
  <h2>江湖行 · 充值后台</h2>
- <div class="warn">后台地址请勿公开。兑换码同一设备一码一用；兑换码含签名，普通玩家无法伪造，但密钥在前端代码中，懂技术者理论上可破解，介意请上服务器版后台。</div>
+ <div class="warn">后台地址请勿公开。兑换码绑定玩家账号，只有该账号能用；同一设备一码一用。兑换码含签名，普通玩家无法伪造，但密钥在前端代码中，懂技术者理论上可破解，介意请上服务器版后台。</div>
  <div class="card">
   <h2 style="font-size:16px">生成兑换码</h2>
+  <label>玩家账号（必填，玩家在游戏充值页可复制）</label>
+  <input id="acc" placeholder="如：JH482913" style="letter-spacing:2px;text-transform:uppercase">
   <label>充值档位</label>
   <select id="tier"></select>
   <label>玩家备注（选填，如微信名）</label>
@@ -57,7 +59,7 @@ td.code{font-family:monospace;color:#ffd75e;word-break:break-all}
   <h2 style="font-size:16px">已生成记录</h2>
   <p class="dim">仅保存在本机浏览器中，换设备看不到。</p>
   <div style="overflow-x:auto"><table>
-   <tr><th>兑换码</th><th>档位</th><th>备注</th><th>时间</th><th>状态</th><th>操作</th></tr>
+   <tr><th>兑换码</th><th>账号</th><th>档位</th><th>备注</th><th>时间</th><th>状态</th><th>操作</th></tr>
    <tbody id="hist"></tbody>
   </table></div>
   <div class="rowbtns">
@@ -72,8 +74,9 @@ td.code{font-family:monospace;color:#ffd75e;word-break:break-all}
 var CD_A="ABCDEFGHJKMNPQRSTUVWXYZ23456789";
 var CD_SECRET="jhMcc2026#X7q2";
 function cyrb53(str,seed){seed=seed||0;var h1=0xdeadbeef^seed,h2=0x41c6ce57^seed;for(var i=0,ch;i<str.length;i++){ch=str.charCodeAt(i);h1=Math.imul(h1^ch,2654435761);h2=Math.imul(h2^ch,1597334677);}h1=Math.imul(h1^(h1>>>16),2246822507);h1^=Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507);h2^=Math.imul(h1^(h1>>>13),3266489909);return 4294967296*(2097151&h2)+(h1>>>0);}
-function cdSig(payload){var h=cyrb53(CD_SECRET+"|"+payload),s="";for(var i=0;i<6;i++){s+=CD_A[h%32];h=Math.floor(h/32);}return s;}
-function cdMake(tier){var n="";for(var i=0;i<5;i++)n+=CD_A[Math.floor(Math.random()*32)];var p=CD_A[tier]+n,s=cdSig(p),raw=p+s;return raw.slice(0,4)+"-"+raw.slice(4,8)+"-"+raw.slice(8,12);}
+function cdSig(payload,account){var L=CD_A.length,h=cyrb53(CD_SECRET+"|"+payload+"|"+String(account||"").toUpperCase()),s="";for(var i=0;i<6;i++){s+=CD_A[h%L];h=Math.floor(h/L);}return s;}
+function cdMake(tier,account){var n="";for(var i=0;i<5;i++)n+=CD_A[Math.floor(Math.random()*CD_A.length)];var p=CD_A[tier]+n,s=cdSig(p,account),raw=p+s;return raw.slice(0,4)+"-"+raw.slice(4,8)+"-"+raw.slice(8,12);}
+function cdVerify(code,account){var raw=String(code||"").toUpperCase().replace(/[^A-Z0-9]/g,"");if(raw.length!==12)return -1;var p=raw.slice(0,6);if(cdSig(p,account)!==raw.slice(6))return -1;var tier=CD_A.indexOf(p[0]);return(tier>=0&&tier<TIERS.length)?tier:-1;}
 
 var TIERS=[
  {money:6,gold:60},{money:30,gold:330},{money:98,gold:1080},
@@ -91,10 +94,10 @@ TIERS.forEach(function(t,i){var o=document.createElement("option");o.value=i;o.t
 var lastCode=null;
 function renderHist(){
  var h=getHist(),tb=document.getElementById("hist");tb.innerHTML="";
- if(!h.length){tb.innerHTML='<tr><td colspan="6" class="dim">暂无记录</td></tr>';return;}
+ if(!h.length){tb.innerHTML='<tr><td colspan="7" class="dim">暂无记录</td></tr>';return;}
  h.slice().reverse().forEach(function(r){
   var tr=document.createElement("tr");
-  tr.innerHTML='<td class="code">'+r.code+'</td><td>￥'+r.money+'</td><td>'+(r.note||"-").replace(/</g,"&lt;")+'</td><td>'+r.time+'</td>'
+  tr.innerHTML='<td class="code">'+r.code+'</td><td>'+(r.acc||"-")+'</td><td>￥'+r.money+'</td><td>'+(r.note||"-").replace(/</g,"&lt;")+'</td><td>'+r.time+'</td>'
    +'<td><span class="st '+(r.sent?"st1":"st0")+'">'+(r.sent?"已发放":"未发放")+'</span></td><td></td>';
   var td=tr.lastChild;
   var b1=document.createElement("button");b1.className="btn ghost";b1.style.cssText="padding:4px 8px;font-size:12px;margin:0";b1.textContent=r.sent?"撤回":"发放";
@@ -115,9 +118,12 @@ function showApp(){document.getElementById("gate").style.display="none";document
 if(sessionStorage.getItem(LOGIN_KEY)==="1")showApp();
 
 document.getElementById("gen").onclick=function(){
- var code=cdMake(+tierSel.value),t=TIERS[+tierSel.value];
+ var acc=document.getElementById("acc").value.trim().toUpperCase();
+ if(!acc){alert("请先输入玩家账号");return;}
+ var code=cdMake(+tierSel.value,acc),t=TIERS[+tierSel.value];
+ if(cdVerify(code,acc)!==+tierSel.value){alert("生成校验失败，请重试");return;}
  lastCode=code;
- var h=getHist();h.push({code:code,money:t.money,gold:t.gold,note:document.getElementById("note").value.trim(),time:nowStr(),sent:false});saveHist(h);
+ var h=getHist();h.push({code:code,acc:acc,money:t.money,gold:t.gold,note:document.getElementById("note").value.trim(),time:nowStr(),sent:false});saveHist(h);
  var out=document.getElementById("out");out.style.display="block";out.textContent=code;
  document.getElementById("outBtns").style.display="flex";
  renderHist();

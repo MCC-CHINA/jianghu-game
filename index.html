@@ -324,8 +324,9 @@ const TIERS=[
 const CD_A="ABCDEFGHJKMNPQRSTUVWXYZ23456789";
 const CD_SECRET="jhMcc2026#X7q2";
 function cyrb53(str,seed){seed=seed||0;var h1=0xdeadbeef^seed,h2=0x41c6ce57^seed;for(var i=0,ch;i<str.length;i++){ch=str.charCodeAt(i);h1=Math.imul(h1^ch,2654435761);h2=Math.imul(h2^ch,1597334677);}h1=Math.imul(h1^(h1>>>16),2246822507);h1^=Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507);h2^=Math.imul(h1^(h1>>>13),3266489909);return 4294967296*(2097151&h2)+(h1>>>0);}
-function cdSig(payload){var h=cyrb53(CD_SECRET+"|"+payload),s="";for(var i=0;i<6;i++){s+=CD_A[h%32];h=Math.floor(h/32);}return s;}
-function cdVerify(code){var raw=String(code||"").toUpperCase().replace(/[^A-Z0-9]/g,"");if(raw.length!==12)return -1;var p=raw.slice(0,6);if(cdSig(p)!==raw.slice(6))return -1;var tier=CD_A.indexOf(p[0]);return(tier>=0&&tier<TIERS.length)?tier:-1;}
+function cdSig(payload,account){var L=CD_A.length,h=cyrb53(CD_SECRET+"|"+payload+"|"+String(account||"").toUpperCase()),s="";for(var i=0;i<6;i++){s+=CD_A[h%L];h=Math.floor(h/L);}return s;}
+function cdVerify(code,account){var raw=String(code||"").toUpperCase().replace(/[^A-Z0-9]/g,"");if(raw.length!==12)return -1;var p=raw.slice(0,6);if(cdSig(p,account)!==raw.slice(6))return -1;var tier=CD_A.indexOf(p[0]);return(tier>=0&&tier<TIERS.length)?tier:-1;}
+function newAccount(){return "JH"+String(Math.floor(100000+Math.random()*900000));}
 function cdNorm(code){return String(code||"").toUpperCase().replace(/[^A-Z0-9]/g,"");}
 const RANKS=[{name:"武林神话·叶孤鸿",zl:99999,vip:12},{name:"剑圣·西门飘雪",zl:52000,vip:10},{name:"魔教教主·任逍遥",zl:38000,vip:9},{name:"丐帮帮主·洪七",zl:26000,vip:8},{name:"武当掌门·张真人",zl:18000,vip:7},{name:"峨眉掌门·灭绝师太",zl:12000,vip:6},{name:"少林方丈·玄慈",zl:9000,vip:5},{name:"黑风寨主·黑风虎",zl:5000,vip:3},{name:"采花大盗·田伯光",zl:2800,vip:2},{name:"江南大侠·江别鹤",zl:1500,vip:1}];
 const RANK_PAY=[{name:"神豪·王多鱼",pay:99999,vip:12},{name:"江南首富·沈万三",pay:52000,vip:11},{name:"西域土豪·金轮法王",pay:26000,vip:10},{name:"盐帮帮主·方中信",pay:12000,vip:8},{name:"总镖头·铁中堂",pay:6000,vip:7},{name:"富商·陶朱公",pay:2600,vip:5},{name:"钱庄掌柜·金算盘",pay:1200,vip:4},{name:"小地主·黄世仁",pay:500,vip:2},{name:"暴发户·苟富贵",pay:150,vip:1}];
@@ -739,7 +740,7 @@ function zhanli(){
 }
 function newGame(name,profKey){
  S={player:{name,prof:profKey||"warrior",level:1,exp:0,hp:115,mp:55,coins:100,gold:0,
- stamina:50,maxStamina:50,skills:PROF_STARTER[profKey||"warrior"].slice(),task:null,taskDone:false,feather:0,
+ account:newAccount(),stamina:50,maxStamina:50,skills:PROF_STARTER[profKey||"warrior"].slice(),task:null,taskDone:false,feather:0,
  base:{maxhp:115,maxmp:55,atk:14,def:9,spd:9}},
  equip:{weapon:null,armor:null,boots:null,charm:null},bag:[],pets:[],activePet:-1,wing:{tier:0},
  partners:[],activePartner:-1,arena:{rank:1000,date:"",left:5,reward:"",top:ARENA_TOP.map((n,i)=>({name:n,rank:i+1}))},
@@ -787,7 +788,7 @@ function rCreate(){
  $("gobtn").onclick=()=>{
  const n=$("cname").value.trim();
  if(!n){toast("请先输入名字");return;}
- newGame(n,selProf);TAB="home";render();toast("欢迎来到江湖，"+n+"！");
+ newGame(n,selProf);TAB="home";render();toast("欢迎来到江湖，"+n+"！你的玩家账号是 "+S.player.account);
  };
 }
 /* ============ 江湖（主界面/战斗）=========== */
@@ -1396,7 +1397,8 @@ function rPay(){
  <div class="tier"><div><div class="gold">首充大礼包</div><div class="m">288元宝 · 20000铜币 · 体力+90 · 4阶灵兽蛋×1（开出黄~天级宠物）</div></div>
  <button class="btn small primary" id="firstgift" style="width:auto;margin:0" ${(S.orders.length&&!S.firstGift)?"":"disabled"}>${S.firstGift?"已领取":(S.orders.length?"领取":"首充后可领")}</button></div></div>
  <div class="card"><h3>充值元宝</h3>
- <p class="dim">游戏内不支持直接充值，请联系客服购买兑换码后在此兑换。</p>
+ <p class="dim">游戏内不支持直接充值，请把下方玩家账号告诉客服，客服后台输入账号生成你的专属兑换码后，在此输入兑换。</p>
+ <p>我的玩家账号：<b class="gold" id="myacc">${p.account||""}</b> <button class="btn small" style="width:auto;margin:0;padding:4px 10px" id="cpacc">复制</button></p>
  <p>当前元宝：<b class="gold">${p.gold}</b></p>
  <div class="rowbtns"><input id="cdinput" placeholder="输入兑换码，如 ABCD-EFGH-IJKL" style="flex:1;padding:10px;border-radius:8px;border:1px solid #444;background:#1a1a22;color:#fff;font-size:15px;letter-spacing:1px"><button class="btn small primary" style="width:auto;margin:0" id="cdgo">兑换</button></div>
  <p class="dim" style="margin-top:6px">兑换码由客服后台生成，一码一用，区分大小写可忽略，自动忽略空格与横杠。</p></div><div class="card"><h3>充值豪礼</h3><p class="dim">神级宠物与稀有称号只能通过充值豪礼或限时活动获得。</p>`;
@@ -1445,6 +1447,7 @@ function rPay(){
  };
  const cdgo=$("cdgo");if(cdgo)cdgo.onclick=redeemCode;
  const cdi=$("cdinput");if(cdi)cdi.addEventListener("keydown",e=>{if(e.key==="Enter")redeemCode();});
+ const cpa=$("cpacc");if(cpa)cpa.onclick=()=>{const t=$("myacc").textContent;if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(()=>toast("账号已复制"),()=>toast("复制失败，请手动记录"));}else{toast("账号："+t);}};
  m.querySelectorAll("[data-gift]").forEach(b=>b.onclick=()=>{
  const gf=GIFTS.find(x=>x.id===b.dataset.gift);
  const total=S.orders.reduce((a,o)=>a+o.money,0);
@@ -1486,9 +1489,10 @@ function grantRecharge(tier,oid){ // 兑换码到账（后台管控，游戏内�
  calcStats();save();render();toast(msg);
 }
 function redeemCode(){
+ const p=S.player;
  const inp=$("cdinput"),code=inp?inp.value:"";
- const tier=cdVerify(code);
- if(tier<0){toast("兑换码无效，请检查后重试");return;}
+ const tier=cdVerify(code,p.account);
+ if(tier<0){toast("兑换码无效，或与当前账号不匹配");return;}
  const raw=cdNorm(code);
  S.usedCodes=S.usedCodes||[];
  if(S.usedCodes.includes(raw)){toast("该兑换码已使用过");return;}
@@ -1852,6 +1856,7 @@ function rMore(){
  if(S&&S.player){
  if(!S.player.prof)S.player.prof="warrior";
  if(!Array.isArray(S.usedCodes))S.usedCodes=[];
+ if(!S.player.account)S.player.account=newAccount();
  if(Array.isArray(S.player.skills)){
   S.player.skills=S.player.skills.filter(s=>s!=="bajibeng"&&s!=="shihuyin"&&(!SKILLS[s]||SKILLS[s].prof===S.player.prof));
   for(const st of PROF_STARTER[S.player.prof]){if(!S.player.skills.includes(st))S.player.skills.push(st);}
