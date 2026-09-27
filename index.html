@@ -99,6 +99,19 @@ body{background:#141009;color:#e8dcc0;font-family:"Songti SC","STSong","SimSun",
 #topbar .wornart{position:relative;display:inline-block;height:40px;vertical-align:middle}
 #topbar .wornart .wornbg{height:40px;width:auto;border-radius:8px;display:block}
 #topbar .wornart .atitle{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:19px;letter-spacing:3px}
+/* 左上角武林神话：分层游龙（背景与文字静止，双龙独立游动） */
+#topbar .wornart2{position:relative;display:inline-block;width:120px;height:40px;vertical-align:middle}
+#topbar .wornart2 .wbg{position:absolute;inset:0;width:100%;height:100%;border-radius:8px}
+#topbar .wornart2 .wdwrap{position:absolute;top:0;bottom:0;width:52px;display:flex;align-items:center;justify-content:center;pointer-events:none}
+#topbar .wornart2 .wdwrap.l{left:-2px}
+#topbar .wornart2 .wdwrap.r{right:-2px}
+#topbar .wornart2 .wdragon{width:100%;height:auto;mix-blend-mode:screen;transform-origin:50% 50%}
+#topbar .wornart2 .wdl{animation:swimL 7.4s ease-in-out infinite}
+#topbar .wornart2 .wdr{animation:swimR 9.3s ease-in-out -3.7s infinite}
+#topbar .wornart2 .wshimmer{position:absolute;inset:0;border-radius:8px;pointer-events:none;background:radial-gradient(ellipse 26% 62% at 16% 52%,rgba(130,150,255,.16),transparent 70%),radial-gradient(ellipse 26% 62% at 84% 48%,rgba(130,150,255,.16),transparent 70%);animation:wshimmer 11s ease-in-out infinite}
+@keyframes swimL{0%,100%{transform:translate(0,0) rotate(0deg) scale(1)}22%{transform:translate(2.5px,-3.5px) rotate(2.2deg) skewY(1.2deg) scale(1.02)}48%{transform:translate(-2px,-6px) rotate(-1.6deg) skewY(-1deg) scale(1.045)}74%{transform:translate(-3px,-2px) rotate(-2.4deg) skewY(1deg) scale(1.015)}}
+@keyframes swimR{0%,100%{transform:translate(0,0) rotate(0deg) scale(1.03)}28%{transform:translate(-3px,-5px) rotate(-2deg) skewY(-1.2deg) scale(1)}55%{transform:translate(2.5px,-7px) rotate(1.8deg) skewY(1deg) scale(1.05)}82%{transform:translate(3.5px,-2.5px) rotate(2.4deg) skewY(-0.8deg) scale(1.02)}}
+@keyframes wshimmer{0%,100%{opacity:.45}50%{opacity:1}}
 .tt .ttimg{height:36px;width:auto;border-radius:8px;vertical-align:middle}
 .tt:not(.locked) .ttimg{animation:imgGlow 2s ease-in-out infinite}
 .tt.locked .ttimg{filter:grayscale(1) brightness(.55);opacity:.65}
@@ -620,9 +633,9 @@ function animTitle(name,cls,hue){
  const c=animTitleCls(name,cls,hue);
  return `<span class="atitle ${c}"${c==="at-hue"&&hue!=null?` style="--h:${hue}"`:""}>${name}</span>`;
 }
-/* 佩戴称号渲染：武林神话=静态背景图+四个字流光动画，其余用动态文字 */
+/* 佩戴称号渲染：武林神话=分层游龙（背景字静止、双龙独立游动），其余用动态文字 */
 function wornTitleHTML(wt){
- if(wt.name==="武林神话")return `<span class="wornart"><img class="wornbg" src="title-bg-wulin.webp" alt=""><span class="atitle at-fire">武林神话</span></span>`;
+ if(wt.name==="武林神话")return `<span class="wornart2"><img class="wbg" src="title-wulin-scene.webp" alt=""><span class="wdwrap l"><img class="wdragon wdl" src="wl-dragon-l.webp" alt=""></span><span class="wdwrap r"><img class="wdragon wdr" src="wl-dragon-r.webp" alt=""></span><span class="wshimmer"></span></span>`;
  return animTitle(wt.name,wt.cls,wt.hue);
 }
 // 统一佩戴称号：{k:"vip",id:等级} | {k:"ev",id:称号eid} | {k:"rank",id:"榜:名次"}
