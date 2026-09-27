@@ -473,9 +473,9 @@ function grantReward(g){
  if(k==="gold")p.gold+=v;
  else if(k==="coins")p.coins+=v;
  else if(k==="stamina")p.stamina=Math.min(p.maxStamina,p.stamina+v);
- else if(k==="egg3"){for(let i=0;i<v;i++){const pool=Object.keys(PETS).filter(x=>PETS[x].tier<=2);const pid=pick(pool);S.pets.push({pid,name:PETS[pid].name,level:p.level,exp:0});}if(S.activePet===-1)S.activePet=0;}
+ else if(k==="egg3"){for(let i=0;i<v;i++){const pool=Object.keys(PETS).filter(x=>PETS[x].tier<=2);const pid=pick(pool);S.pets.push({pid,name:PETS[pid].name,level:p.level,exp:0});}if(S.activePet===-1&&S.player.level>=10)S.activePet=0;}
  else if(k==="box"){const tier=Math.min(5,Math.floor(p.level/6)+1);for(let i=0;i<v;i++){const pool=Object.keys(ITEMS).filter(x=>ITEMS[x].slot==="weapon"&&ITEMS[x].tier===tier&&!ITEMS[x].gift);S.bag.push(mkWeapon(pick(pool)));}}
- else if(k==="pet"){if(S.pets.some(x=>x.pid===v)){p.gold+=3000;}else{const pb=PETS[v];S.pets.push({pid:v,name:pb.name,level:p.level,exp:0});if(S.activePet===-1)S.activePet=0;}}
+ else if(k==="pet"){if(S.pets.some(x=>x.pid===v)){p.gold+=3000;}else{const pb=PETS[v];S.pets.push({pid:v,name:pb.name,level:p.level,exp:0});if(S.activePet===-1&&S.player.level>=10)S.activePet=0;}}
  else if(k==="gongfa"){S.gongfaLearned=S.gongfaLearned||{};if(gfLearned(v))p.gold+=2000;else S.gongfaLearned[v]=1;}
  else if(k==="gongfa_rand_god"){const cand=Object.keys(GONGFA).filter(x=>GONGFA[x].tier===4&&!GONGFA[x].vip6&&!gfLearned(x));S.gongfaLearned=S.gongfaLearned||{};if(cand.length)S.gongfaLearned[pick(cand)]=1;else p.gold+=2000;}
  else if(k==="title"){S.eventTitles=S.eventTitles||[];if(!S.eventTitles.includes(v))S.eventTitles.push(v);}
@@ -497,22 +497,22 @@ function tieredName(n,t){return `<span class="tn-${PTIERS[t]}">${n}</span>`;} //
 function itemNameHTML(it){const d=ITEMS[it.iid];return d.tier>=5?godName(d.name):d.name;} // 装备名（5阶神级流光）
 function myRankTitles(){
  const t=[],zl=zhanli();
- const zr=[...RANKS.map(r=>({...r})),{zl,me:true}].sort((a,b)=>b.zl-a.zl).findIndex(r=>r.me);
+ const zr=0; // 排行榜已清空NPC，只剩真实玩家，默认第1名
  if(zr<3)t.push({board:"战力榜",rank:zr+1,...RANK_TITLES.zl[zr]});
  const pay=S.orders.reduce((a,o)=>a+o.money,0);
- const pr=[...RANK_PAY.map(r=>({...r})),{pay,me:true}].sort((a,b)=>b.pay-a.pay).findIndex(r=>r.me);
+ const pr=0;
  if(pr<3)t.push({board:"充值榜",rank:pr+1,...RANK_TITLES.pay[pr]});
  // 宠物榜：取评分最高的宠物
  let myPetScore=0,myPetName="暂无宠物";
  for(const pet of(S.pets||[])){const sc=petScore(pet);if(sc>myPetScore){myPetScore=sc;myPetName=pet.name;}}
- const per=[...RANK_PET.map(r=>({...r})),{name:S.player.name+"（我）",pet:myPetName,score:myPetScore,me:true}].sort((a,b)=>b.score-a.score).findIndex(r=>r.me);
+ const per=0;
  if(per<3)t.push({board:"宠物榜",rank:per+1,...RANK_TITLES.pet[per]});
  // 翅膀榜
  const myWing=(S.wing&&S.wing.tier)||0;
- const wr=[...RANK_WING.map(r=>({...r})),{name:S.player.name+"（我）",wing:myWing?WING_NAMES[myWing]:"未激活",tier:myWing,me:true}].sort((a,b)=>b.tier-a.tier).findIndex(r=>r.me);
+ const wr=0;
  if(wr<3)t.push({board:"翅膀榜",rank:wr+1,...RANK_TITLES.wing[wr]});
  // 等级榜
- const lr=[...RANK_LV.map(r=>({...r})),{name:S.player.name+"（我）",lv:S.player.level,me:true}].sort((a,b)=>b.lv-a.lv).findIndex(r=>r.me);
+ const lr=0;
  if(lr<3)t.push({board:"等级榜",rank:lr+1,...RANK_TITLES.lv[lr]});
  return t;
 }
@@ -666,7 +666,7 @@ function recruitPartner(t,s){
  const used=S.partners.map(x=>x.name);
  const name=pick(PARTNER_NAMES.filter(n=>!used.includes(n)))||pick(PARTNER_NAMES);
  S.partners.push({name,tier:t,sub:s,level:S.player.level,exp:0,equip:{weapon:null,armor:null,boots:null,charm:null}});
- if(S.activePartner===-1||S.activePartner===undefined)S.activePartner=0;
+ if((S.activePartner===-1||S.activePartner===undefined)&&S.player.level>=5)S.activePartner=0;
  save();render();toast(` ${tierName(t,s)}伙伴「${name}」加入队伍！`);
 }
 const VIP_TITLES=[null, // 索引=VIP等级：称号名+属性+爆率
@@ -722,7 +722,7 @@ function calcStats(){
  if(fjlv){p.atk+=4*fm*fjlv;p.maxhp+=50*fm*fjlv;p.maxmp+=10*fm*fjlv;}
  const wt=(S.wing&&S.wing.tier)||0; // 翅膀加成：每阶攻击+12 气血+120 速度+3
  if(wt){p.atk+=12*wt;p.maxhp+=120*wt;p.spd+=3*wt;}
- const ap=(S.partners||[])[S.activePartner]; // 出战伙伴：将其30%属性加给玩家
+ const ap=S.player.level>=5?(S.partners||[])[S.activePartner]:undefined; // 出战伙伴（需5级）：将其30%属性加给玩家
  if(ap){const st=partnerStats(ap);p.atk+=Math.floor(st.atk*0.3);p.def+=Math.floor(st.def*0.3);p.maxhp+=Math.floor(st.hp*0.3);p.spd+=Math.floor(st.spd*0.3);}
  for(const t of myRankTitles()){const b=t.bonus; // 排行榜称号加成（可叠加）
  p.atk+=b.atk||0;p.def+=b.def||0;p.maxhp+=b.hp||0;p.maxmp+=b.mp||0;p.spd+=b.spd||0;p.luck+=b.luck||0;}
@@ -734,7 +734,7 @@ function calcStats(){
 }
 function zhanli(){
  const p=S.player;let z=p.atk*3+p.def*2+p.maxhp*0.5+p.spd*2;
- const pet=S.pets[S.activePet]; if(pet){const b=PETS[pet.pid];z+=(b.atk*(1+0.15*(pet.level-1)))*2*petTierMult(b);}
+ const pet=S.player.level>=10?S.pets[S.activePet]:undefined; if(pet){const b=PETS[pet.pid];z+=(b.atk*(1+0.15*(pet.level-1)))*2*petTierMult(b);}
  return Math.floor(z);
 }
 function newGame(name,sectKey,profKey){
@@ -859,7 +859,7 @@ if(p.hp<=0){endBattle(false);return;}
 petTurn();
 }
 function petTurn(){
-const pet=S.pets[S.activePet];
+const pet=S.player.level>=10?S.pets[S.activePet]:undefined;
 if(!pet||B.over)return;
 const b=PETS[pet.pid],f=B.foe;
 const pa=Math.floor(b.atk*(1+0.15*(pet.level-1))*petTierMult(b));
@@ -1015,7 +1015,7 @@ if(f.hp>f.maxhp*0.3){toast("先把它打到30%以下血量再捕捉");return;}
 if(Math.random()<0.6){
 const pid=f.catchPet,b=PETS[pid];
 S.pets.push({pid,name:b.name,level:f.lv,exp:0});
-if(S.activePet===-1)S.activePet=0;
+if(S.activePet===-1&&S.player.level>=10)S.activePet=0;
 log(`<span class="sys">捕捉成功！加入了你的队伍！</span>`);
 B.over=true;save();rBattle();
 }else{log(`<span class="foe">捕捉失败，它挣脱了！</span>`);foeTurn();save();rBattle();}
@@ -1146,9 +1146,9 @@ function takeConsumable(use){ // 消耗1个，返回是否成功
 function rWing(){
 const m=$("main"),p=S.player;
 const wt=(S.wing&&S.wing.tier)||0,wc=wingCost(wt);
-const canUp=wt<WING_MAX&&(p.feather||0)>=wc.feather&&p.coins>=wc.coins;
+const canUp=wt<WING_MAX&&(p.feather||0)>=wc.feather&&p.coins>=wc.coins&&p.level>=20;
 let h=`<div class="card"><h3>我的翅膀</h3>`;
-if(!wt)h+=`<p class="dim">尚未激活翅膀。集齐 <b class="gold">灵羽×${wc.feather}</b>+ 铜币${wc.coins} 即可激活「${WING_NAMES[1]}」！<br>灵羽来源：世界BOSS掉落、商城购买、每日VIP礼包。</p>`;
+if(!wt)h+=`<p class="dim">尚未激活翅膀。集齐 <b class="gold">灵羽×${wc.feather}</b>+ 铜币${wc.coins} 即可激活「${WING_NAMES[1]}」！<br>灵羽来源：世界BOSS掉落、商城购买、每日VIP礼包。<br>${p.level<20?`<b class="bad">需20级才能激活翅膀（当前${p.level}级）</b>`:""}</p>`;
 else h+=`<p>当前：<b class="gold">${WING_NAMES[wt]}（${wt}阶）</b><span class="dim">攻击+${12*wt} 气血+${120*wt} 速度+${3*wt}</span></p>`;
 if(wt<WING_MAX)h+=`<div class="tier"><div><div class="gold">${wt?"升至"+(wt+1)+"阶·"+WING_NAMES[wt+1]:"激活翅膀"}</div><div class="m">消耗 灵羽×${wc.feather}（拥有${p.feather||0}）· 铜币${wc.coins}（拥有${p.coins}）</div></div>
 <button class="btn small primary" style="width:auto;margin:0" id="wingUp"${canUp?"":" disabled"}>${wt?"升阶":"激活"}</button></div>`;
@@ -1157,6 +1157,7 @@ h+=`</div>`;m.innerHTML=h;
 const wu=$("wingUp");
 if(wu)wu.onclick=()=>{
  const t=(S.wing&&S.wing.tier)||0,c=wingCost(t);
+ if(p.level<20){toast("需20级才能激活翅膀");return;}
  if(t>=WING_MAX||(p.feather||0)<c.feather||p.coins<c.coins)return;
  p.feather-=c.feather;p.coins-=c.coins;S.wing={tier:t+1};
  calcStats();save();render();toast(` 翅膀${t?"升至":"激活"}「${WING_NAMES[t+1]}」！`);
@@ -1179,7 +1180,7 @@ if(!(S.partners||[]).length)h+=`<p class="dim">还没有伙伴，去招募一位
  const it=pt.equip[slot];
  h+=`${SLOTNAME[slot]}:${it?itemNameHTML(it)+(it.enh?`+${it.enh}`:""):"空"}${it?`<button class="btn small" style="padding:2px 6px;font-size:11px;margin:2px" data-pun="${i}_${slot}">卸下</button>`:`<button class="btn small" style="padding:2px 6px;font-size:11px;margin:2px" data-peq="${i}_${slot}">穿戴</button>`} `;
  }
- h+=`</div></div>${i===S.activePartner?"":`<button class="btn small" style="width:auto;margin:0" data-pfight="${i}">出战</button>`}</div>`;
+ h+=`</div></div>${i===S.activePartner?"":`<button class="btn small" style="width:auto;margin:0" data-pfight="${i}"${p.level<5?" disabled":""}>${p.level<5?"5级可召唤":"出战"}</button>`}</div>`;
 });
 h+=`</div>`;m.innerHTML=h;
 const rc=$("recC");
@@ -1190,7 +1191,7 @@ if(rg)rg.onclick=()=>{if(p.gold<88){toast("元宝不足（需88）");return;}p.g
  const r=Math.random();recruitPartner(r<0.4?2:(r<0.8?3:4));};
 const mv=$("mythicVip");
 if(mv)mv.onclick=()=>{if(vipLevel()<8||S.claimedMythicVip)return;recruitPartner(4,3);S.claimedMythicVip=true;save();render();};
-m.querySelectorAll("[data-pfight]").forEach(b=>b.onclick=()=>{S.activePartner=+b.dataset.pfight;calcStats();save();render();toast(" 伙伴出战！");});
+m.querySelectorAll("[data-pfight]").forEach(b=>b.onclick=()=>{if(p.level<5){toast("需5级才能召唤伙伴出战");return;}S.activePartner=+b.dataset.pfight;calcStats();save();render();toast(" 伙伴出战！");});
 m.querySelectorAll("[data-pun]").forEach(b=>b.onclick=()=>{
  const[pi,slot]=b.dataset.pun.split("_"),pt=S.partners[+pi],it=pt.equip[slot];
  if(!it)return;pt.equip[slot]=null;S.bag.push(it);calcStats();save();render();toast("已卸下");});
@@ -1217,10 +1218,10 @@ const b=PETS[pet.pid];
 const atk=Math.floor(b.atk*(1+0.15*(pet.level-1))),hp=Math.floor(b.hp*(1+0.15*(pet.level-1)));
 h+=`<div class="mob"><div><div class="mn">${tieredName(pet.name,b.tier)} ${tierBadge(b.tier,b.sub)}<span class="dim">Lv.${pet.level}</span>${i===S.activePet?'<span class="gold">出战中</span>':""}</div>
 <div class="md">${b.desc}</div><div class="md">气血${hp} 攻击${atk} · 经验${pet.exp}/${petExpNeed(pet.level)}</div></div>
-${i===S.activePet?"":`<button class="btn" data-pet="${i}">出战</button>`}</div>`;
+${i===S.activePet?"":`<button class="btn" data-pet="${i}"${p.level<10?" disabled":""}>${p.level<10?"10级可召唤":"出战"}</button>`}</div>`;
 });
 h+=`</div>`;m.innerHTML=h;
-m.querySelectorAll("[data-pet]").forEach(b=>b.onclick=()=>{S.activePet=+b.dataset.pet;save();render();toast("宠物出战！");});
+m.querySelectorAll("[data-pet]").forEach(b=>b.onclick=()=>{if(p.level<10){toast("需10级才能召唤宠物出战");return;}S.activePet=+b.dataset.pet;save();render();toast("宠物出战！");});
 }
 /* ============ 门派 ============ */
 function rSect(){
@@ -1346,7 +1347,7 @@ m.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>{
 const k=b.dataset.g;
 if(k==="tili"&&p.gold>=10){p.gold-=10;p.stamina=Math.min(p.maxStamina,p.stamina+30);toast("体力+30！");}
 else if(k==="egg"&&p.gold>=88){p.gold-=88;const pool=Object.keys(PETS).filter(k=>PETS[k].tier<=ptier);const pid=pick(pool);
-S.pets.push({pid,name:PETS[pid].name,level:p.level,exp:0});if(S.activePet===-1)S.activePet=0;toast("开出了！");}
+S.pets.push({pid,name:PETS[pid].name,level:p.level,exp:0});if(S.activePet===-1&&S.player.level>=10)S.activePet=0;toast("开出了！");}
 else if(k==="box"&&p.gold>=68){p.gold-=68;const pool=Object.keys(ITEMS).filter(x=>ITEMS[x].slot==="weapon"&&ITEMS[x].tier===tier&&!ITEMS[x].gift);
 const iid=pick(pool);S.bag.push(mkWeapon(iid));toast("开出了！");}
 else if(k==="feather"&&p.gold>=10){p.gold-=10;p.feather=(p.feather||0)+1;toast(" 灵羽+1！");}
@@ -1446,7 +1447,7 @@ function rPay(){
  const pool=Object.keys(PETS).filter(k=>PETS[k].tier<=3);
  const pid=pick(pool);
  S.pets.push({pid,name:PETS[pid].name,level:p.level,exp:0});
- if(S.activePet===-1)S.activePet=0;
+ if(S.activePet===-1&&S.player.level>=10)S.activePet=0;
  save();render();
  toast(` 首充礼包到账：元宝+288，铜币+20000，体力+90，灵兽蛋开出「${PETS[pid].name}」！`);
  };
@@ -1456,7 +1457,7 @@ function rPay(){
  const total=S.orders.reduce((a,o)=>a+o.money,0);
  if(!gf||total<gf.need||(S.claimedGifts||{})[gf.id])return;
  S.claimedGifts=S.claimedGifts||{};S.claimedGifts[gf.id]=1;
- if(gf.kind==="pet"){const pb=PETS[gf.pid];S.pets.push({pid:gf.pid,name:pb.name,level:S.player.level,exp:0});if(S.activePet===-1)S.activePet=0;}
+ if(gf.kind==="pet"){const pb=PETS[gf.pid];S.pets.push({pid:gf.pid,name:pb.name,level:S.player.level,exp:0});if(S.activePet===-1&&S.player.level>=10)S.activePet=0;}
  else{S.eventTitles=S.eventTitles||[];if(!S.eventTitles.includes(gf.eid))S.eventTitles.push(gf.eid);}
  calcStats();save();render();toast(`获得${gf.name}！`);
  });
@@ -1652,8 +1653,8 @@ function viewProfile(r){
 function rRank(){
  const m=$("main"),zl=zhanli(),p=S.player;
  const pay=S.orders.reduce((a,o)=>a+o.money,0);
- const zlist=[...RANKS.map(r=>({...r})),{name:p.name+"（我）",zl,me:true}].sort((a,b)=>b.zl-a.zl);
- const plist=[...RANK_PAY.map(r=>({...r})),{name:p.name+"（我）",pay,me:true}].sort((a,b)=>b.pay-a.pay);
+ const zlist=[{name:p.name+"（我）",zl,me:true}];
+ const plist=[{name:p.name+"（我）",pay,me:true}];
  let h=`<div class="card"><h3>武林战力榜</h3><p class="dim">我的战力：<b class="gold">${zl}</b>· 第 ${zlist.findIndex(r=>r.me)+1} 名</p>`;
  h+=zlist.map((r,i)=>`<div class="rankrow${r.me?" me":""}"><span>${i+1}. <span class="vplink" data-b="zl" data-i="${i}">${vipName(r.name,r.me?vipLevel():(r.vip||0))}</span>${i<3?` ${titleBadge(RANK_TITLES.zl[i].name,RANK_TITLES.zl[i].cls)}`:""}</span><span>${r.zl}</span></div>`).join("")+`</div>`;
  h+=`<div class="card"><h3>充值风云榜</h3><p class="dim">我的累计充值：<b class="gold">￥${pay}</b>· 第 ${plist.findIndex(r=>r.me)+1} 名</p>`;
@@ -1661,16 +1662,16 @@ function rRank(){
  // 宠物榜
  let myPetScore=0,myPetName="暂无宠物";
  for(const pet of(S.pets||[])){const sc=petScore(pet);if(sc>myPetScore){myPetScore=sc;myPetName=pet.name;}}
- const petlist=[...RANK_PET.map(r=>({...r})),{name:p.name+"（我）",pet:myPetName,score:myPetScore,me:true}].sort((a,b)=>b.score-a.score);
+ const petlist=[{name:p.name+"（我）",pet:myPetName,score:myPetScore,me:true}];
  h+=`<div class="card"><h3>宠物排行榜</h3><p class="dim">我的最强宠物：<b class="gold">${myPetName}</b>（评分${myPetScore}）· 第 ${petlist.findIndex(r=>r.me)+1} 名</p>`;
  h+=petlist.map((r,i)=>`<div class="rankrow${r.me?" me":""}"><span>${i+1}. <span class="vplink" data-b="pet" data-i="${i}">${vipName(r.name,r.me?vipLevel():(r.vip||0))}</span> <span class="dim">${r.pet}</span>${i<3?` ${titleBadge(RANK_TITLES.pet[i].name,RANK_TITLES.pet[i].cls)}`:""}</span><span>${r.score}</span></div>`).join("")+`</div>`;
  // 翅膀榜
  const myWing=(S.wing&&S.wing.tier)||0;
- const winglist=[...RANK_WING.map(r=>({...r})),{name:p.name+"（我）",wing:myWing?WING_NAMES[myWing]:"未激活",tier:myWing,me:true}].sort((a,b)=>b.tier-a.tier);
+ const winglist=[{name:p.name+"（我）",wing:myWing?WING_NAMES[myWing]:"未激活",tier:myWing,me:true}];
  h+=`<div class="card"><h3>翅膀排行榜</h3><p class="dim">我的翅膀：<b class="gold">${myWing?WING_NAMES[myWing]+`（${myWing}阶）`:"未激活"}</b>· 第 ${winglist.findIndex(r=>r.me)+1} 名</p>`;
  h+=winglist.map((r,i)=>`<div class="rankrow${r.me?" me":""}"><span>${i+1}. <span class="vplink" data-b="wing" data-i="${i}">${vipName(r.name,r.me?vipLevel():(r.vip||0))}</span> <span class="dim">${r.wing}${r.tier?`·${r.tier}阶`:""}</span>${i<3?` ${titleBadge(RANK_TITLES.wing[i].name,RANK_TITLES.wing[i].cls)}`:""}</span><span>${r.tier}阶</span></div>`).join("")+`</div>`;
  // 等级榜
- const lvlist=[...RANK_LV.map(r=>({...r})),{name:p.name+"（我）",lv:p.level,me:true}].sort((a,b)=>b.lv-a.lv);
+ const lvlist=[{name:p.name+"（我）",lv:p.level,me:true}];
  h+=`<div class="card"><h3>等级排行榜</h3><p class="dim">我的等级：<b class="gold">Lv.${p.level}</b>· 第 ${lvlist.findIndex(r=>r.me)+1} 名</p>`;
  h+=lvlist.map((r,i)=>`<div class="rankrow${r.me?" me":""}"><span>${i+1}. <span class="vplink" data-b="lv" data-i="${i}">${vipName(r.name,r.me?vipLevel():(r.vip||0))}</span>${i<3?` ${titleBadge(RANK_TITLES.lv[i].name,RANK_TITLES.lv[i].cls)}`:""}</span><span>Lv.${r.lv}</span></div>`).join("")+`</div>`;
  m.innerHTML=h;
@@ -1808,7 +1809,7 @@ function rEvent(){
  if(esp)esp.onclick=()=>{
  if(vipTotal()<2998||S.claimedSaintPet)return;
  S.claimedSaintPet=true;S.pets.push({pid:"shenglong",name:PETS.shenglong.name,level:p.level,exp:0});
- if(S.activePet===-1)S.activePet=0;save();render();toast(" 限时活动：圣级宠物「九天圣龙」加入队伍！")};
+ if(S.activePet===-1&&S.player.level>=10)S.activePet=0;save();render();toast(" 限时活动：圣级宠物「九天圣龙」加入队伍！")};
  const esg=$("evtSGf");
  if(esg)esg.onclick=()=>{
  if(vipTotal()<3999||gfLearned("shengxinjue"))return;
@@ -1818,7 +1819,7 @@ function rEvent(){
  if(esh)esh.onclick=()=>{
  if(vipTotal()<5999||S.claimedSaintHuang)return;
  S.claimedSaintHuang=true;S.pets.push({pid:"shenghuang",name:PETS.shenghuang.name,level:p.level,exp:0});
- if(S.activePet===-1)S.activePet=0;save();render();toast(" 限时活动：圣级宠物「混沌圣凰」加入队伍！")};
+ if(S.activePet===-1&&S.player.level>=10)S.activePet=0;save();render();toast(" 限时活动：圣级宠物「混沌圣凰」加入队伍！")};
  const ezz=$("evtZZ");
  if(ezz)ezz.onclick=()=>{
  if(vipTotal()<7999||S.claimedZhizun)return;
@@ -1829,7 +1830,7 @@ function rEvent(){
  if(vipTotal()<9999||S.claimedHongmeng||gfLearned("hongmengjue"))return;
  S.claimedHongmeng=true;
  S.pets.push({pid:"hongmeng",name:PETS.hongmeng.name,level:p.level,exp:0});
- if(S.activePet===-1)S.activePet=0;
+ if(S.activePet===-1&&S.player.level>=10)S.activePet=0;
  S.gongfaLearned=S.gongfaLearned||{};S.gongfaLearned.hongmengjue=1;
  calcStats();save();render();toast(" 限时活动：至尊终极宠物「鸿蒙至尊龙」与功法《鸿蒙至尊诀》到手！")};
  m.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{TAB=b.dataset.go;B=null;render();window.scrollTo(0,0);});
