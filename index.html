@@ -1308,7 +1308,7 @@ function rCreate(){
 function rHome(){
  const m=$("main"),p=S.player;
  if(B){rBattle();return;}
- let h=`<div class="card"><img class="titleart" src="title-jianghu.webp" alt="江湖行"><h3>闯荡江湖</h3><p class="dim">先选难度，再选区域挑战。普通难度每关10小关，英雄/传说/终极每关15小关，最后一关为BOSS。每次挑战消耗3点体力。</p><div class="rowbtns">`;
+ let h=`<div class="card"><img class="titleart" src="title-jianghu.webp" alt="江湖行"><h3>闯荡江湖</h3><p class="dim">先选难度，再选区域挑战。普通难度每关10小关，英雄/传说/终极每关15小关，最后一关为BOSS。每次挑战消耗3点体力。<br>掉落仅出常规装备；终极武器、至尊终极、鸿蒙、轩辕系列只能通过神兵合成获得，不掉落。</p><div class="rowbtns">`;
  if(S.diffTab===undefined||S.diffTab<0||S.diffTab>3)S.diffTab=0;
  const TD=S.diffTab,TDN=diffStages(TD);
  DIFFS.forEach((D,di)=>{h+=`<button class="btn small${TD===di?" primary":""}" data-dtab="${di}">${D.name}</button>`;});
@@ -1570,10 +1570,10 @@ function zoneExtraDrops(zi,di,boss,LG,dropIt){
   if(Math.random()<0.08){const pi=zi<=2?["金疮药","hp150"]:(zi<=5?["大还丹","hp450"]:["九转还魂丹","fullstate"]);addConsumable(pi[0],pi[1],1);dropIt(pi[0]+"×1");LG(`<span class="sys">掉落：${pi[0]}×1！</span>`);}
  }
 }
-function diffDropDesc(zi,di){ // 难度掉落说明：每种难度显示各自掉落物
+function diffDropDesc(zi,di){ // 难度掉落说明：每种难度显示各自掉落物（仅常规装备掉落，终极/至尊成品仅合成获得）
  const dq=1+di*0.5,q=n=>Math.max(1,Math.floor(n*dq));
- const tier=ZONES[zi].tier,tn=(["","黄","玄","地","天","神","圣","至尊"][tier]||tier)+"阶";
- const p=[tn+"武器/防具",`洗炼石×${q(1)}`];
+ const tier=ZONES[zi].tier;
+ const p=[tier+"阶常规武器/防具",`洗炼石×${q(1)}`];
  if(zi>=2)p.push(`灵羽×${q(2+Math.floor(zi/2))}`);
  p.push(zi<=2?"金疮药":(zi<=5?"大还丹":"九转还魂丹"));
  const b=[`BOSS洗炼石×${q(1+Math.floor(zi/3))}`];
@@ -1884,36 +1884,45 @@ S.player.coins-=cost;it.enh++;calcStats();save();closeModal();render();toast("�
 };
 }
 function synthModal(){
- const zrows=[1,2,3,4,5,6,7,8].map(t=>{
+ /* 神兵合成按装备等级（阶）重排：2阶→7阶，装备名加品阶炫光 */
+ const ultRow=t=>{
   const ids=CLASS_WPN[t],uname=ITEMS[ZONE_ULT[t]].name,utier=ITEMS[ZONE_ULT[t]].tier,cost=ZONE_ULT_COST[t];
   const mat=ids.map(id=>{const has=S.bag.some(x=>x.iid===id);return `<span style="color:${has?"#7dd87d":"#ff8787"}">${ITEMS[id].name}[${ITEMS[id].cls}]</span>`;}).join(" ");
   const can=ids.every(id=>S.bag.some(x=>x.iid===id))&&S.player.coins>=cost;
-  return `<div class="tier"><div><div><span class="gold">${uname}</span><span class="dim"> · ${ZONES[t-1].name}终极武器</span></div><div class="m">${mat} · ${cost/10000}万铜币（拥有${S.player.coins}）</div></div><button class="btn small autow${can?" primary":""}" data-zsynth="${t}">合成</button></div>`;
- }).join("");
+  return `<div class="tier"><div><div>${tieredName(uname,utier-1)}<span class="dim"> · ${ZONES[t-1].name}终极武器</span></div><div class="m">${mat} · ${cost/10000}万铜币（拥有${S.player.coins}）</div></div><button class="btn small autow${can?" primary":""}" data-zsynth="${t}">合成</button></div>`;
+ };
  const xmat=XUANYUAN_NEED.map(id=>{const has=S.bag.some(x=>x.iid===id);return `<span style="color:${has?"#7dd87d":"#ff8787"}">${ITEMS[id].name}</span>`;}).join(" ");
  const xcan=XUANYUAN_NEED.every(id=>S.bag.some(x=>x.iid===id))&&S.player.coins>=SYNTH_COST;
  const arows=ARMOR_SYNTH.map(([slot,xid,xname],idx)=>{
   const needs=[1,2,3,4].map(t=>topItemOfSlot(t,slot));
   const mat=needs.map((iid,ti)=>{const has=S.bag.some(x=>x.iid===iid);return `<span style="color:${has?"#7dd87d":"#ff8787"}">${ITEMS[iid].name}</span><span class="dim">(${BOSS_OF_TIER[ti+1].split("·")[0]})</span>`;}).join(" ");
   const can=needs.every(iid=>S.bag.some(x=>x.iid===iid))&&S.player.coins>=ARMOR_SYNTH_COST;
-  return `<div class="tier"><div><div>${xname}<span class="dim"> · ${SLOTNAME[slot]} · 终极防具</span></div><div class="m">${mat} · 200万铜币（拥有${S.player.coins}）</div></div><button class="btn small autow${can?" primary":""}" data-asynth="${idx}">合成</button></div>`;
+  return `<div class="tier"><div><div>${tieredName(xname,5)}<span class="dim"> · ${SLOTNAME[slot]} · 终极防具</span></div><div class="m">${mat} · 200万铜币（拥有${S.player.coins}）</div></div><button class="btn small autow${can?" primary":""}" data-asynth="${idx}">合成</button></div>`;
  }).join("");
  const xjN=S.bag.filter(x=>x.iid==="w13").length;
  const zzcan=xjN>=3&&S.player.coins>=ZHIZUN_COST;
  const zzrows=ZHIZUN_WPN.map(([xid,xname,xcls])=>`<div class="tier"><div><div>${tieredName(xname,6)}<span class="dim"> · 至尊终极武器[${xcls}]</span></div><div class="m"><span style="color:${xjN>=3?"#7dd87d":"#ff8787"}">轩辕神剑×3（拥有${xjN}）</span> · 1000万铜币（拥有${S.player.coins}）<br><span class="dim">7阶至尊 · 全游戏最高阶武器</span></div></div><button class="btn small autow${zzcan?" primary":""}" data-zhizun="${xid}">合成</button></div>`).join("");
  const xaN=S.bag.filter(x=>x.iid==="xa").length;
  const zacan=xaN>=3&&S.player.coins>=ZHIZUN_COST;
- const zarows=ZHIZUN_ARMOR.map(([xid,xname,xcls])=>`<div class="tier"><div><div>${xname}<span class="dim"> · 至尊终极防具[${xcls}]</span></div><div class="m"><span style="color:${xaN>=3?"#7dd87d":"#ff8787"}">轩辕战甲×3（拥有${xaN}）</span> · 1000万铜币（拥有${S.player.coins}）<br><span class="dim">7阶至尊 · 全游戏最高阶防具</span></div></div><button class="btn small autow${zacan?" primary":""}" data-zhizunarmor="${xid}">合成</button></div>`).join("");
+ const zarows=ZHIZUN_ARMOR.map(([xid,xname,xcls])=>`<div class="tier"><div><div>${tieredName(xname,6)}<span class="dim"> · 至尊终极防具[${xcls}]</span></div><div class="m"><span style="color:${xaN>=3?"#7dd87d":"#ff8787"}">轩辕战甲×3（拥有${xaN}）</span> · 1000万铜币（拥有${S.player.coins}）<br><span class="dim">7阶至尊 · 全游戏最高阶防具</span></div></div><button class="btn small autow${zacan?" primary":""}" data-zhizunarmor="${xid}">合成</button></div>`).join("");
  const hmmat=HONGMENG_NEED.map(id=>{const has=S.bag.some(x=>x.iid===id);return `<span style="color:${has?"#7dd87d":"#ff8787"}">${ITEMS[id].name}</span>`;}).join(" ");
  const hmcan=HONGMENG_NEED.every(id=>S.bag.some(x=>x.iid===id))&&S.player.coins>=HONGMENG_COST;
- const hrow=`<div class="tier"><div><div>鸿蒙神剑<span class="dim"> · 无职业限制</span></div><div class="m">${hmmat} · 800万铜币（拥有${S.player.coins}）<br><span class="dim">7阶至尊 · 集齐熔岩/冰原/云梦/九幽四把终极武器</span></div></div><button class="btn small autow${hmcan?" primary":""}" data-hongmeng="w45">合成</button></div>`;
+ const hrow=`<div class="tier"><div><div>${tieredName("鸿蒙神剑",6)}<span class="dim"> · 无职业限制</span></div><div class="m">${hmmat} · 800万铜币（拥有${S.player.coins}）<br><span class="dim">7阶至尊 · 集齐熔岩/冰原/云梦/九幽四把终极武器</span></div></div><button class="btn small autow${hmcan?" primary":""}" data-hongmeng="w45">合成</button></div>`;
  const harows=HONGMENG_ARMOR.map(([slot,xid,xname],idx)=>{
   const tiers=[5,6,7],needs=tiers.map(t=>topItemOfSlot(t,slot));
   const mat=needs.map((iid,ti)=>{const has=S.bag.some(x=>x.iid===iid);return `<span style="color:${has?"#7dd87d":"#ff8787"}">${ITEMS[iid].name}</span><span class="dim">(${BOSS_OF_TIER[tiers[ti]].split("·")[0]})</span>`;}).join(" ");
   const can=needs.every(iid=>S.bag.some(x=>x.iid===iid))&&S.player.coins>=HONGMENG_ARMOR_COST;
-  return `<div class="tier"><div><div>${xname}<span class="dim"> · ${SLOTNAME[slot]} · 鸿蒙防具</span></div><div class="m">${mat} · 800万铜币（拥有${S.player.coins}）</div></div><button class="btn small autow${can?" primary":""}" data-hongmengarmor="${idx}">合成</button></div>`;
+  return `<div class="tier"><div><div>${tieredName(xname,6)}<span class="dim"> · ${SLOTNAME[slot]} · 鸿蒙防具</span></div><div class="m">${mat} · 800万铜币（拥有${S.player.coins}）</div></div><button class="btn small autow${can?" primary":""}" data-hongmengarmor="${idx}">合成</button></div>`;
  }).join("");
- modal(`<h3>神兵合成</h3><p class="dim">关卡终极武器：集齐本关战士/法师/射手三职业武器 + 铜币 → 本关终极武器。轩辕神剑：集齐青竹林/黑风寨/幽冥谷/华山之巅四把终极武器 + 300万铜币。鸿蒙神剑：集齐熔岩炼狱/极北冰原/云梦仙泽/九幽魔域四把终极武器 + 800万铜币（无职业限制）。至尊终极武器：轩辕神剑×3 + 1000万铜币（战士斩尤帝剑/法师灭尤帝杖/射手断尤帝弓）。至尊终极防具：轩辕战甲×3 + 1000万铜币（战士斩尤帝甲/法师灭尤帝袍/射手断尤帝衣）。防具：集齐同部位四件1-4阶BOSS防具 + 200万铜币 → 轩辕防具；集齐同部位三件5-7阶BOSS防具 + 800万铜币 → 鸿蒙防具。材料需放在背包中（已装备的请先卸下）。</p>${zrows}<div class="tier"><div><div>轩辕神剑<span class="dim"> · 终极武器</span></div><div class="m">${xmat} · 300万铜币（拥有${S.player.coins}）</div></div><button class="btn small autow${xcan?" primary":""}" id="dosynth">合成</button></div><h3 style="margin-top:8px">鸿蒙神剑</h3>${hrow}<h3 style="margin-top:8px">至尊终极武器</h3>${zzrows}<h3 style="margin-top:8px">至尊终极防具</h3>${zarows}<h3 style="margin-top:8px">鸿蒙防具</h3>${harows}<h3 style="margin-top:8px">防具合成</h3>${arows}<div class="rowbtns"><button class="btn" onclick="closeModal()">关闭</button></div>`);
+ const xuanRow=`<div class="tier"><div><div>${tieredName("轩辕神剑",5)}<span class="dim"> · 终极武器</span></div><div class="m">${xmat} · 300万铜币（拥有${S.player.coins}）</div></div><button class="btn small autow${xcan?" primary":""}" id="dosynth">合成</button></div>`;
+ /* 按装备等级（阶）重排：2阶→7阶 */
+ const sec2=`<h3 style="margin-top:8px">2阶</h3>`+ultRow(1);
+ const sec3=`<h3 style="margin-top:8px">3阶</h3>`+ultRow(2);
+ const sec4=`<h3 style="margin-top:8px">4阶</h3>`+ultRow(3);
+ const sec5=`<h3 style="margin-top:8px">5阶</h3>`+ultRow(4);
+ const sec6=`<h3 style="margin-top:8px">6阶</h3>`+ultRow(5)+ultRow(6)+xuanRow+`<h3 style="margin-top:8px">6阶·轩辕防具</h3>`+arows;
+ const sec7=`<h3 style="margin-top:8px">7阶</h3>`+ultRow(7)+ultRow(8)+`<h3 style="margin-top:8px">7阶·鸿蒙神剑</h3>`+hrow+`<h3 style="margin-top:8px">7阶·至尊终极武器</h3>`+zzrows+`<h3 style="margin-top:8px">7阶·至尊终极防具</h3>`+zarows+`<h3 style="margin-top:8px">7阶·鸿蒙防具</h3>`+harows;
+ modal(`<h3>神兵合成</h3><p class="dim">按装备等级从低到高排列。关卡终极武器：集齐本关战士/法师/射手三职业武器 + 铜币 → 本关终极武器。轩辕神剑：集齐青竹林/黑风寨/幽冥谷/华山之巅四把终极武器 + 300万铜币。鸿蒙神剑：集齐熔岩炼狱/极北冰原/云梦仙泽/九幽魔域四把终极武器 + 800万铜币（无职业限制）。至尊终极武器：轩辕神剑×3 + 1000万铜币（战士斩尤帝剑/法师灭尤帝杖/射手断尤帝弓）。至尊终极防具：轩辕战甲×3 + 1000万铜币（战士斩尤帝甲/法师灭尤帝袍/射手断尤帝衣）。防具：集齐同部位四件1-4阶BOSS防具 + 200万铜币 → 轩辕防具；集齐同部位三件5-7阶BOSS防具 + 800万铜币 → 鸿蒙防具。材料需放在背包中（已装备的请先卸下）。</p>`+sec2+sec3+sec4+sec5+sec6+sec7+`<div class="rowbtns"><button class="btn" onclick="closeModal()">关闭</button></div>`);
  $("modalbox").querySelectorAll("[data-asynth]").forEach(b=>b.onclick=()=>{
   const[slot,xid,xname]=ARMOR_SYNTH[+b.dataset.asynth];
   const needs=[1,2,3,4].map(t=>{const iid=topItemOfSlot(t,slot);return[iid,ITEMS[iid].name];});
