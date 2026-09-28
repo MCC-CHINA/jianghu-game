@@ -1203,7 +1203,7 @@ function renderTop(){
  $("topName").onclick=()=>{modal(attrPanelHTML()+`<div class="rowbtns"><button class="btn small" onclick="closeModal()">关闭</button></div>`);};
  const tv=$("topVip");if(tv)tv.onclick=()=>{TAB="vipinfo";B=null;render();window.scrollTo(0,0);};
 }
-const TABS=[["home","江湖"],["bag","背包"],["pet","宠物"],["wing","翅膀"],["partner","伙伴"],["task","任务"],["gongfa","功法"],["shop","商店"],["title","称号"],["arena","竞技"],["more","更多"]];
+const TABS=[["home","江湖"],["char","角色"],["bag","背包"],["pet","宠物"],["wing","翅膀"],["partner","伙伴"],["task","任务"],["gongfa","功法"],["shop","商店"],["title","称号"],["arena","竞技"],["more","更多"]];
 function renderTabs(){
  const t=$("tabbar");t.style.display="flex";
  t.innerHTML=TABS.map(([k,n])=>`<button class="${TAB===k?'on':''}" data-t="${k}">${n}</button>`).join("");
@@ -1214,7 +1214,7 @@ function renderTabs(){
  fab.style.display="block";fab.className=TAB==="chat"?"on":"";
 }
 function render(){if(S&&S.player&&sweepExpired())setTimeout(()=>toast(" 小红剑已到期，已自动卸下"),50);renderTop();renderTabs();
- ({home:rHome,bag:rBag,pet:rPet,task:rTask,gongfa:rGongfaSkill,shop:rShop,pay:rPay,rank:rRank,title:rTitle,arena:rArena,chat:rChat,wing:rWing,partner:rPartner,event:rEvent,more:rMore,vipinfo:rVip,market:rMarket,mail:rMail}[TAB])();}
+ ({home:rHome,char:rChar,bag:rBag,pet:rPet,task:rTask,gongfa:rGongfaSkill,shop:rShop,pay:rPay,rank:rRank,title:rTitle,arena:rArena,chat:rChat,wing:rWing,partner:rPartner,event:rEvent,more:rMore,vipinfo:rVip,market:rMarket,mail:rMail}[TAB])();}
 /* ============ 创建角色 ============ */
 function rCreate(){
  $("topbar").style.display="none";$("tabbar").style.display="none";
@@ -1447,6 +1447,15 @@ if(autoOn){
  }else{autoOn=false;if(!win)setTimeout(()=>toast("战败，自动战斗已停止"),50);}
 }
 }
+/* 极品装备世界播报：BOSS掉落 tier>=5（神级流光及以上）或品质"极品"（带幸运）的装备时全服播报；扫荡不播防刷屏 */
+function jipinBroadcast(it,zi,silent){
+ if(silent||!it)return;
+ const d=ITEMS[it.iid];if(!d)return;
+ const jipin=(d.tier||0)>=5||(d.slot==="weapon"&&weaponQuality(it)[0]==="极品");
+ if(!jipin)return;
+ const luck=(it.bonus&&it.bonus.luck)?`（幸运+${it.bonus.luck}）`:"";
+ pushChat("world",{sys:1,txt:`贺！「${S.player.name}」在${ZONES[zi].name}打出了极品「${d.name}」${luck}，羡煞旁人！`,t:Date.now()});
+}
 /* 野外/竞技场胜利结算（手动战斗与扫荡共用）。o={arena,oppRank,round,mi,silent,loot} */
 function settleZoneWin(f,zi,o){
 const p=S.player,em=expMult();
@@ -1486,12 +1495,12 @@ const tier=ZONES[zi].tier;
 const pool=Object.keys(ITEMS).filter(k=>ITEMS[k].tier===tier&&!ITEMS[k].gift);
 if(f.boss){
 // BOSS：概率掉落本关最高级武器，概率受爆率加成
-if(Math.random()<0.3*(1+vipDrop()/100)){const cw=zoneClassWeapon(tier);S.bag.push(mkWeapon(cw));dropIt(ITEMS[cw].name+"（"+ITEMS[cw].cls+"）");LG(`<span class="sys">BOSS掉落：${ITEMS[cw].name}（${ITEMS[cw].cls}）！集齐本关三职业武器可合成终极武器</span>`);}
-else{const iid=pick(pool);S.bag.push(mkWeapon(iid));dropIt(ITEMS[iid].name);LG(`<span class="sys">获得了！</span>`);}
+if(Math.random()<0.3*(1+vipDrop()/100)){const cw=zoneClassWeapon(tier),cwIt=mkWeapon(cw);S.bag.push(cwIt);dropIt(ITEMS[cw].name+"（"+ITEMS[cw].cls+"）");jipinBroadcast(cwIt,zi,o.silent);LG(`<span class="sys">BOSS掉落：${ITEMS[cw].name}（${ITEMS[cw].cls}）！集齐本关三职业武器可合成终极武器</span>`);}
+else{const iid=pick(pool),riIt=mkWeapon(iid);S.bag.push(riIt);dropIt(ITEMS[iid].name);jipinBroadcast(riIt,zi,o.silent);LG(`<span class="sys">获得了！</span>`);}
 if(Math.random()<0.2){addConsumable("洗炼石","xilian");dropIt("洗炼石×1");LG(`<span class="sys">BOSS掉落：洗炼石×1！可在背包洗炼武器属性</span>`);}
 if(Math.random()<0.3*(1+vipDrop()/100)){
  const asl=pick(ARMOR_SLOTS),ai=topItemOfSlot(tier,asl);
- if(ai){S.bag.push({iid:ai,enh:0});dropIt(ITEMS[ai].name);LG(`<span class="sys">BOSS掉落：${ITEMS[ai].name}！集齐同部位四件BOSS防具可合成轩辕防具</span>`);}
+ if(ai){const aiIt={iid:ai,enh:0};S.bag.push(aiIt);dropIt(ITEMS[ai].name);jipinBroadcast(aiIt,zi,o.silent);LG(`<span class="sys">BOSS掉落：${ITEMS[ai].name}！集齐同部位四件BOSS防具可合成轩辕防具</span>`);}
 }
 }else if(Math.random()<0.3*(1+vipDrop()/100)){
 const iid=pick(pool);
@@ -1659,15 +1668,20 @@ B.over=true;save();rBattle();
 <script>
 "use strict";
 /* ============ 背包/装备 ============ */
-function rBag(){
-const m=$("main"),p=S.player;
-let h=`<div class="card"><h3>背包</h3><p class="dim">已装备：</p><div class="statgrid">`;
+function bagEquipHTML(){
+const p=S.player;
+let h=`<div class="card"><h3>我的装备</h3><p class="dim">已穿戴：</p><div class="statgrid">`;
 for(const slot of SLOTS){
 const it=S.equip[slot];
 h+=`<div>${SLOTNAME[slot]}：<b>${it?itemNameHTML(it)+qualityTag(it)+(it.enh?` +${it.enh}`:"")+(it.expire?` <span class="dim">${expireText(it)}</span>`:""):"空"}</b>${it&&ITEMS[it.iid].set?` <span class="dim">[${ITEMS[it.iid].set}套]</span>`:""}${it&&it.bonus?` <span class="dim">[${bonusText(it.bonus)}]</span>`:""}${slot==="weapon"&&it?` <button class="btn small" data-rerolleq="1">洗炼</button>`:""}</div>`;
 }
 if(p.setDesc)h+=`<p class="gold" style="margin:6px 0 2px">${p.setDesc}</p>`;
-h+=`<p class="dim">套装效果：3件攻击+5%，6件攻击+10%/气血+10%，9件攻击+15%/气血+15%/防御+10%（圣龙/冰火/九幽/轩辕套）</p></div><button class="btn small" id="enhance">铁匠铺·强化装备</button> <button class="btn small" id="synth">神兵合成</button></div><div class="card"><h3>物品</h3>`;
+h+=`<p class="dim">套装效果：3件攻击+5%，6件攻击+10%/气血+10%，9件攻击+15%/气血+15%/防御+10%（圣龙/冰火/九幽/轩辕套）</p></div><button class="btn small" id="enhance">铁匠铺·强化装备</button> <button class="btn small" id="synth">神兵合成</button></div>`;
+return h;
+}
+function bagItemsHTML(){
+const p=S.player;
+let h=`<div class="card"><h3>物品</h3>`;
 if(!S.bag.length)h+=`<p class="dim">空空如也，去闯荡江湖打怪掉落吧。</p>`;
 sortIdxByTier(S.bag,it=>it.use?{tier:-1,sub:0}:{tier:ITEMS[it.iid].tier,sub:0}).forEach(i=>{
 const it=S.bag[i];
@@ -1683,8 +1697,12 @@ h+=`<div class="mob"><div><div class="mn">${itemNameHTML(it)}${d.cls?` <span cla
 <div class="md">${SLOTNAME[d.slot]} · ${[d.atk&&"攻"+d.atk,d.def&&"防"+d.def,d.hp&&"血"+d.hp,d.spd&&"速"+d.spd,d.luck&&"幸运+"+d.luck].filter(Boolean).join(" ")}${it.bonus?` <span class="gold">[${bonusText(it.bonus)}]</span>`:""}</div></div>
 ${d.slot==="weapon"?`<button class="btn" data-reroll="${i}">洗炼</button>`:""}${d.cls&&d.cls!==PROFS[p.prof].name?`<button class="btn" disabled>职业不符</button>`:`<button class="btn" data-eq="${i}">装备</button>`}</div>`;
 });
-h+=`</div>`;m.innerHTML=h;
-m.querySelectorAll("[data-eq]").forEach(b=>b.onclick=()=>{
+h+=`</div>`;
+return h;
+}
+function bindBag(c){
+const p=S.player;
+c.querySelectorAll("[data-eq]").forEach(b=>b.onclick=()=>{
 const it=S.bag[+b.dataset.eq],d=ITEMS[it.iid],es=equipSlotFor(d),old=S.equip[es];
 if(itemExpired(it)){toast("这件装备已到期，无法装备");return;}
 if(d.cls&&d.cls!==PROFS[p.prof].name){toast("「"+d.name+"」是「"+d.cls+"」职业专属装备，你的职业是"+PROFS[p.prof].name+"，无法装备");return;}
@@ -1692,7 +1710,7 @@ S.equip[es]=it;S.bag.splice(+b.dataset.eq,1);
 if(old)S.bag.push(old);
 calcStats();save();render();toast("装备了");
 });
-m.querySelectorAll("[data-use]").forEach(b=>b.onclick=()=>{
+c.querySelectorAll("[data-use]").forEach(b=>b.onclick=()=>{
 const it=S.bag[+b.dataset.use];
 if(it.use==="xilian")return;
 if((it.use==="hp150"||it.use==="hp450")&&p.hp>=p.maxhp){toast("气血已满，无需用药");return;}
@@ -1705,7 +1723,23 @@ if(it.use==="mpfull")p.mp=p.maxmp;
 if(EXPDAN[it.use]){const d=EXPDAN[it.use];S.expBuff={mult:d.mult,until:Date.now()+1800000};calcStats();save();render();toast(d.name+"生效，"+d.mult+"倍经验持续30分钟！");return;}
 calcStats();save();render();toast("用药了，效果拔群！");
 });
-$("synth").onclick=()=>synthModal();
+const _sy=c.querySelector("#synth");if(_sy)_sy.onclick=()=>synthModal();
+c.querySelectorAll("[data-reroll]").forEach(b=>b.onclick=()=>doReroll(()=>S.bag[+b.dataset.reroll]));
+const rqe=c.querySelector("[data-rerolleq]");
+if(rqe)rqe.onclick=()=>doReroll(()=>S.equip.weapon);
+const _eh=c.querySelector("#enhance");if(_eh)_eh.onclick=()=>{
+const slots=Object.entries(S.equip).filter(([s,it])=>it&&it.enh<5);
+if(!slots.length){toast("没有可强化的装备（已满级或未装备）");return;}
+modal(`<h3>铁匠铺</h3>${slots.map(([s,it],i)=>{const d=ITEMS[it.iid],cost=50*(it.enh+1)*d.tier;
+return`<div class="tier"><div><div class="gold">${itemNameHTML(it)} +${it.enh}→+${it.enh+1}</div><div class="m">花费 ${cost} 铜币</div></div><button class="btn small" style="width:auto;margin:0" data-en="${i}">强化</button></div>`;}).join("")}
+<button class="btn small" onclick="closeModal()">关闭</button>`);
+$("modalbox").querySelectorAll("[data-en]").forEach(b=>b.onclick=()=>{
+const[slot,it]=slots[+b.dataset.en],d=ITEMS[it.iid],cost=50*(it.enh+1)*d.tier;
+if(S.player.coins<cost){toast("铜币不足");return;}
+S.player.coins-=cost;it.enh++;calcStats();save();closeModal();render();toast("强化成功！");
+});
+};
+}
 function synthModal(){
  const zrows=[1,2,3,4,5,6,7,8].map(t=>{
   const ids=CLASS_WPN[t],uname=ITEMS[ZONE_ULT[t]].name,utier=ITEMS[ZONE_ULT[t]].tier,cost=ZONE_ULT_COST[t];
@@ -1799,21 +1833,29 @@ function doReroll(getIt){
  const q=weaponQuality(it);
  toast(`洗炼完成！品质：${q[0]} [${bonusText(it.bonus)}]`);
 }
-m.querySelectorAll("[data-reroll]").forEach(b=>b.onclick=()=>doReroll(()=>S.bag[+b.dataset.reroll]));
-const rqe=m.querySelector("[data-rerolleq]");
-if(rqe)rqe.onclick=()=>doReroll(()=>S.equip.weapon);
-$("enhance").onclick=()=>{
-const slots=Object.entries(S.equip).filter(([s,it])=>it&&it.enh<5);
-if(!slots.length){toast("没有可强化的装备（已满级或未装备）");return;}
-modal(`<h3>铁匠铺</h3>${slots.map(([s,it],i)=>{const d=ITEMS[it.iid],cost=50*(it.enh+1)*d.tier;
-return`<div class="tier"><div><div class="gold">${itemNameHTML(it)} +${it.enh}→+${it.enh+1}</div><div class="m">花费 ${cost} 铜币</div></div><button class="btn small" style="width:auto;margin:0" data-en="${i}">强化</button></div>`;}).join("")}
-<button class="btn small" onclick="closeModal()">关闭</button>`);
-$("modalbox").querySelectorAll("[data-en]").forEach(b=>b.onclick=()=>{
-const[slot,it]=slots[+b.dataset.en],d=ITEMS[it.iid],cost=50*(it.enh+1)*d.tier;
-if(S.player.coins<cost){toast("铜币不足");return;}
-S.player.coins-=cost;it.enh++;calcStats();save();closeModal();render();toast("强化成功！");
-});
-};
+function rBag(){const m=$("main");m.innerHTML=bagEquipHTML()+bagItemsHTML();bindBag(m);}
+/* ============ 角色 ============ */
+const CHAR_SUBS=[["attr","属性"],["equip","装备"],["bag","背包"],["title","称号"],["pet","宠物"],["wing","翅膀"],["partner","伙伴"]];
+function rChar(){
+ const m=$("main"),p=S.player,sub=S.charSub||"attr";
+ let h=`<div class="card"><h3>角色·${escHtml(p.name)}</h3><div class="rowbtns">`;
+ for(const [k,n] of CHAR_SUBS)h+=`<button class="btn small${sub===k?" primary":""}" data-charsub="${k}">${n}</button>`;
+ h+=`</div></div><div id="charBody"></div>`;
+ m.innerHTML=h;
+ m.querySelectorAll("[data-charsub]").forEach(b=>b.onclick=()=>{S.charSub=b.dataset.charsub;save();render();});
+ const body=$("charBody");
+ if(sub==="attr")body.innerHTML=`<div class="card"><h3>角色属性</h3>${attrPanelHTML()}</div>`;
+ else if(sub==="equip")body.innerHTML=bagEquipHTML();
+ else if(sub==="bag")body.innerHTML=bagItemsHTML();
+ else if(sub==="title")body.innerHTML=titleHTML();
+ else if(sub==="pet")body.innerHTML=petHTML();
+ else if(sub==="wing")body.innerHTML=wingHTML();
+ else if(sub==="partner")body.innerHTML=partnerHTML();
+ if(sub==="equip"||sub==="bag")bindBag(body);
+ else if(sub==="title")bindTitle(body);
+ else if(sub==="pet")bindPet(body);
+ else if(sub==="wing")bindWing(body);
+ else if(sub==="partner")bindPartner(body);
 }
 /* 丹药/材料叠加（顶层，供全游戏调用） */
 function addConsumable(name,use,n){ // 丹药/材料叠加，每组上限99
@@ -1833,8 +1875,8 @@ function takeConsumable(use){ // 消耗1个，返回是否成功
  return true;
 }
 /* ============ 宠物 ============ */
-function rWing(){
-const m=$("main"),p=S.player;
+function wingHTML(){
+const p=S.player;
 const wt=(S.wing&&S.wing.tier)||0,wc=wingCost(wt);
 const canUp=wt<WING_MAX&&(p.feather||0)>=wc.feather&&p.coins>=wc.coins&&p.level>=20;
 let h=`<div class="card"><h3>我的翅膀</h3>`;
@@ -1843,8 +1885,11 @@ else h+=`<p>当前：<b class="gold">${WING_NAMES[wt]}（${wt}阶）</b><span cl
 if(wt<WING_MAX)h+=`<div class="tier"><div><div class="gold">${wt?"升至"+(wt+1)+"阶·"+WING_NAMES[wt+1]:"激活翅膀"}</div><div class="m">消耗 灵羽×${wc.feather}（拥有${p.feather||0}）· 铜币${wc.coins}（拥有${p.coins}）</div></div>
 <button class="btn small primary" style="width:auto;margin:0" id="wingUp"${canUp?"":" disabled"}>${wt?"升阶":"激活"}</button></div>`;
 else h+=`<p class="dim">已达最高 ${WING_MAX} 阶「${WING_NAMES[WING_MAX]}」，翱翔九天！</p>`;
-h+=`</div>`;m.innerHTML=h;
-const wu=$("wingUp");
+return h;
+}
+function bindWing(c){
+const p=S.player;
+const wu=c.querySelector("#wingUp");
 if(wu)wu.onclick=()=>{
  const t=(S.wing&&S.wing.tier)||0,c=wingCost(t);
  if(p.level<20){toast("需20级才能激活翅膀");return;}
@@ -1853,8 +1898,9 @@ if(wu)wu.onclick=()=>{
  calcStats();save();render();toast(` 翅膀${t?"升至":"激活"}「${WING_NAMES[t+1]}」！`);
 };
 }
-function rPartner(){
-const m=$("main"),p=S.player;
+function rWing(){const m=$("main");m.innerHTML=wingHTML();bindWing(m);}
+function partnerHTML(){
+const p=S.player;
 const v=vipLevel(),canMythicVip=v>=8&&!S.claimedMythicVip;
 let h=`<div class="card"><h3>我的伙伴</h3><p class="dim">伙伴只能穿戴武器和护甲。出战伙伴将其30%属性加给你，战斗胜利出战伙伴获得修为升级。<br>伙伴分黄/玄/地/天/神/圣/至尊七级，每级又分低级/中级/高级/终极四档，每位都是斗破苍穹中的人物。神级终极获取：VIP8免费领取 / 限时活动「神将降临」/ 千金募名将（低概率）；圣级：千金募名将（极低概率3%）；至尊终极（萧炎/薰儿）：限时活动「至尊降临」或下方圣级合成。3位同品级伙伴可合成更高品级。</p>`;
 if(canMythicVip)h+=`<div class="tier"><div><div class="gold">VIP8专属神将</div><div class="m">免费招募神话品质伙伴×1</div></div><button class="btn small primary" style="width:auto;margin:0" id="mythicVip">领取</button></div>`;
@@ -1874,29 +1920,32 @@ sortIdxByTier(S.partners||[],pt=>({tier:pt.tier,sub:pt.sub})).forEach(i=>{
  }
  h+=`</div></div><button class="btn small" style="width:auto;margin:0" data-hskill="${i}">技能</button>${i===S.activePartner?"":`<button class="btn small" style="width:auto;margin:0" data-pfight="${i}"${p.level<5?" disabled":""}>${p.level<5?"5级可召唤":"出战"}</button>`}</div>`;
 });
-h+=`</div>`;m.innerHTML=h;
 let ph=`<div class="card"><h3>伙伴合成</h3><p class="dim">3位同品级伙伴可合成1位更高品级的随机伙伴（出战中的不可用，身上装备自动退回背包）。神级以上合成需对应进化石：神级1999元宝、圣级19999元宝、至尊29999元宝（商城有售，世界BOSS也掉落，至尊石概率极低）。圣→至尊必出萧炎/薰儿（未拥有的优先）。合成失败时材料消失，请谨慎！</p>`;
 for(let t=0;t<6;t++){
  const n=partnerSynthCount(t),rate=Math.floor(SYNTH_RATE[t]*100),st=SYNTH_STONE[t];
  const stone=st?`<div class="m">需${st[1]}×1（拥有${countItem(st[0])}）</div>`:"";
  ph+=`<div class="tier"><div><div>${tieredName(PTIERS[t]+"级",t)} → ${tieredName(PTIERS[t+1]+"级",t+1)}${t===5?'<span class="dim">（萧炎/薰儿）</span>':""}</div><div class="m">可用 ${n}/3 位 · 成功率${rate}%</div>${stone}</div><button class="btn small primary" style="width:auto;margin:0" data-psynth="${t}"${n<3?" disabled":""}>合成</button></div>`;
 }
-ph+=`</div>`;m.insertAdjacentHTML("beforeend",ph);
-m.querySelectorAll("[data-psynth]").forEach(b=>b.onclick=()=>doPartnerSynth(+b.dataset.psynth));
-const rc=$("recC");
+ph+=`</div>`;h+=ph;
+return h;
+}
+function bindPartner(c){
+const p=S.player;
+c.querySelectorAll("[data-psynth]").forEach(b=>b.onclick=()=>doPartnerSynth(+b.dataset.psynth));
+const rc=c.querySelector("#recC");
 if(rc)rc.onclick=()=>{if(p.coins<5000){toast("铜币不足（需5000）");return;}p.coins-=5000;
  const r=Math.random();recruitPartner(r<0.5?0:(r<0.8?1:2));};
-const rg=$("recG");
+const rg=c.querySelector("#recG");
 if(rg)rg.onclick=()=>{if(p.gold<88){toast("元宝不足（需88）");return;}p.gold-=88;
  const r=Math.random();recruitPartner(r<0.03?5:(r<0.43?2:(r<0.83?3:4)));};
-const mv=$("mythicVip");
+const mv=c.querySelector("#mythicVip");
 if(mv)mv.onclick=()=>{if(vipLevel()<8||S.claimedMythicVip)return;recruitPartner(4,3);S.claimedMythicVip=true;save();render();};
-m.querySelectorAll("[data-pfight]").forEach(b=>b.onclick=()=>{if(p.level<5){toast("需5级才能召唤伙伴出战");return;}S.activePartner=+b.dataset.pfight;calcStats();save();render();toast(" 伙伴出战！");});
-m.querySelectorAll("[data-hskill]").forEach(b=>b.onclick=()=>openSkillModal("partner",+b.dataset.hskill));
-m.querySelectorAll("[data-pun]").forEach(b=>b.onclick=()=>{
+c.querySelectorAll("[data-pfight]").forEach(b=>b.onclick=()=>{if(p.level<5){toast("需5级才能召唤伙伴出战");return;}S.activePartner=+b.dataset.pfight;calcStats();save();render();toast(" 伙伴出战！");});
+c.querySelectorAll("[data-hskill]").forEach(b=>b.onclick=()=>openSkillModal("partner",+b.dataset.hskill));
+c.querySelectorAll("[data-pun]").forEach(b=>b.onclick=()=>{
  const[pi,slot]=b.dataset.pun.split("_"),pt=S.partners[+pi],it=pt.equip[slot];
  if(!it)return;pt.equip[slot]=null;S.bag.push(it);calcStats();save();render();toast("已卸下");});
-m.querySelectorAll("[data-peq]").forEach(b=>b.onclick=()=>{
+c.querySelectorAll("[data-peq]").forEach(b=>b.onclick=()=>{
  const[pi,slot]=b.dataset.peq.split("_"),pt=S.partners[+pi];
  const items=S.bag.map((it,i)=>({it,i})).filter(x=>x.it.iid&&ITEMS[x.it.iid]&&ITEMS[x.it.iid].slot===baseSlot(slot)&&!itemExpired(x.it));
  if(!items.length){toast("背包没有可穿戴的"+SLOTNAME[slot]);return;}
@@ -1910,6 +1959,7 @@ m.querySelectorAll("[data-peq]").forEach(b=>b.onclick=()=>{
  });
 });
 }
+function rPartner(){const m=$("main");m.innerHTML=partnerHTML();bindPartner(m);}
 /* ============ 宠物合成 ============ */
 const SYNTH_RATE=[0.8,0.7,0.6,0.5,0.4,0.3]; // 黄->玄 ... 圣->至尊 成功率
 const SYNTH_STONE={3:["evostone","神级进化石"],4:["evo_saint","圣级进化石"],5:["evo_zun","至尊进化石"]}; // 高阶合成所需进化石：商城有售（神1999/圣19999/至尊29999元宝），世界BOSS也掉落（至尊石概率极低）
@@ -1956,8 +2006,8 @@ function doPartnerSynth(t){
   calcStats();save();render();toast(`合成成功！${tieredName(tierName(e.tier,e.sub),e.tier)}伙伴「${tieredName(e.name,e.tier)}」加入队伍！`);
  }else{calcStats();save();render();toast("合成失败，三位伙伴离队了……");}
 }
-function rPet(){
-const m=$("main"),p=S.player;
+function petHTML(){
+const p=S.player;
 let h=`<div class="card"><h3>我的宠物</h3><p class="dim">宠物均为斗罗大陆魂兽，分黄/玄/地/天/神/圣/至尊七级，每级又分低级/中级/高级/终极四档，品级越高助战越强。野外把怪物打到30%血以下可捕捉；3只同品级可合成更高品级（神级以上需对应进化石（商城有售，世界BOSS也掉落，至尊石概率极低）；最高「至尊终极」彩色流光，唯限时活动「鸿蒙降临」可得。</p>`;
 if(!S.pets.length)h+=`<p class="dim">还没有宠物，去青竹林捕捉风狒狒吧！</p>`;
 sortIdxByTier(S.pets,pet=>{const b=PETS[pet.pid];return{tier:b.tier,sub:b.sub};}).forEach(i=>{
@@ -1967,18 +2017,22 @@ h+=`<div class="mob"><div><div class="mn">${tieredName(pet.name,b.tier)} ${tierB
 <div class="md">${b.desc}</div><div class="md">气血${hp} 攻击${atk} · 经验${pet.exp}/${petExpNeed(pet.level)}</div><div class="md">技能：${skillListHTML(pet)}</div></div>
 <button class="btn" data-pskill="${i}">技能</button>${i===S.activePet?"":`<button class="btn" data-pet="${i}"${p.level<10?" disabled":""}>${p.level<10?"10级可召唤":"出战"}</button>`}</div>`;
 });
-h+=`</div>`;m.innerHTML=h;
-m.querySelectorAll("[data-pet]").forEach(b=>b.onclick=()=>{if(p.level<10){toast("需10级才能召唤宠物出战");return;}S.activePet=+b.dataset.pet;save();render();toast("宠物出战！");});
-m.querySelectorAll("[data-pskill]").forEach(b=>b.onclick=()=>openSkillModal("pet",+b.dataset.pskill));
 let sh=`<div class="card"><h3>宠物合成</h3><p class="dim">3只同品级宠物可合成1只更高品级的随机宠物（出战中的不可用）。神级以上合成需对应进化石：神级1999元宝、圣级19999元宝、至尊29999元宝（商城有售，世界BOSS也掉落，至尊石概率极低）。合成失败时材料消失，请谨慎！</p>`;
 for(let t=0;t<6;t++){
  const n=synthCount(t),rate=Math.floor(SYNTH_RATE[t]*100),st=SYNTH_STONE[t];
  const stone=st?`<div class="m">需${st[1]}×1（拥有${countItem(st[0])}）</div>`:"";
  sh+=`<div class="tier"><div><div>${tieredName(PTIERS[t]+"级",t)} → ${tieredName(PTIERS[t+1]+"级",t+1)}</div><div class="m">可用 ${n}/3 只 · 成功率${rate}%</div>${stone}</div><button class="btn small primary" style="width:auto;margin:0" data-synth="${t}"${n<3?" disabled":""}>合成</button></div>`;
 }
-sh+=`</div>`;m.insertAdjacentHTML("beforeend",sh);
-m.querySelectorAll("[data-synth]").forEach(b=>b.onclick=()=>doPetSynth(+b.dataset.synth));
+sh+=`</div>`;h+=sh;
+return h;
 }
+function bindPet(c){
+const p=S.player;
+c.querySelectorAll("[data-pet]").forEach(b=>b.onclick=()=>{if(p.level<10){toast("需10级才能召唤宠物出战");return;}S.activePet=+b.dataset.pet;save();render();toast("宠物出战！");});
+c.querySelectorAll("[data-pskill]").forEach(b=>b.onclick=()=>openSkillModal("pet",+b.dataset.pskill));
+c.querySelectorAll("[data-synth]").forEach(b=>b.onclick=()=>doPetSynth(+b.dataset.synth));
+}
+function rPet(){const m=$("main");m.innerHTML=petHTML();bindPet(m);}
 /* ============ 江湖任务 ============ */
 function rTask(){
 const m=$("main"),p=S.player;
@@ -2326,8 +2380,8 @@ function rArena(){
  };
 }
 /* ============ 称号 ============ */
-function rTitle(){
- const m=$("main"),v=vipLevel(),w=S.wornTitle;
+function titleHTML(){
+ const v=vipLevel(),w=S.wornTitle;
  const myT=myRankTitles().map(t=>t.name),evGot=S.eventTitles||[];
  let vipHtml="";
  for(let i=1;i<VIP_NEED.length;i++){const tt=VIP_TITLES[i],got=i<=v;
@@ -2346,14 +2400,17 @@ function rTitle(){
  const RKB={zl:"战力之巅",pay:"神豪无双",pet:"灵兽之主",wing:"九天神皇",lv:"登峰造极"};
  for(const bk of Object.keys(RKB)){if(myT.includes(RKB[bk]))rkArt+=`<div class="tshow" data-wk="rank" data-wid="${bk}:0" title="点击佩戴">${titleDynHTML(RKB[bk],true)}</div>`;}
  const shenArt=evGot.includes("shenzhi")?`<div class="tshow" data-wk="ev" data-wid="shenzhi" title="点击佩戴">${titleDynHTML("神之眷顾",true)}</div>`:"";
- m.innerHTML=`<div class="card"><h3>VIP称号</h3>${vipArt}<p class="dim">点击已获得的称号进行佩戴/切换</p><div class="tgrid">${vipHtml}</div></div>`
+ return `<div class="card"><h3>VIP称号</h3>${vipArt}<p class="dim">点击已获得的称号进行佩戴/切换</p><div class="tgrid">${vipHtml}</div></div>`
  +`<div class="card"><h3>排行榜荣誉称号</h3>${rkArt}<div class="tgrid">${rkHtml}</div></div>`
  +`<div class="card"><h3>限定称号</h3>${shenArt}<div class="tgrid">${evHtml}</div></div>`;
- m.querySelectorAll("[data-wk]").forEach(s=>s.onclick=()=>{
+}
+function bindTitle(c){
+ c.querySelectorAll("[data-wk]").forEach(s=>s.onclick=()=>{
  const k=s.dataset.wk;let id=s.dataset.wid;if(k==="vip")id=+id;
  S.wornTitle={k:k,id:id};calcStats();save();render();
  const wt=wornTitleInfo();toast(`已佩戴称号「${wt?wt.name:""}」！`);});
 }
+function rTitle(){const m=$("main");m.innerHTML=titleHTML();bindTitle(m);}
 /* ============ 玩家档案查看 ============ */
 function hashStr(s){let h=0;s=String(s);for(let i=0;i<s.length;i++){h=(h*31+s.charCodeAt(i))>>>0;}return h;}
 const NPC_PETS=["啸天虎","碧鳞蛇","金翅雕","金蚕蛊","苍原狼","月影兔","灵羽鸡","泰坦巨猿","天青牛蟒","九幽冥雀"];
@@ -2988,7 +3045,7 @@ function rMore(){
  const m=$("main");
  m.innerHTML=attrPanelHTML()
  +`<div class="card"><h3>玩法说明</h3><p class="dim">
- · 建号三选一：战士（攻击+10%）/ 法师（内力上限+30%）/ 射手（速度+15%）；建号自动生成玩家账号（JH+6位数字），充值兑换要用；建号即得本职业2个入门技能<br>· 去「江湖」挑战敌人，战斗点「攻击」自动施展本职业最强技能（内力不够则普通攻击），升级变强；战斗中点「自动」开启持续自动战斗（自动放技能、怒气满放必杀、残血自动吃药，胜利后自动挑战本关下一个怪物、本关打完自动停止，无需再次点击，手动操作或返回即停止）；结算画面可「再战一场」或「下一关卡」，无需返回重选关卡；曾击败过的怪物可在关卡列表点「扫荡」直接领取胜利奖励（每次3点体力）；野怪打到30%血以下可捕捉为宠物；修为按关卡难度递增——青竹林1倍、黑风寨2倍、幽冥谷3.5倍、华山之巅6倍、熔岩炼狱10倍、极北冰原16倍、云梦仙泽26倍、九幽魔域40倍，关卡BOSS再享2.5倍；升级所需修为递增（1→2级需2000，越往后越多）<br>· 技能三职业完全隔离，「功法」页下半部分只能学本职业的：战士（罗汉拳/打狗棒法/焰分噬浪尺/帝印诀）、法师（绵掌/弄炎诀/五轮离火法/佛怒火莲）、射手（峨眉刺/三千雷动/风之极·陨杀/大天造化掌）<br>· 12个装备栏：武器/帽子/护甲/裤子/护腕×2/戒指×2/项链/勋章/鞋子/腰带；武器分职业——战士/法师/射手只能装备本职业的装备（鸿蒙神剑无职业限制，人人可装备）；BOSS掉落本关职业武器（优先掉没有的）；武器共7阶（1黄2玄3地4天5神6圣7至尊），带随机属性，洗炼石可重置；幸运只来自武器（最高7）与项链（最高2），其他途径不加幸运；铁匠铺可强化；防具有套装效果——圣龙/冰火/九幽/轩辕套：3件攻击+5%，6件攻击+10%/气血+10%，9件攻击+15%/气血+15%/防御+10%<br>· 背包「神兵合成」：集齐本关战士/法师/射手三职业武器+铜币→本关终极武器（8关：青竹圣剑/黑风魔刃/幽冥鬼剑/华山紫青剑/熔岩圣剑/冰原帝戟/云梦仙剑/九幽帝刃）；集齐前四把+300万铜币→轩辕神剑（6阶圣）；集齐后四把+800万铜币→鸿蒙神剑（7阶至尊，无职业限制）；轩辕神剑×3+1000万铜币→至尊终极武器（7阶至尊·全游戏最高阶：战士斩尤帝剑/法师灭尤帝杖/射手断尤帝弓）；轩辕战甲×3+1000万铜币→至尊终极防具（7阶至尊：战士斩尤帝甲/法师灭尤帝袍/射手断尤帝衣）；同部位四件1-4阶BOSS防具+200万铜币→轩辕防具；同部位三件5-7阶BOSS防具+800万铜币→鸿蒙防具（7阶至尊）<br>· 宠物均为斗罗大陆魂兽，分黄/玄/地/天/神/圣/至尊七级，每级又分低/中/高/终极四档，10级可出战助战；3只同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用）；神级以上需进化石：神级1999/圣级19999/至尊29999元宝，商城有售，世界BOSS也掉落（至尊石概率极低）<br>· 宠物技能（斗罗大陆魂兽技）与伙伴技能（斗破苍穹斗技）：每只/每位初始拥有3个，最高神级，按品级加攻击（黄+3%/玄+5%/地+8%/天+12%/神+18%，可叠加）；出战时有概率施展技能造成额外伤害；宠物/伙伴页点「技能」可花铜币更换领悟（随机同品级及以下新技能，最高神级）；圣级/至尊级技能后续通过限时活动获取<br>· 伙伴均为斗破苍穹人物，5级可出战，出战将其30%属性加给你，只能穿戴武器和护甲，战斗胜利得修为升级；「宠物」页铜币/元宝招募；神级终极：VIP8免费领/「神将降临」（￥1288）/千金募名将；圣级：千金募名将极低概率（3%）；3位同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用；神级以上需进化石）；至尊终极（萧炎/薰儿随机其一）：「至尊降临」（￥7999）或圣级合成（30%，需至尊进化石）<br>· 功法分七级四档，习得后花铜币修炼（最高5重）加属性；神级唯VIP6/限时活动「神功现世」；圣级/至尊级唯限时活动可得<br>· 斗气境界即转生：斗之气/斗者/斗师/大斗师/斗灵/斗王/斗皇/斗宗/斗尊/斗圣/斗帝共十一境，每境有等级上限（3/6/10/14/18/24/30/36/44/99/99级），满级后必须去「功法」页花铜币转生突破才能继续升级，突破还加属性<br>· 翅膀20级激活，灵羽升级，每阶攻击+12/气血+120/速度+3<br>· 充值：游戏内无直接充值，右上角「充值」页凭兑换码兑换——把玩家账号告诉客服，客服后台生成你的专属码后在此输入，一码一用；兑换码元宝、VIP6神级功法、首充小红剑（攻击26/幸运7，永久）、首充大礼包（288元宝+2万铜币+体力+灵兽蛋）全部发放至邮箱手动领取<br>· 累计充值升VIP1-10（6/30/98/198/498/998/1998/2998/4998/9999元），每级攻击/气血+2%、每日VIP礼包（发至邮箱）、专属称号；VIP6及以上名字彩色显示<br>· 充值豪礼5档（30/98/198/498/998）：启程礼（元宝/洗炼石/经验丹）、天级终极宠物天青牛蟒·大明、神级宠物三眼金猊·王秋儿/冰天雪女、稀有称号神之眷顾——真实充值与红包共同累积，平民打怪攒红包也能领；奖励发放至邮箱<br>· 累计充值奖励4档（1998/2998/5998/9999，仅真实充值）：元宝+圣级/至尊进化石+限定称号（一代宗师/开宗立派/纵横四海/名扬四海），奖励发放至邮箱；打怪掉充值红包（0.5/1/3/5/10元，每日上限100个），红包计入充值豪礼进度但不计VIP等级与累计充值奖励<br>· 限时活动（仅真实充值，每位玩家自建号起3天内有效，过期不可再领）：神功现世（￥498神级大日焚天诀）、神将降临（￥1288神话伙伴）、圣宠降临（￥2998圣级光明圣龙）、圣功现世（￥3999圣级圣心诀）、圣凰降临（￥5999圣级光明凤凰）、至尊降临（￥7999至尊萧炎/薰儿）、鸿蒙降临（￥9999金眼黑龙王·帝天/银龙王·古月娜+鸿蒙至尊诀）<br>· 世界BOSS（活动中心，每日可挑战）：血量999999999，打不死，纯粹比拼伤害，单场30回合封顶；挑战按钮旁「伤害榜」查看今日所有玩家伤害排名；每日24点按排名自动发放至邮箱（手动领取）——冠军200元宝+圣级进化石+灵羽×30+百万铜币+洗炼石×10，第2-3名100元宝+神级进化石+灵羽×20+五十万铜币+洗炼石×5，第4-10名50元宝+灵羽×10+二十万铜币+洗炼石×3，参与奖灵羽×5+五万铜币+洗炼石×1<br>· 竞技场每日5次，挑战更高排名对手，胜则排名上升，前三每日领奖（发至邮箱）；江湖任务：击败10个敌人，奖300铜币+1200修为（发至邮箱）<br>· 体力：江湖挑战/竞技场每次3点，世界BOSS每次5点，每45秒回复1点，打坐+10（有冷却），商城体力丹+30<br>· 离线挂机：下线后自动挂机（上限8小时），挂机地图可在「江湖」页自由选择（默认最高可进图），上线弹窗结算修为/铜币/体力，出战宠物与伙伴也得一半修为<br>· 每日签到（活动中心）：7天一轮，断签重计，奖励发至邮箱——第1天铜币×8000/体力×20，第2天铜币×12000/洗炼石×2，第3天元宝×30/体力×30，第4天铜币×20000/灵羽×10，第5天元宝×50/洗炼石×3，第6天元宝×80/灵羽×20，第7天元宝×120/神级进化石×1<br>· 商店=江湖药铺（铜币）+元宝商城（元宝）+元宝兑换铜币（10元宝→10万/50→55万/100→120万）；经验丹双倍25/三倍45/五倍80元宝，背包使用后30分钟打怪修为加倍<br>· 聊天只有世界频道，5秒发一条，NPC会自动互动；排行榜有战力/充值/宠物/翅膀/等级5榜，前三名得荣誉称号（可佩戴加成）；点击排行/聊天/竞技场中的名字可看档案对比；竞技榜第一、世界BOSS伤害榜第一、等级榜第一、充值榜第一都会世界通报<br>· 邮箱（右上角）：所有奖励统一发放至邮箱手动领取——充值/兑换码/充值豪礼/累计充值奖励/VIP每日礼包/每日签到/限时活动/竞技场每日奖励/江湖任务/交易行购买与寄售成交/玩家交易码/世界BOSS每日24点排名奖励；最多保留30封<br>· 交易行（底部导航「交易」）：寄售装备/进化石/宠物卖给土豪NPC（每次进入结算，定价合理卖得快，成交收5%税，成交款发至邮箱）；购买区每日刷新他人寄售（购买所得发至邮箱）；玩家交易码可跨设备与真实玩家交易（兑换所得发至邮箱）<br>· 称号分VIP称号/限定称号/排行称号共55个，均可佩戴，属性叠加；其中8个为动态称号（稀有称号神之眷顾、VIP10武道至尊、5榜第一：武林神话/战力之巅/神豪无双/灵兽之主/九天神皇/登峰造极）——完整场景底图+左右双神兽独立游动+光效粒子，背景文字静止；其余47个为静态称号牌（VIP金框/榜二银框/榜三铜框/节日红粉蓝紫四框+文字）；佩戴的称号显示在顶栏左上角，点击可进称号页更换；动态称号在称号页有专属大图展示，点击大图可直接佩戴；存档保存在本机，换设备会丢失<br></p></div>
+ · 建号三选一：战士（攻击+10%）/ 法师（内力上限+30%）/ 射手（速度+15%）；建号自动生成玩家账号（JH+6位数字），充值兑换要用；建号即得本职业2个入门技能<br>· 去「江湖」挑战敌人，战斗点「攻击」自动施展本职业最强技能（内力不够则普通攻击），升级变强；战斗中点「自动」开启持续自动战斗（自动放技能、怒气满放必杀、残血自动吃药，胜利后自动挑战本关下一个怪物、本关打完自动停止，无需再次点击，手动操作或返回即停止）；结算画面可「再战一场」或「下一关卡」，无需返回重选关卡；曾击败过的怪物可在关卡列表点「扫荡」直接领取胜利奖励（每次3点体力）；野怪打到30%血以下可捕捉为宠物；修为按关卡难度递增——青竹林1倍、黑风寨2倍、幽冥谷3.5倍、华山之巅6倍、熔岩炼狱10倍、极北冰原16倍、云梦仙泽26倍、九幽魔域40倍，关卡BOSS再享2.5倍；升级所需修为递增（1→2级需2000，越往后越多）<br>· 技能三职业完全隔离，「功法」页下半部分只能学本职业的：战士（罗汉拳/打狗棒法/焰分噬浪尺/帝印诀）、法师（绵掌/弄炎诀/五轮离火法/佛怒火莲）、射手（峨眉刺/三千雷动/风之极·陨杀/大天造化掌）<br>· 12个装备栏：武器/帽子/护甲/裤子/护腕×2/戒指×2/项链/勋章/鞋子/腰带；武器分职业——战士/法师/射手只能装备本职业的装备（鸿蒙神剑无职业限制，人人可装备）；BOSS掉落本关职业武器（优先掉没有的）；武器共7阶（1黄2玄3地4天5神6圣7至尊），带随机属性，洗炼石可重置；幸运只来自武器（最高7）与项链（最高2），其他途径不加幸运；铁匠铺可强化；防具有套装效果——圣龙/冰火/九幽/轩辕套：3件攻击+5%，6件攻击+10%/气血+10%，9件攻击+15%/气血+15%/防御+10%<br>· 角色页：底部导航新增「角色」按钮，一个页面管齐属性、装备、背包、称号、宠物、翅膀、伙伴七个子页（原背包/宠物/翅膀/伙伴/称号入口保留不变）<br>· 背包「神兵合成」：集齐本关战士/法师/射手三职业武器+铜币→本关终极武器（8关：青竹圣剑/黑风魔刃/幽冥鬼剑/华山紫青剑/熔岩圣剑/冰原帝戟/云梦仙剑/九幽帝刃）；集齐前四把+300万铜币→轩辕神剑（6阶圣）；集齐后四把+800万铜币→鸿蒙神剑（7阶至尊，无职业限制）；轩辕神剑×3+1000万铜币→至尊终极武器（7阶至尊·全游戏最高阶：战士斩尤帝剑/法师灭尤帝杖/射手断尤帝弓）；轩辕战甲×3+1000万铜币→至尊终极防具（7阶至尊：战士斩尤帝甲/法师灭尤帝袍/射手断尤帝衣）；同部位四件1-4阶BOSS防具+200万铜币→轩辕防具；同部位三件5-7阶BOSS防具+800万铜币→鸿蒙防具（7阶至尊）<br>· 宠物均为斗罗大陆魂兽，分黄/玄/地/天/神/圣/至尊七级，每级又分低/中/高/终极四档，10级可出战助战；3只同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用）；神级以上需进化石：神级1999/圣级19999/至尊29999元宝，商城有售，世界BOSS也掉落（至尊石概率极低）<br>· 宠物技能（斗罗大陆魂兽技）与伙伴技能（斗破苍穹斗技）：每只/每位初始拥有3个，最高神级，按品级加攻击（黄+3%/玄+5%/地+8%/天+12%/神+18%，可叠加）；出战时有概率施展技能造成额外伤害；宠物/伙伴页点「技能」可花铜币更换领悟（随机同品级及以下新技能，最高神级）；圣级/至尊级技能后续通过限时活动获取<br>· 伙伴均为斗破苍穹人物，5级可出战，出战将其30%属性加给你，只能穿戴武器和护甲，战斗胜利得修为升级；「宠物」页铜币/元宝招募；神级终极：VIP8免费领/「神将降临」（￥1288）/千金募名将；圣级：千金募名将极低概率（3%）；3位同品级可合成更高品级（成功率80%/70%/60%/50%/40%/30%，失败材料消失，出战中不可用；神级以上需进化石）；至尊终极（萧炎/薰儿随机其一）：「至尊降临」（￥7999）或圣级合成（30%，需至尊进化石）<br>· 功法分七级四档，习得后花铜币修炼（最高5重）加属性；神级唯VIP6/限时活动「神功现世」；圣级/至尊级唯限时活动可得<br>· 斗气境界即转生：斗之气/斗者/斗师/大斗师/斗灵/斗王/斗皇/斗宗/斗尊/斗圣/斗帝共十一境，每境有等级上限（3/6/10/14/18/24/30/36/44/99/99级），满级后必须去「功法」页花铜币转生突破才能继续升级，突破还加属性<br>· 翅膀20级激活，灵羽升级，每阶攻击+12/气血+120/速度+3<br>· 充值：游戏内无直接充值，右上角「充值」页凭兑换码兑换——把玩家账号告诉客服，客服后台生成你的专属码后在此输入，一码一用；兑换码元宝、VIP6神级功法、首充小红剑（攻击26/幸运7，永久）、首充大礼包（288元宝+2万铜币+体力+灵兽蛋）全部发放至邮箱手动领取<br>· 累计充值升VIP1-10（6/30/98/198/498/998/1998/2998/4998/9999元），每级攻击/气血+2%、每日VIP礼包（发至邮箱）、专属称号；VIP6及以上名字彩色显示<br>· 充值豪礼5档（30/98/198/498/998）：启程礼（元宝/洗炼石/经验丹）、天级终极宠物天青牛蟒·大明、神级宠物三眼金猊·王秋儿/冰天雪女、稀有称号神之眷顾——真实充值与红包共同累积，平民打怪攒红包也能领；奖励发放至邮箱<br>· 累计充值奖励4档（1998/2998/5998/9999，仅真实充值）：元宝+圣级/至尊进化石+限定称号（一代宗师/开宗立派/纵横四海/名扬四海），奖励发放至邮箱；打怪掉充值红包（0.5/1/3/5/10元，每日上限100个），红包计入充值豪礼进度但不计VIP等级与累计充值奖励<br>· 限时活动（仅真实充值，每位玩家自建号起3天内有效，过期不可再领）：神功现世（￥498神级大日焚天诀）、神将降临（￥1288神话伙伴）、圣宠降临（￥2998圣级光明圣龙）、圣功现世（￥3999圣级圣心诀）、圣凰降临（￥5999圣级光明凤凰）、至尊降临（￥7999至尊萧炎/薰儿）、鸿蒙降临（￥9999金眼黑龙王·帝天/银龙王·古月娜+鸿蒙至尊诀）<br>· 世界BOSS（活动中心，每日可挑战）：血量999999999，打不死，纯粹比拼伤害，单场30回合封顶；挑战按钮旁「伤害榜」查看今日所有玩家伤害排名；每日24点按排名自动发放至邮箱（手动领取）——冠军200元宝+圣级进化石+灵羽×30+百万铜币+洗炼石×10，第2-3名100元宝+神级进化石+灵羽×20+五十万铜币+洗炼石×5，第4-10名50元宝+灵羽×10+二十万铜币+洗炼石×3，参与奖灵羽×5+五万铜币+洗炼石×1<br>· 竞技场每日5次，挑战更高排名对手，胜则排名上升，前三每日领奖（发至邮箱）；江湖任务：击败10个敌人，奖300铜币+1200修为（发至邮箱）<br>· 体力：江湖挑战/竞技场每次3点，世界BOSS每次5点，每45秒回复1点，打坐+10（有冷却），商城体力丹+30<br>· 离线挂机：下线后自动挂机（上限8小时），挂机地图可在「江湖」页自由选择（默认最高可进图），上线弹窗结算修为/铜币/体力，出战宠物与伙伴也得一半修为<br>· 每日签到（活动中心）：7天一轮，断签重计，奖励发至邮箱——第1天铜币×8000/体力×20，第2天铜币×12000/洗炼石×2，第3天元宝×30/体力×30，第4天铜币×20000/灵羽×10，第5天元宝×50/洗炼石×3，第6天元宝×80/灵羽×20，第7天元宝×120/神级进化石×1<br>· 商店=江湖药铺（铜币）+元宝商城（元宝）+元宝兑换铜币（10元宝→10万/50→55万/100→120万）；经验丹双倍25/三倍45/五倍80元宝，背包使用后30分钟打怪修为加倍<br>· 聊天只有世界频道，5秒发一条，NPC会自动互动；排行榜有战力/充值/宠物/翅膀/等级5榜，前三名得荣誉称号（可佩戴加成）；点击排行/聊天/竞技场中的名字可看档案对比；竞技榜第一、世界BOSS伤害榜第一、等级榜第一、充值榜第一都会世界通报；BOSS打出极品装备（神级流光及以上，或带幸运的武器）也会全服世界播报，扫荡不播<br>· 邮箱（右上角）：所有奖励统一发放至邮箱手动领取——充值/兑换码/充值豪礼/累计充值奖励/VIP每日礼包/每日签到/限时活动/竞技场每日奖励/江湖任务/交易行购买与寄售成交/玩家交易码/世界BOSS每日24点排名奖励；最多保留30封<br>· 交易行（底部导航「交易」）：寄售装备/进化石/宠物卖给土豪NPC（每次进入结算，定价合理卖得快，成交收5%税，成交款发至邮箱）；购买区每日刷新他人寄售（购买所得发至邮箱）；玩家交易码可跨设备与真实玩家交易（兑换所得发至邮箱）<br>· 称号分VIP称号/限定称号/排行称号共55个，均可佩戴，属性叠加；其中8个为动态称号（稀有称号神之眷顾、VIP10武道至尊、5榜第一：武林神话/战力之巅/神豪无双/灵兽之主/九天神皇/登峰造极）——完整场景底图+左右双神兽独立游动+光效粒子，背景文字静止；其余47个为静态称号牌（VIP金框/榜二银框/榜三铜框/节日红粉蓝紫四框+文字）；佩戴的称号显示在顶栏左上角，点击可进称号页更换；动态称号在称号页有专属大图展示，点击大图可直接佩戴；存档保存在本机，换设备会丢失<br></p></div>
  <div class="card"><h3>存档</h3>
  <button class="btn small" id="resave">手动保存</button>
  <button class="btn small danger" id="reset">删号重来（清空存档）</button></div>`;
