@@ -144,6 +144,8 @@ input[type=text]{width:100%;background:#0d0a06;border:1px solid #8a6d2f;color:#f
 #modal .box{background:#241b0f;border:2px solid #8a6d2f;border-radius:12px;padding:20px;max-width:400px;width:100%;max-height:80vh;overflow-y:auto}
 #modal .box h3{color:#f5d67b;text-align:center;margin-bottom:12px;letter-spacing:3px}
 .tier{border:1px solid #8a6d2f;border-radius:8px;padding:12px;margin:8px 0;display:flex;justify-content:space-between;align-items:center;background:#2c2110}
+.zz-frame{border:2px solid transparent;border-radius:10px;background:linear-gradient(#2c2110,#2c2110) padding-box,linear-gradient(120deg,#ff2d2d,#ff9d2d,#ffe82d,#3dff5e,#2dc4ff,#b42dff,#ff2d9d,#ff2d2d) border-box;background-size:100% 100%,300% 300%;animation:zzborder 4s linear infinite;box-shadow:0 0 14px rgba(255,180,60,.35)}
+@keyframes zzborder{0%{background-position:0 0,0% 50%}50%{background-position:0 0,100% 50%}100%{background-position:0 0,0% 50%}}
 .sigrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:8px 0}
 .sicell{border:1px solid #8a6d2f;border-radius:8px;padding:8px 4px;text-align:center;background:#241a0c;font-size:12px}
 .sicell .sd{color:#e8c86a;font-weight:bold;margin-bottom:4px}
@@ -1922,10 +1924,10 @@ function synthModal(){
  }).join("");
  const xjN=S.bag.filter(x=>x.iid==="w45").length;
  const zzcan=xjN>=3&&S.player.coins>=ZHIZUN_COST;
- const zzrows=ZHIZUN_WPN.map(([xid,xname,xcls])=>`<div class="tier"><div><div>${tieredName(xname,6)}<span class="dim"> · 至尊终极武器[${xcls}]</span></div><div class="m"><span style="color:${xjN>=3?"#7dd87d":"#ff8787"}">鸿蒙神剑×3（拥有${xjN}）</span> · 1000万铜币（拥有${S.player.coins}）<br><span class="dim">7阶至尊 · 全游戏最高阶武器</span></div></div><button class="btn small autow${zzcan?" primary":""}" data-zhizun="${xid}">合成</button></div>`).join("");
+ const zzrows=ZHIZUN_WPN.map(([xid,xname,xcls])=>`<div class="tier zz-frame"><div><div>${tieredName(xname,6)}<span class="dim"> · 至尊终极武器[${xcls}]</span></div><div class="m"><span style="color:${xjN>=3?"#7dd87d":"#ff8787"}">鸿蒙神剑×3（拥有${xjN}）</span> · 1000万铜币（拥有${S.player.coins}）<br><span class="dim">7阶至尊 · 全游戏最高阶武器</span></div></div><button class="btn small autow${zzcan?" primary":""}" data-zhizun="${xid}">合成</button></div>`).join("");
  const xaN=S.bag.filter(x=>x.iid==="hm_a").length;
  const zacan=xaN>=3&&S.player.coins>=ZHIZUN_COST;
- const zarows=ZHIZUN_ARMOR.map(([xid,xname,xcls])=>`<div class="tier"><div><div>${tieredName(xname,6)}<span class="dim"> · 至尊终极防具[${xcls}]</span></div><div class="m"><span style="color:${xaN>=3?"#7dd87d":"#ff8787"}">鸿蒙战甲×3（拥有${xaN}）</span> · 1000万铜币（拥有${S.player.coins}）<br><span class="dim">7阶至尊 · 全游戏最高阶防具</span></div></div><button class="btn small autow${zacan?" primary":""}" data-zhizunarmor="${xid}">合成</button></div>`).join("");
+ const zarows=ZHIZUN_ARMOR.map(([xid,xname,xcls])=>`<div class="tier zz-frame"><div><div>${tieredName(xname,6)}<span class="dim"> · 至尊终极防具[${xcls}]</span></div><div class="m"><span style="color:${xaN>=3?"#7dd87d":"#ff8787"}">鸿蒙战甲×3（拥有${xaN}）</span> · 1000万铜币（拥有${S.player.coins}）<br><span class="dim">7阶至尊 · 全游戏最高阶防具</span></div></div><button class="btn small autow${zacan?" primary":""}" data-zhizunarmor="${xid}">合成</button></div>`).join("");
  const hmmat=HONGMENG_NEED.map(id=>{const has=S.bag.some(x=>x.iid===id);return `<span style="color:${has?"#7dd87d":"#ff8787"}">${ITEMS[id].name}</span>`;}).join(" ");
  const hmcan=HONGMENG_NEED.every(id=>S.bag.some(x=>x.iid===id))&&S.player.coins>=HONGMENG_COST;
  const hrow=`<div class="tier"><div><div>${tieredName("鸿蒙神剑",6)}<span class="dim"> · 无职业限制</span></div><div class="m">${hmmat} · 800万铜币（拥有${S.player.coins}）<br><span class="dim">7阶至尊 · 由轩辕神剑进阶</span></div></div><button class="btn small autow${hmcan?" primary":""}" data-hongmeng="w45">合成</button></div>`;
@@ -1943,7 +1945,7 @@ function synthModal(){
  const sec4=`<h3 style="margin-top:8px">4阶</h3>`+ultRow(3);
  const sec5=`<h3 style="margin-top:8px">5阶</h3>`+ultRow(4);
  const sec6=`<h3 style="margin-top:8px">6阶</h3>`+ultRow(5)+ultRow(6)+xuanRow+`<h3 style="margin-top:8px">6阶·轩辕防具</h3>`+arows;
- const sec7=`<h3 style="margin-top:8px">7阶</h3>`+ultRow(7)+ultRow(8)+`<h3 style="margin-top:8px">7阶·鸿蒙神剑</h3>`+hrow+`<h3 style="margin-top:8px">7阶·至尊终极武器</h3>`+zzrows+`<h3 style="margin-top:8px">7阶·至尊终极防具</h3>`+zarows+`<h3 style="margin-top:8px">7阶·鸿蒙防具</h3>`+harows;
+ const sec7=`<h3 style="margin-top:8px">7阶</h3>`+ultRow(7)+ultRow(8)+`<h3 style="margin-top:8px">7阶·鸿蒙神剑</h3>`+hrow+`<h3 style="margin-top:8px">7阶·鸿蒙防具</h3>`+harows+`<h3 style="margin-top:8px">7阶·至尊终极武器</h3>`+zzrows+`<h3 style="margin-top:8px">7阶·至尊终极防具</h3>`+zarows;
  modal(`<h3>神兵合成</h3><p class="dim">按装备等级从低到高排列。关卡终极武器：集齐本关战士/法师/射手三职业武器 + 铜币 → 本关终极武器（三职业版本任选其一）。轩辕神剑：集齐青竹林/黑风寨/幽冥谷/华山之巅四把终极武器 + 300万铜币。鸿蒙神剑：轩辕神剑 + 800万铜币（无职业限制）。至尊终极武器：鸿蒙神剑×3 + 1000万铜币（战士斩尤帝剑/法师灭尤帝杖/射手断尤帝弓）。至尊终极防具：鸿蒙战甲×3 + 1000万铜币（战士斩尤帝甲/法师灭尤帝袍/射手断尤帝衣）。防具：集齐同部位四件1-4阶BOSS防具 + 200万铜币 → 轩辕防具；同部位轩辕防具 + 800万铜币 → 鸿蒙防具。材料需放在背包中（已装备的请先卸下）。</p>`+sec2+sec3+sec4+sec5+sec6+sec7+`<div class="rowbtns"><button class="btn" onclick="closeModal()">关闭</button></div>`);
  $("modalbox").querySelectorAll("[data-asynth]").forEach(b=>b.onclick=()=>{
   const[slot,xid,xname]=ARMOR_SYNTH[+b.dataset.asynth];
