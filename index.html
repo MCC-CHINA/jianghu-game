@@ -8,10 +8,12 @@
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{background:#141009;color:#e8dcc0;font-family:"Songti SC","STSong","SimSun",serif;font-size:15px;line-height:1.6;min-height:100vh}
 #app{max-width:520px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;background:#1a140d;box-shadow:0 0 30px rgba(0,0,0,.6)}
-#topbar{position:sticky;top:0;z-index:10;background:#241b0f;border-bottom:2px solid #8a6d2f;padding:8px 12px}
+#topbar{position:sticky;top:0;z-index:10;background:#241b0f;border-bottom:2px solid #8a6d2f;padding:8px 86px 8px 12px}
 #topbar .pname{font-size:16px;font-weight:bold;color:#f5d67b;letter-spacing:1px}
-#topbar .pname{padding-right:64px}
-#topPay{position:absolute;right:10px;top:8px;z-index:11;width:auto;margin:0;padding:6px 14px;font-size:13px}
+.topbtns{position:absolute;right:10px;top:8px;z-index:11;display:flex;flex-direction:column;gap:6px}
+.topbtns .btn{width:auto;min-width:66px;margin:0;padding:6px 10px;font-size:13px;text-align:center}
+#chatFab{position:fixed;left:max(0px,calc(50% - 260px));top:44%;z-index:10;background:#3a2c12;border:1px solid #8a6d2f;border-left:none;color:#f5d67b;font-size:12px;padding:10px 5px;border-radius:0 8px 8px 0;writing-mode:vertical-rl;letter-spacing:3px;cursor:pointer;font-family:inherit;display:none}
+#chatFab.on{background:linear-gradient(180deg,#8a6d2f,#6b521f);color:#fff8e0;font-weight:bold}
 #topbar .pname .lv{background:#8a6d2f;color:#141009;font-size:12px;padding:1px 8px;border-radius:10px;margin-left:6px;vertical-align:2px}
 #topbar .pname .vip{background:linear-gradient(180deg,#f5d67b,#c8903c);color:#3a2a08;font-size:12px;font-weight:bold;padding:1px 8px;border-radius:10px;margin-left:6px;vertical-align:2px}
 #topVip{cursor:pointer;background:rgba(20,12,4,.55);color:#f5d67b;border:1px solid #c8903c;text-shadow:0 0 8px rgba(245,214,123,.7);box-shadow:0 0 8px rgba(200,144,60,.35)}
@@ -1185,25 +1187,33 @@ function renderTop(){
  </div>
  ${expMult()>1?`<div class="expbuff">${expMult()}倍经验 · 剩余${expBuffLeft()}分</div>`:""}
  <div class="wallet"><span>铜币 <b>${p.coins}</b></span><span>元宝 <b>${p.gold}</b></span><span>体力 <b>${p.stamina}/${p.maxStamina}</b></span><span>幸运 <b>${p.luck||0}</b></span><span>战力 <b>${zhanli()}</b></span></div>`;
- t.innerHTML+=`<button class="btn small primary" id="topPay">充值</button>`;
+ t.innerHTML+=`<div class="topbtns"><button class="btn small primary" id="topPay">充值</button><button class="btn small${TAB==="event"?" primary":""}" id="topEvent">活动</button><button class="btn small${TAB==="rank"?" primary":""}" id="topRank">排行</button><button class="btn small${TAB==="market"?" primary":""}" id="topMarket">交易</button></div>`;
  t.innerHTML+=`<button class="btn small" id="topMail">邮箱${mailUnread()?` <b class="gold">(${mailUnread()})</b>`:""}</button>`;
  $("topPay").onclick=()=>{TAB="pay";B=null;render();window.scrollTo(0,0);};
+ $("topEvent").onclick=()=>{TAB="event";B=null;render();window.scrollTo(0,0);};
+ $("topRank").onclick=()=>{TAB="rank";B=null;render();window.scrollTo(0,0);};
+ $("topMarket").onclick=()=>{TAB="market";B=null;render();window.scrollTo(0,0);};
  $("topMail").onclick=()=>{TAB="mail";B=null;render();window.scrollTo(0,0);};
  $("topWorn").onclick=()=>{TAB="title";B=null;render();window.scrollTo(0,0);};
  $("topName").onclick=()=>{modal(attrPanelHTML()+`<div class="rowbtns"><button class="btn small" onclick="closeModal()">关闭</button></div>`);};
  const tv=$("topVip");if(tv)tv.onclick=()=>{TAB="vipinfo";B=null;render();window.scrollTo(0,0);};
 }
-const TABS=[["home","江湖"],["bag","背包"],["pet","宠物"],["wing","翅膀"],["partner","伙伴"],["task","任务"],["gongfa","功法"],["skill","技能"],["shop","商店"],["market","交易"],["rank","排行"],["title","称号"],["arena","竞技"],["chat","聊天"],["event","活动"],["more","更多"]];
+const TABS=[["home","江湖"],["bag","背包"],["pet","宠物"],["wing","翅膀"],["partner","伙伴"],["task","任务"],["gongfa","功法"],["skill","技能"],["shop","商店"],["title","称号"],["arena","竞技"],["more","更多"]];
 function renderTabs(){
  const t=$("tabbar");t.style.display="flex";
  t.innerHTML=TABS.map(([k,n])=>`<button class="${TAB===k?'on':''}" data-t="${k}">${n}</button>`).join("");
  t.querySelectorAll("button").forEach(b=>b.onclick=()=>{TAB=b.dataset.t;B=null;render();});
+ let fab=$("chatFab");
+ if(!fab){fab=document.createElement("button");fab.id="chatFab";fab.textContent="聊天";document.body.appendChild(fab);
+  fab.onclick=()=>{TAB="chat";B=null;render();window.scrollTo(0,0);};}
+ fab.style.display="block";fab.className=TAB==="chat"?"on":"";
 }
 function render(){if(S&&S.player&&sweepExpired())setTimeout(()=>toast(" 小红剑已到期，已自动卸下"),50);renderTop();renderTabs();
  ({home:rHome,bag:rBag,pet:rPet,task:rTask,gongfa:rGongfa,skill:rSkill,shop:rShop,pay:rPay,rank:rRank,title:rTitle,arena:rArena,chat:rChat,wing:rWing,partner:rPartner,event:rEvent,more:rMore,vipinfo:rVip,market:rMarket,mail:rMail}[TAB])();}
 /* ============ 创建角色 ============ */
 function rCreate(){
  $("topbar").style.display="none";$("tabbar").style.display="none";
+ const cf=$("chatFab");if(cf)cf.style.display="none";
  const m=$("main");
  m.innerHTML=`<div class="card"><img class="titleart" src="title-jianghu.webp" alt="江湖行"><h3>初入江湖</h3>
  <p class="dim">欢迎来到文字武侠世界。取一个响亮的名号，选择你的职业，开始闯荡江湖吧！</p>
