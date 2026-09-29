@@ -107,6 +107,7 @@ body{background:#141009;color:#e8dcc0;font-family:"Songti SC","STSong","SimSun",
 .btn.danger{border-color:#a83232;color:#e08a8a}
 .btn.small{padding:8px;font-size:13px;margin:4px 0}
 .btn:disabled{opacity:.4}
+.btn.nomatch{opacity:1;color:#9a865c;border-color:#6b5a33;background:#2b2110;cursor:default}
 /* 统一按钮体系：所有按钮走 btn 基类 + 修饰类，不再写行内样式 */
 .btn.autow{width:auto;margin:0}
 .btn.wauto{width:auto}
@@ -1892,7 +1893,7 @@ h+=`<div class="mob"><div><div class="mn">${it.name}${cnt}</div><div class="md">
 const d=ITEMS[it.iid];
 h+=`<div class="mob"><div><div class="mn">${itemNameHTML(it)}${d.cls?` <span class="dim">[${d.cls}]</span>`:""}${d.set?` <span class="dim">[${d.set}套]</span>`:""}${qualityTag(it)}${it.enh?` <span class="gold">+${it.enh}</span>`:""}${it.expire?` <span class="dim">${expireText(it)}</span>`:""}</div>
 <div class="md">${SLOTNAME[d.slot]} · ${[d.atk&&"攻"+d.atk,d.def&&"防"+d.def,d.hp&&"血"+d.hp,d.spd&&"速"+d.spd,d.luck&&"幸运+"+d.luck].filter(Boolean).join(" ")}${it.bonus?` <span class="gold">[${bonusText(it.bonus)}]</span>`:""}</div></div>
-${`<button class="btn small reroll" data-reroll="${i}">洗炼</button>`}${d.cls&&d.cls!==PROFS[p.prof].name?`<button class="btn" disabled>职业不符</button>`:`<button class="btn" data-eq="${i}">装备</button>`}</div>`;
+${`<button class="btn small reroll" data-reroll="${i}">洗炼</button>`}${d.cls&&d.cls!==PROFS[p.prof].name?`<button class="btn nomatch">职业不符</button>`:`<button class="btn" data-eq="${i}">装备</button>`}</div>`;
 });
 h+=`</div>`;
 return h;
@@ -3306,4 +3307,3 @@ if(offR)setTimeout(()=>{try{modal(`<div class="card"><h3>离线挂机结算</h3>
 </script>
 </body>
 </html>
-<!-- pages-redeploy 20260929 -->
