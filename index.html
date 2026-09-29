@@ -1309,7 +1309,7 @@ function renderTop(){
  const v=vipLevel();
  const wt=wornTitleInfo();
  const charged=(S.orders||[]).length>0; // 首充后只显示充值按钮，不再显示首充
- t.innerHTML=`<div class="pname"><div class="titlerow">${wt?`<div class="wornt" id="topWorn" title="点击更换称号">${wornTitleHTML(wt)}</div>`:`<div class="wornt none" id="topWorn" title="点击前往称号页">暂无称号·点击获取</div>`}${charged?"":`<span class="vip vipbtn" id="topFirst" title="首充礼包">首充</span>`}<span class="vip vipbtn${TAB==="pay"?" cur":""}" id="topPay" title="充值">充值</span></div><div><span id="topName" class="${v>=6?"vipn"+Math.min(v,10):""}" style="cursor:pointer" title="点击查看角色属性">${p.name}</span><span class="lv">Lv.${p.level} ${PROFS[p.prof||"warrior"].name}</span>${v?`<span class="vip" id="topVip" title="查看VIP详情">VIP${v}</span>`:""}</div>
+ t.innerHTML=`<div class="pname"><div class="titlerow">${wt?`<div class="wornt" id="topWorn" title="点击更换称号">${wornTitleHTML(wt)}</div>`:`<div class="wornt none" id="topWorn" title="点击前往称号页">暂无称号·点击获取</div>`}${charged?"":`<span class="vip vipbtn" id="topFirst" title="首充礼包">首充</span>`}<span class="vip vipbtn${TAB==="pay"?" cur":""}" id="topPay" title="充值">充值</span></div><div><span id="topName" class="${v>=6?"vipn"+Math.min(v,10):""}" style="cursor:pointer" title="点击查看角色属性">${p.name}</span><span class="lv">Lv.${p.level} ${PROFS[p.prof||"warrior"].name}</span>${v?`<span class="vip${TAB==="vipinfo"?" cur":""}" id="topVip" title="查看VIP详情">VIP${v}</span>`:""}</div>
  <div class="bars">
  <div class="bar hp"><i style="width:${p.hp/p.maxhp*100}%"></i><span>气血 ${p.hp}/${p.maxhp}</span></div>
  <div class="bar mp"><i style="width:${p.mp/p.maxmp*100}%"></i><span>内力 ${p.mp}/${p.maxmp}</span></div>
@@ -1732,9 +1732,8 @@ if(B.over){
   $("bagain").onclick=()=>{startBattle(B.zi,B.di,B.si);};
   $("bnext").onclick=()=>{
    const pl=S.player;let zi2=B.zi,di2=B.di,si2=B.si+1;
-   if(si2>=diffStages(B.di)){si2=0;di2++;}
-   if(di2>=DIFFS.length){di2=0;zi2++;}
-   if(zi2>=ZONES.length){toast("已是最后一关");return;}
+   if(si2>=diffStages(B.di)){si2=0;zi2++;if(zi2>=ZONES.length){zi2=0;di2++;}}
+   if(di2>=DIFFS.length){toast("已是最后一关");return;}
    if(pl.level<ZONES[zi2].req){toast("「"+ZONES[zi2].name+"」需要"+ZONES[zi2].req+"级");return;}
    if(!zoneUnlocked(zi2)){toast("「"+ZONES[zi2].name+"」尚未解锁："+zoneLockReason(zi2));return;}
    if(!diffUnlocked(zi2,di2)){toast("「"+ZONES[zi2].name+"·"+DIFFS[di2].name+"」尚未解锁");return;}
