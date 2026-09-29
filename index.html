@@ -1310,7 +1310,7 @@ function renderTop(){
  const v=vipLevel();
  const wt=wornTitleInfo();
  const charged=(S.orders||[]).length>0; // 首充后只显示充值按钮，不再显示首充
- t.innerHTML=`<div class="pname"><div class="titlerow">${wt?`<div class="wornt" id="topWorn" title="点击更换称号">${wornTitleHTML(wt)}</div>`:`<div class="wornt none" id="topWorn" title="点击前往称号页">暂无称号·点击获取</div>`}${charged?"":`<span class="vip vipbtn" id="topFirst" title="首充礼包">首充</span>`}<span class="vip vipbtn${TAB==="pay"?" cur":""}" id="topPay" title="充值">充值</span></div><div><span id="topName" class="${v>=6?"vipn"+Math.min(v,10):""}" style="cursor:pointer" title="点击查看角色属性">${p.name}</span><span class="lv">Lv.${p.level} ${PROFS[p.prof||"warrior"].name}</span>${v?`<span class="vip${TAB==="vipinfo"?" cur":""}" id="topVip" title="查看VIP详情">VIP${v}</span>`:""}</div>
+ t.innerHTML=`<div class="pname"><div class="titlerow">${wt?`<div class="wornt" id="topWorn" title="点击更换称号">${wornTitleHTML(wt)}</div>`:`<div class="wornt none" id="topWorn" title="点击前往称号页">暂无称号·点击获取</div>`}${charged?"":`<span class="vip vipbtn" id="topFirst" title="首充礼包">首充</span>`}<span class="vip vipbtn${TAB==="pay"?" cur":""}" id="topPay" title="充值">充值</span></div><div><span id="topName" class="${v>=6?"vipn"+Math.min(v,10):""}" style="cursor:pointer" title="点击查看角色属性">${p.name}</span><span class="lv">Lv.${p.level} ${PROFS[p.prof||"warrior"].name}</span>${v?`<span class="vip${TAB==="vipinfo"?" cur":""}" id="topVip" title="查看VIP详情">VIP${v}</span>`:""}<span class="vip vipbtn${TAB==="rank"?" cur":""}" id="topRank" title="排行榜">排行</span><span class="vip vipbtn${TAB==="mail"?" cur":""}" id="topMail" title="邮箱">邮箱${mailUnread()?`(${mailUnread()})`:""}</span></div>
  <div class="bars">
  <div class="bar hp"><i style="width:${p.hp/p.maxhp*100}%"></i><span>气血 ${p.hp}/${p.maxhp}</span></div>
  <div class="bar mp"><i style="width:${p.mp/p.maxmp*100}%"></i><span>内力 ${p.mp}/${p.maxmp}</span></div>
@@ -1318,7 +1318,7 @@ function renderTop(){
  </div>
  ${expMult()>1?`<div class="expbuff">${expMult()}倍经验 · 剩余${expBuffLeft()}分</div>`:""}
  <div class="wallet"><span>铜币 <b>${p.coins}</b></span><span>元宝 <b>${p.gold}</b></span><span>体力 <b>${p.stamina}/${p.maxStamina}</b></span><span>幸运 <b>${p.luck||0}</b></span><span>战力 <b>${zhanli()}</b></span></div>`;
- const tbMain=`<button class="btn small${TAB==="event"?" primary":""}" id="topEvent">活动</button><button class="btn small${TAB==="rank"?" primary":""}" id="topRank">排行</button><button class="btn small${TAB==="market"?" primary":""}" id="topMarket">交易</button><button class="btn small mailbtn${TAB==="mail"?" primary":""}" id="topMail">邮箱${mailUnread()?` <b class="gold">(${mailUnread()})</b>`:""}</button>`;
+ const tbMain=`<button class="btn small${TAB==="event"?" primary":""}" id="topEvent">活动</button><button class="btn small${TAB==="market"?" primary":""}" id="topMarket">交易</button>`;
  t.innerHTML+=`<div class="topbtns">${S.topCollapsed?"":tbMain}<button class="btn small${S.topCollapsed?" primary":""}" id="topToggle">${S.topCollapsed?"展开":"收起"}</button></div>`;
  $("topPay").onclick=()=>{TAB="pay";B=null;render();window.scrollTo(0,0);};
  const tF=$("topFirst");if(tF)tF.onclick=()=>{TAB="pay";B=null;render();window.scrollTo(0,0);};
