@@ -520,22 +520,22 @@ const BOSS_EXP_MULT=2.5; // 关卡BOSS额外2.5倍修为
 function zoneMobExp(zi,mo){const plv=(S&&S.player)?S.player.level:1;return Math.floor(mo.exp*(ZONE_EXP_MULT[zi]||1)*(mo.boss?BOSS_EXP_MULT:1)*(1+(plv-1)*0.02));} // 关卡修为随玩家等级成长：每级+2%
 /* 关卡难度体系（2026-09-29）：4种难度——普通（每关10小关）/英雄/传说/终极（每关15小关），逐关解锁 */
 const DIFFS=[
- {name:"普通",mult:1,xp:1},
- {name:"英雄",mult:4,xp:3},
- {name:"传说",mult:16,xp:10},
- {name:"终极",mult:64,xp:32}
+ {name:"普通",mult:1,xp:1,cm:1},
+ {name:"英雄",mult:1.28,xp:3,cm:4},
+ {name:"传说",mult:1.315,xp:10,cm:16},
+ {name:"终极",mult:5.75,xp:32,cm:64}
 ];
 function diffStages(di){return di===0?10:15;} // 普通难度每关10小关，英雄/传说/终极每关15小关
 const DIFF_DROP=[1,1.5,2,2.5]; // 难度装备掉率倍率：普通×1、英雄×1.5、传说×2、终极×2.5（终极最高、普通最低）
 function zoneMob(zi,di,si){
  const z=ZONES[zi],D=DIFFS[di];
  const mo=(si>=diffStages(di)-1?z.mobs[4]:z.mobs[si%4])(); // 本难度最后一小关为BOSS，其余循环前4种怪物
- const sm=D.mult*(1+si*0.12);
+ const sm=D.mult*(1+si*0.08);
  mo.hp=Math.floor(mo.hp*sm);mo.atk=Math.floor(mo.atk*sm);mo.def=Math.floor(mo.def*sm);
  mo.spd=Math.floor(mo.spd*Math.pow(sm,0.15));
  mo.lv=Math.max(1,Math.round(mo.lv*Math.pow(sm,0.35))+di*3);
  mo.exp=Math.floor(mo.exp*D.xp*(1+si*0.08));
- mo.coins=Math.floor(mo.coins*D.mult*(1+si*0.08));
+ mo.coins=Math.floor(mo.coins*D.cm*(1+si*0.08));
  mo.di=di;mo.si=si;mo.name=D.name+"·"+mo.name;
  return mo;
 }
